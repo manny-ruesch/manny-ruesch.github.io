@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>An agentic WhatsApp assistant, in production — Manny Ruesch</title>
+<meta name="description" content="How I put an AI agent on a real-estate agency's WhatsApp number: three languages, CRM search over 400+ listing fields, and a rule that it can never overwrite a client record.">
+<link rel="canonical" href="__SITE_URL__/work/hermes.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="An agentic WhatsApp assistant, in production">
+<meta property="og:description" content="How I put an AI agent on a real-estate agency's WhatsApp number: three languages, CRM search over 400+ listing fields, and a rule that it can never overwrite a client record.">
+<meta property="og:url" content="__SITE_URL__/work/hermes.html">
+<meta property="og:image" content="__SITE_URL__/assets/og/hermes.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="theme-color" content="#0A0D12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="stylesheet" href="../assets/case.css">
+</head>
+<body id="top">
+<div id="progress"></div><div id="glow"></div>
+
+<nav id="nav" aria-label="Main">
+  <div class="wrap">
+    <a href="../index.html" class="logo"><span class="mk">MR</span><span>Manny Ruesch</span></a>
+    <div class="navlinks">
+      <a href="../index.html#work" class="hide-sm">Work</a>
+      <a href="../index.html#stack" class="hide-sm">Stack</a>
+      <a href="../index.html#contact" class="hide-sm">Contact</a>
+      <a href="https://www.linkedin.com/in/manny-ruesch" target="_blank" rel="noopener" class="cta">LinkedIn ↗</a>
+    </div>
+  </div>
+</nav>
+
+<header class="case-head">
+  <div class="wrap">
+    <a href="../index.html#work" class="backlink">← Work</a>
+    <div class="kicker">// automation &amp; AI system · for a real-estate agency in Berlin</div>
+    <h1>An agentic WhatsApp assistant, in production</h1>
+    <p class="lede">An AI agent that answers clients on WhatsApp in three languages, searches the CRM for matching listings, and writes qualified leads back — without ever overwriting a client record.</p>
+    <div class="metrics3">
+      <div><b>9</b><span>n8n workflows</span></div>
+      <div><b>Live</b><span>on a real WhatsApp number</span></div>
+      <div><b>DE · EN · FR</b><span>languages handled</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="sec rv"><div class="wrap">
+  <h2>The problem</h2>
+  <p>A large share of client conversations never reached the CRM. They happened in personal WhatsApp threads, on agents' phones, after hours. Nobody answers a listing enquiry at 11pm — and the agency's clients are international: German locals, English-speaking expats, French investors.</p>
+  <p>Every message that went unanswered was a lead quietly evaporating, with <strong>no trace anywhere</strong> that it had ever existed.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>What I built</h2>
+  <p>An AI agent connected to the agency's real WhatsApp number through Meta's Cloud API, live since June 2026. It holds a conversation, works out what the person actually wants, and acts on the CRM through two tools of its own.</p>
+  <ul>
+    <li>Detects the language and qualifies the contact type — buyer, renter, owner, landlord — and adapts: an owner is never shown listings, they are qualified as a seller lead.</li>
+    <li>Searches the CRM across 14 criteria: price range, rooms, bedrooms, area, neighbourhood, energy class, elevator, cellar, balcony, floor.</li>
+    <li>Sends one photo per listing, with that listing's description in the caption — not a wall of text followed by loose images.</li>
+    <li>Creates the contact, or recognises a returning one by email, then by phone number.</li>
+    <li>Logs every tool call with zero personal data, and emails a weekly report every Monday morning.</li>
+  </ul>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>How it works</h2>
+  <div class="diag">
+    <svg viewBox="0 0 920 380" role="img" aria-label="A WhatsApp message reaches Meta's Cloud API, then an AI agent running Gemini. The agent calls two tools — listing search and CRM contact — which both talk to the onOffice REST API. A composer splits the reply into text plus one photo per listing. Tool calls are logged to an analytics table that feeds a weekly report.">
+      <defs><marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+        <path d="M0 0 L6 3 L0 6 z" fill="rgba(255,255,255,.34)"/></marker></defs>
+      <g class="edge" marker-end="url(#ah)">
+        <path d="M134 66 H166"/><path d="M314 66 H346"/><path d="M534 66 H566"/><path d="M706 66 H738"/>
+        <path d="M410 100 C410 142 384 142 384 174"/><path d="M478 100 C478 142 564 142 564 174"/>
+        <path d="M384 236 V294"/><path d="M564 236 V294"/>
+        <path d="M642 208 H698" stroke-dasharray="4 5"/>
+      </g>
+      <g class="flow">
+        <path d="M134 66 H166"/><path d="M314 66 H346"/><path d="M534 66 H566"/><path d="M706 66 H738"/>
+        <path d="M410 100 C410 142 384 142 384 174"/><path d="M478 100 C478 142 564 142 564 174"/>
+        <path d="M384 236 V294"/><path d="M564 236 V294"/>
+      </g>
+      <g class="bx">
+        <rect x="16" y="40" width="118" height="52" rx="10"/>
+        <text x="75" y="62">Client</text><text class="s" x="75" y="78">WhatsApp</text>
+        <rect x="174" y="40" width="140" height="52" rx="10"/>
+        <text x="244" y="62">Meta Cloud API</text><text class="s" x="244" y="78">inbound webhook</text>
+        <rect x="574" y="40" width="132" height="52" rx="10"/>
+        <text x="640" y="62">Composer</text><text class="s" x="640" y="78">splits the reply</text>
+        <rect x="746" y="40" width="158" height="52" rx="10"/>
+        <text x="825" y="62">Reply</text><text class="s" x="825" y="78">text + 1 photo / listing</text>
+        <rect x="306" y="180" width="156" height="56" rx="10"/>
+        <text x="384" y="204">Tool · Search</text><text class="s" x="384" y="220">14 criteria</text>
+        <rect x="486" y="180" width="156" height="56" rx="10"/>
+        <text x="564" y="204">Tool · CRM</text><text class="s" x="564" y="220">dedupe + log activity</text>
+        <rect x="306" y="300" width="336" height="52" rx="10"/>
+        <text x="474" y="322">onOffice · REST API</text><text class="s" x="474" y="338">400+ fields · HMAC-signed</text>
+      </g>
+      <g class="acc-b">
+        <rect x="354" y="32" width="180" height="68" rx="12"/>
+        <text x="444" y="60">AI agent</text>
+        <text class="s" x="444" y="78">Gemini 2.5 Flash</text>
+        <text class="s" x="444" y="92">+ 12-message memory</text>
+      </g>
+      <g class="dash-b">
+        <rect x="698" y="182" width="204" height="52" rx="10"/>
+        <text x="800" y="204">Analytics</text><text class="s" x="800" y="220">data table → weekly report</text>
+      </g>
+    </svg>
+  </div>
+  <p class="diag-cap">Both tools log every call — search criteria and outcomes, never personal data.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Under the hood</h2>
+
+  <div class="callout pitfall">
+    <span class="badge">PITFALL</span>
+    <h3>“No listings found” — when there were twenty-four</h3>
+    <p>In n8n, <code>$fromAI('bedrooms', …, 'number')</code> <strong>without a fourth argument</strong> marks the field as <em>required</em> in the schema handed to the model. The moment the model omitted an optional parameter, n8n rejected the tool call <strong>before</strong> it ever reached the sub-workflow. The agent saw an error and told the client there was nothing available.</p>
+    <p>It was intermittent — it depended on what the model chose to send — so it never reproduced in testing.</p>
+    <p class="outcome"><b>FIX</b> Give every <code>$fromAI</code> a default value; the field becomes optional. Coalescing with <code>|| 0</code> does nothing: validation happens before the expression is evaluated.</p>
+  </div>
+
+  <div class="callout decision">
+    <span class="badge">DECISION</span>
+    <h3>Never overwrite a client record</h3>
+    <p>An adversarial audit showed that an unverified email address could trigger an update to a third party's record. So when the agent meets a contact it already knows, it <strong>never writes to that record</strong>. It appends an entry to the CRM's activity log instead.</p>
+    <p class="outcome"><b>TRADE-OFF</b> We lose automatic record enrichment. We gain the structural impossibility of corrupting client data.</p>
+  </div>
+
+  <div class="callout pitfall">
+    <span class="badge">PITFALL</span>
+    <h3>The duplicate that kept coming back</h3>
+    <p>The CRM's address search does not match a contact by phone number. A lead who had only ever given a phone number was recreated as a fresh duplicate every single time they came back.</p>
+    <p class="outcome"><b>FIX</b> An exact filtered read on the phone field, fired only when no email was supplied — email stays authoritative, so the two never cross-match.</p>
+  </div>
+
+  <div class="callout pitfall">
+    <span class="badge">PITFALL</span>
+    <h3>The bot quoting its own outdated self</h3>
+    <p>After shipping a fix that added minimum-budget search, the bot kept telling one tester it could only handle a maximum. The conversation memory still held the pre-fix message, and the model was citing itself.</p>
+    <p class="outcome"><b>FIX</b> Verified on a fresh session, then instructed the model that its current capabilities are authoritative and it must never repeat a limitation stated earlier in the thread.</p>
+  </div>
+
+  <div class="callout decision">
+    <span class="badge">DECISION</span>
+    <h3>Sort by energy rating, don't filter by it</h3>
+    <p>Clients ask for energy-efficient flats. Berlin's older housing stock is overwhelmingly rated D or E. A strict A-to-C filter would have returned <strong>zero results</strong>, every time.</p>
+    <p class="outcome"><b>TRADE-OFF</b> The agent surfaces the best available ratings first instead of promising a standard the market cannot supply.</p>
+  </div>
+
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Results</h2>
+  <p>Live on the agency's real WhatsApp number since June 2026. Nine workflows: the production agent, a chat-based twin for testing, two agentic tools, a URL-sync job, an evaluation harness that replays test cases, a stats dashboard, a weekly report, and a dedicated error workflow.</p>
+  <p>That error workflow earned its keep: it surfaced a production failure — the model returning an empty string, which WhatsApp rejects — within minutes, before any client noticed.</p>
+  <p><strong>Still open.</strong> Direct listing links depend on a bug in the agency's website that I don't control; the agent falls back to the category page rather than send a broken URL. An audit also found an API token hard-coded in Code nodes — it needs moving to an environment variable, and the token rotated, because it has been sitting in execution history.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Stack</h2>
+  <ul>
+    <li><strong>n8n</strong>, self-hosted on a VPS — agent orchestration, tools, ops workflows</li>
+    <li><strong>Gemini 2.5 Flash</strong> — reasoning, language detection, qualification</li>
+    <li><strong>Meta WhatsApp Cloud API</strong> — inbound webhook, text and image sends</li>
+    <li><strong>onOffice REST API</strong> — HMAC-signed listing and contact operations</li>
+    <li><strong>n8n Data Tables</strong> — anonymous event logging</li>
+  </ul>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>What I took away</h2>
+  <p>The hard part of an AI agent is not the prompt. It is everything around it: what happens when the model omits a parameter, when a client replies “ok”, when two people share a phone number, when the model returns an empty string.</p>
+  <p>The prompt took an afternoon. The failure modes took weeks — and an adversarial audit to find the ones I had talked myself out of worrying about.</p>
+</div></section>
+
+<div class="wrap"><nav class="pager" aria-label="Other case studies">
+  <a href="backbone.html">← Automation backbone</a>
+  <a href="staging.html">AI home-staging →</a>
+</nav></div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="logo"><span class="mk">MR</span></div>
+    <div class="mono">Designed &amp; built by Manny Ruesch · 2026</div>
+    <a href="#top">Back to top ↑</a>
+  </div>
+</footer>
+
+<script src="../assets/site.js"></script>
+</body>
+</html>
