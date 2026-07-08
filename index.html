@@ -103,6 +103,12 @@ section{position:relative;padding:clamp(70px,10vw,130px) 0}
 /* ---- extra motion ---- */
 h1.head .g{cursor:default}
 .card{transition:border-color .35s,box-shadow .35s,transform .15s var(--ease)}
+a.card{display:block;cursor:pointer}
+a.card::after{content:"Read the case study →";display:block;margin-top:18px;
+  font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--acc);
+  opacity:0;transform:translateY(4px);transition:.3s var(--ease)}
+a.card:hover::after,a.card:focus-visible::after{opacity:1;transform:none}
+a.card:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
 
 @media(prefers-reduced-motion:reduce){
   /* .rv is also suppressed in site.css. It is re-asserted here — after the
@@ -111,6 +117,10 @@ h1.head .g{cursor:default}
      cards would regain their hover transition under reduced motion. Cascade
      anchor, not a restyle. */
   .rv{opacity:1;transform:none;transition:none}
+  /* `.rv` cannot reach a pseudo-element. Without this, the "Read the case study"
+     affordance would still slide and fade. It stays permanently visible instead:
+     someone who disabled animation cannot discover a hover-only affordance. */
+  a.card::after{opacity:1;transform:none;transition:none}
   .status .dot,.scrollcue .bar{animation:none}
 }
 </style>
@@ -167,7 +177,7 @@ h1.head .g{cursor:default}
 <section style="padding-top:0">
   <div class="wrap">
     <div class="metrics rv">
-      <div class="m"><div class="v"><span class="num" data-to="28">0</span></div><div class="l">workflows shipped</div></div>
+      <div class="m"><div class="v"><span class="num" data-to="32">0</span></div><div class="l">active n8n workflows</div></div>
       <div class="m"><div class="v"><span class="num" data-to="720" data-prefix="~">0</span><span class="u">/mo</span></div><div class="l">operations automated</div></div>
       <div class="m"><div class="v"><span class="num" data-to="350" data-prefix="~">0</span><span class="u">h</span></div><div class="l">saved every month</div></div>
       <div class="m"><div class="v"><span class="num" data-to="3">0</span></div><div class="l">languages · DE / EN / FR</div></div>
@@ -183,7 +193,7 @@ h1.head .g{cursor:default}
     <div class="grouphead rv"><h3>Automation &amp; AI systems</h3><span>// for a real-estate agency in Berlin</span></div>
     <div class="cards">
 
-      <div class="card feat rv">
+      <a class="card feat rv" href="work/staging.html">
         <div class="badge">flagship</div>
         <div class="inner">
           <div>
@@ -197,9 +207,9 @@ h1.head .g{cursor:default}
             <div class="shot after"><span class="lab">AFTER · AI</span><img src="assets/staging-after.png" alt="AI-furnished room"></div>
           </div>
         </div>
-      </div>
+      </a>
 
-      <div class="card feat rv">
+      <a class="card feat rv" href="work/dashboard.html">
         <div class="inner">
           <div>
             <span class="idx">02</span>
@@ -209,35 +219,35 @@ h1.head .g{cursor:default}
           </div>
           <div class="onefull"><img src="assets/dashboard.png" alt="Real-time marketing dashboard"></div>
         </div>
-      </div>
+      </a>
 
-      <div class="card rv">
+      <a class="card rv" href="work/seo-generator.html">
         <span class="idx">03</span>
         <h4>Multilingual SEO Engine</h4>
         <p>Authority content at ~€0.30 per article, generated in German, English and French — versus €60–120k/year for an editorial agency.</p>
-        <div class="tags"><span class="tag">n8n</span><span class="tag">DataForSEO</span><span class="tag">Gemini</span></div>
-      </div>
+        <div class="tags"><span class="tag">n8n</span><span class="tag">Google Autocomplete</span><span class="tag">Gemini</span></div>
+      </a>
 
-      <div class="card rv d1">
+      <a class="card rv d1" href="work/hermes.html">
         <span class="idx">04</span>
         <h4>WhatsApp AI Agent</h4>
-        <p>A Mistral-powered assistant that qualifies leads 24/7 in three languages and hands warm prospects to a human — wired straight into the CRM.</p>
-        <div class="tags"><span class="tag">Mistral</span><span class="tag">n8n</span><span class="tag">WhatsApp API</span></div>
-      </div>
+        <p>An agentic assistant on the agency's real WhatsApp number — qualifies leads 24/7 in three languages, searches the CRM for matching listings, and writes warm prospects back into it.</p>
+        <div class="tags"><span class="tag">Gemini 2.5 Flash</span><span class="tag">n8n</span><span class="tag">WhatsApp Cloud API</span></div>
+      </a>
 
-      <div class="card rv">
+      <a class="card rv" href="work/deliverability.html">
         <span class="idx">05</span>
         <h4>Deliverability Watchdog</h4>
-        <p>~500 DMARC reports parsed and archived every month — silent email-deliverability problems surfaced automatically before they cost a sale.</p>
+        <p>Aggregate reports from ~12 mailbox providers, parsed and archived automatically — silent email-deliverability problems surfaced before they cost a sale.</p>
         <div class="tags"><span class="tag">n8n</span><span class="tag">NocoDB</span><span class="tag">DMARC</span></div>
-      </div>
+      </a>
 
-      <div class="card rv d1">
+      <a class="card rv d1" href="work/backbone.html">
         <span class="idx">06</span>
         <h4>The automation backbone</h4>
-        <p>28 workflows behind the scenes — lead capture, listing sync, monitoring — turning ~720 manual operations a month into a system that runs itself.</p>
+        <p>32 active workflows behind the scenes — lead capture, listing sync, monitoring — turning ~720 manual operations a month into a system that runs itself.</p>
         <div class="tags"><span class="tag">n8n</span><span class="tag">onOffice</span><span class="tag">self-hosted</span></div>
-      </div>
+      </a>
 
     </div>
 
@@ -283,7 +293,7 @@ h1.head .g{cursor:default}
     <div class="stack">
       <div class="col rv"><h5>Automation</h5><ul><li><i></i>n8n</li><li><i></i>Make</li><li><i></i>Webhooks</li><li><i></i>REST APIs</li></ul></div>
       <div class="col rv d1"><h5>Code</h5><ul><li><i></i>Python</li><li><i></i>JavaScript / TS</li><li><i></i>Next.js</li><li><i></i>FastAPI · Docker</li></ul></div>
-      <div class="col rv d2"><h5>AI / LLMs</h5><ul><li><i></i>GPT-4o</li><li><i></i>Claude</li><li><i></i>Gemini</li><li><i></i>Mistral · ElevenLabs</li></ul></div>
+      <div class="col rv d2"><h5>AI / LLMs</h5><ul><li><i></i>GPT-4o</li><li><i></i>Claude</li><li><i></i>Gemini</li><li><i></i>ElevenLabs</li></ul></div>
       <div class="col rv d3"><h5>Data / Infra</h5><ul><li><i></i>PostgreSQL</li><li><i></i>NocoDB</li><li><i></i>Google Analytics</li><li><i></i>VPS · self-hosting</li></ul></div>
     </div>
   </div>
