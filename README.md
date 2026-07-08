@@ -3,7 +3,7 @@
 A single-page portfolio plus six engineering case studies, hand-written in static HTML.
 No framework, no build step, no dependencies.
 
-**Live:** __SITE_URL__
+**Live:** https://manny-ruesch.github.io
 
 ## What's here
 
