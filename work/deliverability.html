@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Catching e-mail failures nobody sees — Manny Ruesch</title>
+<title>Catching e-mail failures nobody sees · Manny Ruesch</title>
 <meta name="description" content="Building a DMARC monitoring pipeline that parses reports from a dozen mailbox providers, tells forwarding apart from spoofing, and refuses to cry wolf.">
 <link rel="canonical" href="https://manny-ruesch.github.io/work/deliverability.html">
 <meta property="og:type" content="article">
@@ -42,7 +42,7 @@
     <a href="../index.html#work" class="backlink">← Work</a>
     <div class="kicker">// automation &amp; AI system · for a real-estate agency in Berlin</div>
     <h1>Catching e-mail failures nobody sees</h1>
-    <p class="lede">The e-mails that sell apartments can fail silently. Nobody reads raw DMARC reports — so I built something that does, and only speaks when it matters.</p>
+    <p class="lede">The e-mails that sell apartments can fail silently. Nobody reads raw DMARC reports, so I built something that does, and only speaks when it matters.</p>
     <div class="metrics3">
       <div><b>~12</b><span>mailbox providers monitored</span></div>
       <div><b>36</b><span>n8n nodes</span></div>
@@ -56,14 +56,14 @@
 <section class="sec rv"><div class="wrap">
   <h2>The problem</h2>
   <p>Every mailbox provider will happily send you a daily report saying who has been sending mail using your domain, and whether it authenticated. They arrive as compressed XML attachments. Nobody, anywhere, reads them.</p>
-  <p>Which means a domain can be spoofed, or a legitimate mail stream can start failing authentication, and the first signal is a client saying “I never got your email” — weeks later, about an apartment that has since sold to someone else.</p>
+  <p>Which means a domain can be spoofed, or a legitimate mail stream can start failing authentication, and the first signal is a client saying “I never got your email”, weeks later, about an apartment that has since sold to someone else.</p>
 </div></section>
 
 <section class="sec rv"><div class="wrap">
   <h2>What I built</h2>
   <p>A mailbox receives the reports. A pipeline unzips them, parses the XML, resolves every sending IP to its owner, classifies each result, and writes it all to a database. It alerts only when a human should act.</p>
   <ul>
-    <li>Every failing IP is enriched with its owner, network and country — free, no API key.</li>
+    <li>Every failing IP is enriched with its owner, network and country: free, no API key.</li>
     <li>Failures from a known forwarder are relabelled as forwarding, not spoofing.</li>
     <li>Unparseable reports go to a dead-letter table rather than killing the run.</li>
     <li>A weekly AI-written digest: pass rate per source, alignment, week-on-week trend, new IPs.</li>
@@ -121,13 +121,13 @@
     <h3>A forward is not an attack</h3>
     <p>When someone auto-forwards your mail, the forwarding server relays it from <em>its own</em> IP. Authentication fails. The report calls it a failure. It looks exactly like spoofing.</p>
     <p>So the pipeline learns which IP ranges belong to the legitimate sending infrastructure, and relabels failures from anywhere else as forwarding. If <strong>every</strong> failure in a batch is a forward, no alert fires at all.</p>
-    <p class="outcome"><b>TRADE-OFF</b> Deliberately conservative — only one known sender is reclassified. A false “all clear” is far worse than a false alarm.</p>
+    <p class="outcome"><b>TRADE-OFF</b> Deliberately conservative: only one known sender is reclassified. A false “all clear” is far worse than a false alarm.</p>
   </div>
 
   <div class="callout pitfall">
     <span class="badge">PITFALL</span>
     <h3>The alert that only looked at the first ten</h3>
-    <p>The alerting logic evaluated a <em>sample</em> of failing IPs — the first ten, sliced for a readable email. A real spoofing source sitting at position eleven would never have triggered anything.</p>
+    <p>The alerting logic evaluated a <em>sample</em> of failing IPs: the first ten, sliced for a readable email. A real spoofing source sitting at position eleven would never have triggered anything.</p>
     <p>It was found by an adversarial audit, not by a test, and not by me.</p>
     <p class="outcome"><b>FIX</b> Evaluate every failing IP for the alert decision; keep the slice for the email body only. Those are two different jobs and they had been conflated.</p>
   </div>
@@ -135,14 +135,14 @@
   <div class="callout decision">
     <span class="badge">DECISION</span>
     <h3>A dead-letter queue, not a dead workflow</h3>
-    <p>One malformed report from one provider used to abort the entire run — losing every valid report in the same batch.</p>
-    <p class="outcome"><b>TRADE-OFF</b> Bad reports now land in their own table and the run continues. Someone has to look at that table. Nobody does, until the count grows — which is roughly the correct amount of attention for the problem.</p>
+    <p>One malformed report from one provider used to abort the entire run, losing every valid report in the same batch.</p>
+    <p class="outcome"><b>TRADE-OFF</b> Bad reports now land in their own table and the run continues. Someone has to look at that table. Nobody does, until the count grows, which is roughly the correct amount of attention for the problem.</p>
   </div>
 
   <div class="callout decision">
     <span class="badge">DECISION</span>
     <h3>Naming the blind spot out loud</h3>
-    <p>The monitored domain is the transactional one. The <strong>marketing</strong> newsletters — the ones that actually sell apartments — go out from a second domain that has no monitoring at all, and whose DNS I don't have access to.</p>
+    <p>The monitored domain is the transactional one. The <strong>marketing</strong> newsletters, the ones that actually sell apartments, go out from a second domain that has no monitoring at all, and whose DNS I don't have access to.</p>
     <p class="outcome"><b>HONEST</b> The most sophisticated part of this system watches the wrong domain. Saying so in the handover was worth more than any feature I could have added.</p>
   </div>
 
@@ -150,25 +150,25 @@
 
 <section class="sec rv"><div class="wrap">
   <h2>Results</h2>
-  <p>Reports flowing in from around a dozen mailbox providers, with authentication failures at effectively zero. An adversarial audit of the pipeline found one high-severity bug — the sampling blind spot above — which is now fixed.</p>
+  <p>Reports flowing in from around a dozen mailbox providers, with authentication failures at effectively zero. An adversarial audit of the pipeline found one high-severity bug, the sampling blind spot above, which is now fixed.</p>
   <p><strong>Still open.</strong> Both domains sit in monitoring-only mode. The path to enforcement is mapped: confirm every legitimate sender aligns, then ramp the policy in stages. And the marketing domain still needs its own monitoring first.</p>
-  <p>Honest verdict: for a five-person agency, this is <em>over-built</em>. The remaining value is not more features — it is closing the blind spot and handing it over cleanly.</p>
+  <p>Honest verdict: for a five-person agency, this is <em>over-built</em>. The remaining value is not more features. It is closing the blind spot and handing it over cleanly.</p>
 </div></section>
 
 <section class="sec rv"><div class="wrap">
   <h2>Stack</h2>
   <ul>
-    <li><strong>n8n</strong>, self-hosted — 36 nodes, plus a separate healthcheck workflow</li>
-    <li><strong>IMAP</strong> — the reports arrive as compressed XML attachments</li>
-    <li><strong>NocoDB</strong> — records, and a dead-letter table for the unreadable ones</li>
-    <li><strong>Free IP-reputation API</strong> — owner, network, country, datacenter flag</li>
-    <li><strong>Gemini</strong> — the weekly digest and its TL;DR</li>
+    <li><strong>n8n</strong>, self-hosted: 36 nodes, plus a separate healthcheck workflow</li>
+    <li><strong>IMAP</strong>: the reports arrive as compressed XML attachments</li>
+    <li><strong>NocoDB</strong>: records, and a dead-letter table for the unreadable ones</li>
+    <li><strong>Free IP-reputation API</strong>: owner, network, country, datacenter flag</li>
+    <li><strong>Gemini</strong>: the weekly digest and its TL;DR</li>
   </ul>
 </div></section>
 
 <section class="sec rv"><div class="wrap">
   <h2>What I took away</h2>
-  <p>The bug that matters is the one that fails silently. This whole system exists because of a class of failure that produces no error, no bounce, no complaint — just an email that never arrives.</p>
+  <p>The bug that matters is the one that fails silently. This whole system exists because of a class of failure that produces no error, no bounce, no complaint. Just an email that never arrives.</p>
   <p>And the most valuable thing I wrote about it was not code. It was the sentence admitting which domain it doesn't watch.</p>
 </div></section>
 

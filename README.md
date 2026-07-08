@@ -1,4 +1,4 @@
-# Manny Ruesch — portfolio
+# Manny Ruesch · portfolio
 
 A single-page portfolio plus six engineering case studies, hand-written in static HTML.
 No framework, no build step, no dependencies.
@@ -9,7 +9,7 @@ No framework, no build step, no dependencies.
 
 | Path | |
 |---|---|
-| `index.html` | Homepage — hero, project cards, stack |
+| `index.html` | Homepage: hero, project cards, stack |
 | `work/*.html` | Six case studies, one file each, one URL each |
 | `assets/site.css` · `site.js` | Shared nav, footer, animated MR monogram, scroll reveals |
 | `assets/case.css` | Case-study layer: architecture diagrams, callouts |
@@ -18,7 +18,7 @@ No framework, no build step, no dependencies.
 ## Design notes
 
 - **Six real pages, not a JS router.** Each case study has a shareable URL and a working
-  link preview. A client-side router would have broken both — LinkedIn does not run
+  link preview. A client-side router would have broken both, because LinkedIn does not run
   JavaScript when it builds a preview card.
 - **The MR monogram draws itself** on load: a node-graph `M` and `R` inside a chip
   outline, traced by a glowing pen tip that follows an invisible SVG path via
@@ -28,7 +28,7 @@ No framework, no build step, no dependencies.
   never does.
 - **`prefers-reduced-motion` is honoured everywhere.** Every animation stops and all
   content is revealed immediately. Getting this right required re-asserting one rule as
-  a cascade anchor after splitting the stylesheet — a `.card` transition had started
+  a cascade anchor after splitting the stylesheet, because a `.card` transition had started
   winning on source order.
 
 ## Confidentiality

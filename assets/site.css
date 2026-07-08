@@ -1,4 +1,4 @@
-/* site.css — shared across index.html and work/*.html
+/* site.css · shared across index.html and work/*.html
    Requires: Space Grotesk, Inter, JetBrains Mono (loaded via <link> in <head>) */
 
 :root{
@@ -29,7 +29,7 @@ a{color:inherit;text-decoration:none}
 .logo{display:flex;align-items:center;gap:12px;font-family:'Space Grotesk';font-weight:700;letter-spacing:.02em}
 .logo .mk{width:36px;height:36px;display:grid;place-items:center;font-size:.66rem;color:var(--acc);font-weight:700;flex:none}
 .logo .mk svg{width:100%;height:100%;overflow:visible;display:block}
-/* MR monogram — progressive draw + pen tip */
+/* MR monogram · progressive draw + pen tip */
 .logo .mk .chip,.logo .mk .edges line,.logo .mk .trace{stroke-dasharray:260;stroke-dashoffset:260;transition:stroke-dashoffset .9s var(--ease)}
 .logo .mk .nodes circle,.logo .mk .active circle,.logo .mk .pin{transform-box:fill-box;transform-origin:center;opacity:0;transform:scale(.2);transition:opacity .4s ease,transform .42s var(--ease)}
 .logo .mk .tip{opacity:0}

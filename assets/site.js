@@ -1,4 +1,4 @@
-/* site.js — shared across index.html and work/*.html
+/* site.js · shared across index.html and work/*.html
    Wrapped in an IIFE: exports nothing to global scope, so a page's own inline
    script may freely declare its own `nav`, `io`, `RM`, … without colliding. */
 (function(){

@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>An SEO article engine in three languages — Manny Ruesch</title>
-<meta name="description" content="Publishing authority content in three languages costs what an editorial agency charges. I built a 49-node pipeline that does it for cents — and stopped chasing AI-detector scores when I proved they contradict each other.">
+<title>An SEO article engine in three languages · Manny Ruesch</title>
+<meta name="description" content="Publishing authority content in three languages costs what an editorial agency charges. I built a 49-node pipeline that does it for cents, and stopped chasing AI-detector scores when I proved they contradict each other.">
 <link rel="canonical" href="https://manny-ruesch.github.io/work/seo-generator.html">
 <meta property="og:type" content="article">
 <meta property="og:title" content="An SEO article engine in three languages">
-<meta property="og:description" content="Publishing authority content in three languages costs what an editorial agency charges. I built a 49-node pipeline that does it for cents — and stopped chasing AI-detector scores when I proved they contradict each other.">
+<meta property="og:description" content="Publishing authority content in three languages costs what an editorial agency charges. I built a 49-node pipeline that does it for cents, and stopped chasing AI-detector scores when I proved they contradict each other.">
 <meta property="og:url" content="https://manny-ruesch.github.io/work/seo-generator.html">
 <meta property="og:image" content="https://manny-ruesch.github.io/assets/og/seo-generator.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -42,7 +42,7 @@
     <a href="../index.html#work" class="backlink">← Work</a>
     <div class="kicker">// automation &amp; AI system · for a real-estate agency in Berlin</div>
     <h1>An SEO article engine in three languages</h1>
-    <p class="lede">A keyword goes in; a German, English and French article come out — each written for a different reader, for about thirty cents.</p>
+    <p class="lede">A keyword goes in; a German, English and French article come out, each written for a different reader, for about thirty cents.</p>
     <div class="metrics3">
       <div><b>3</b><span>languages, 3 personas</span></div>
       <div><b>~€0.30</b><span>per article</span></div>
@@ -55,19 +55,19 @@
 
 <section class="sec rv"><div class="wrap">
   <h2>The problem</h2>
-  <p>The agency sells to three audiences in three languages. Publishing authority content for all of them, at the cadence search engines reward, costs what an editorial agency charges — tens of thousands a year.</p>
+  <p>The agency sells to three audiences in three languages. Publishing authority content for all of them, at the cadence search engines reward, costs what an editorial agency charges: tens of thousands a year.</p>
   <p>Machine translation was not an option either: a French investor and a Berlin local do not need the same article, they need different arguments.</p>
 </div></section>
 
 <section class="sec rv"><div class="wrap">
   <h2>What I built</h2>
-  <p>A form takes a topic. Forty-nine nodes later, six Google Docs exist: a proofreading copy and a ready-to-paste HTML copy, in German, English and French — each with meta description, structured data, tags and internal links.</p>
+  <p>A form takes a topic. Forty-nine nodes later, six Google Docs exist: a proofreading copy and a ready-to-paste HTML copy, in German, English and French, each with meta description, structured data, tags and internal links.</p>
   <ul>
-    <li>Keyword expansion from Google's own autocomplete — free, no API key, real search data.</li>
+    <li>Keyword expansion from Google's own autocomplete: free, no API key, real search data.</li>
     <li>One master article, then two <em>persona adaptations</em>: Berlin locals, international expats, French-speaking investors.</li>
     <li>Internal links chosen from the live sitemap, bucketed per language.</li>
     <li>A third mode that takes an article somebody else wrote and translates and formats it through the same chain.</li>
-    <li>Every run emails a summary — with a warning banner in the subject line if any stage degraded.</li>
+    <li>Every run emails a summary, with a warning banner in the subject line if any stage degraded.</li>
   </ul>
 </div></section>
 
@@ -122,13 +122,13 @@
     <span class="badge">DECISION</span>
     <h3>Adaptations, not translations</h3>
     <p>The English and French articles are written for different readers, not translated from the German. The expat needs to know what a <em>Milieuschutz</em> zone means for them; the investor needs the yield implications; the local needs neither explained.</p>
-    <p class="outcome"><b>TRADE-OFF</b> Three prompts to maintain instead of one translation call — and three focus keywords, generated per language, instead of a German keyword awkwardly jammed into a French sentence.</p>
+    <p class="outcome"><b>TRADE-OFF</b> Three prompts to maintain instead of one translation call, plus three focus keywords, generated per language, instead of a German keyword awkwardly jammed into a French sentence.</p>
   </div>
 
   <div class="callout pitfall">
     <span class="badge">PITFALL</span>
     <h3>AI detectors disagree with each other</h3>
-    <p>An article scored <strong>82% “AI”</strong> on one detector. I rewrote the voice, tested five strategies, and got it to a modest improvement. Then I ran the <em>same text</em> through a second detector: <strong>27% AI — “strongly convinced this was written by a human”</strong>.</p>
+    <p>An article scored <strong>82% “AI”</strong> on one detector. I rewrote the voice, tested five strategies, and got it to a modest improvement. Then I ran the <em>same text</em> through a second detector: <strong>27% AI, “strongly convinced this was written by a human”</strong>.</p>
     <p>Worse, the optimisation was making the prose <em>worse</em>: forcing burstiness produced a mechanical rhythm of its own, which is just a new tell.</p>
     <p class="outcome"><b>DECISION</b> Stop. Search engines do not penalise AI writing, they penalise bad writing. The only lever that survives scrutiny is a human editor.</p>
   </div>
@@ -136,7 +136,7 @@
   <div class="callout pitfall">
     <span class="badge">PITFALL</span>
     <h3>One greedy regex, literal asterisks in every FAQ</h3>
-    <p>The Markdown-to-HTML converter matched bold as <code>\*\*([^*]+)\*\*</code> — a character class that forbids an internal asterisk. Any nested emphasis, like a bolded question containing an italicised term, fell straight through and shipped as literal asterisks on the live site.</p>
+    <p>The Markdown-to-HTML converter matched bold as <code>\*\*([^*]+)\*\*</code>, a character class that forbids an internal asterisk. Any nested emphasis, like a bolded question containing an italicised term, fell straight through and shipped as literal asterisks on the live site.</p>
     <p class="outcome"><b>FIX</b> A lazy match, <code>\*\*(.+?)\*\*</code>, applied before italics. Reproduced in Node first, on the exact failing string, before touching the workflow.</p>
   </div>
 
@@ -144,7 +144,7 @@
     <span class="badge">DECISION</span>
     <h3>Never publish automatically</h3>
     <p>The pipeline can write directly to the CMS. It doesn't. It produces documents, and a person decides.</p>
-    <p class="outcome"><b>TRADE-OFF</b> Slower. But a mediocre article published automatically costs more — in brand, and in search ranking — than the twenty minutes of reading it saved.</p>
+    <p class="outcome"><b>TRADE-OFF</b> Slower. But a mediocre article published automatically costs more, in brand and in search ranking, than the twenty minutes of reading it saved.</p>
   </div>
 
 </div></section>
@@ -158,11 +158,11 @@
 <section class="sec rv"><div class="wrap">
   <h2>Stack</h2>
   <ul>
-    <li><strong>n8n</strong>, self-hosted — 49 nodes, one linear pipeline, three input modes</li>
-    <li><strong>Gemini 2.5 Pro / Flash</strong> — article, adaptations, metadata, internal linking</li>
-    <li><strong>Google Autocomplete</strong> — keyword expansion, free and unauthenticated</li>
-    <li><strong>Google Drive &amp; Docs API</strong> — six documents per run</li>
-    <li><strong>Sitemap parsing</strong> — internal links resolved per language</li>
+    <li><strong>n8n</strong>, self-hosted: 49 nodes, one linear pipeline, three input modes</li>
+    <li><strong>Gemini 2.5 Pro / Flash</strong>: article, adaptations, metadata, internal linking</li>
+    <li><strong>Google Autocomplete</strong>: keyword expansion, free and unauthenticated</li>
+    <li><strong>Google Drive &amp; Docs API</strong>: six documents per run</li>
+    <li><strong>Sitemap parsing</strong>: internal links resolved per language</li>
   </ul>
 </div></section>
 

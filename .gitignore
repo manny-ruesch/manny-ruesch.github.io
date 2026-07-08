@@ -1,5 +1,5 @@
-# Local verification + build tooling. forbidden.txt names the company —
-# it must never reach the public repo.
+# Local verification + build tooling. forbidden.txt names the company,
+# so it must never reach the public repo.
 tools/
 .DS_Store
 scratch-*

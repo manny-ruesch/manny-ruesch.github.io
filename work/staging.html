@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>An empty room, furnished in ~33 seconds — Manny Ruesch</title>
-<meta name="description" content="How I replaced a €150–400 property photo shoot with an AI pipeline that furnishes an empty room in about half a minute — and what it took to stop the model from redecorating the ceiling.">
+<title>An empty room, furnished in ~33 seconds · Manny Ruesch</title>
+<meta name="description" content="How I replaced a €150–400 property photo shoot with an AI pipeline that furnishes an empty room in about half a minute, and what it took to stop the model from redecorating the ceiling.">
 <link rel="canonical" href="https://manny-ruesch.github.io/work/staging.html">
 <meta property="og:type" content="article">
 <meta property="og:title" content="An empty room, furnished in ~33 seconds">
-<meta property="og:description" content="How I replaced a €150–400 property photo shoot with an AI pipeline that furnishes an empty room in about half a minute — and what it took to stop the model from redecorating the ceiling.">
+<meta property="og:description" content="How I replaced a €150–400 property photo shoot with an AI pipeline that furnishes an empty room in about half a minute, and what it took to stop the model from redecorating the ceiling.">
 <meta property="og:url" content="https://manny-ruesch.github.io/work/staging.html">
 <meta property="og:image" content="https://manny-ruesch.github.io/assets/og/staging.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -42,7 +42,7 @@
     <a href="../index.html#work" class="backlink">← Work</a>
     <div class="kicker">// automation &amp; AI system · for a real-estate agency in Berlin</div>
     <h1>An empty room, furnished in ~33 seconds</h1>
-    <p class="lede">Raw listing photos go in, fully-staged interiors come out — replacing a €150–400, multi-day photo shoot with a pipeline that runs while the agent is still on the phone.</p>
+    <p class="lede">Raw listing photos go in, fully-staged interiors come out. It replaces a €150–400, multi-day photo shoot with a pipeline that runs while the agent is still on the phone.</p>
     <div class="metrics3">
       <div><b>~33 s</b><span>per photo</span></div>
       <div><b>~175</b><span>listings per month</span></div>
@@ -55,7 +55,7 @@
 
 <section class="sec rv"><div class="wrap">
   <h2>The problem</h2>
-  <p>An empty apartment photographs badly and sells slowly. Staging one for a shoot costs between €150 and €400 and takes days to schedule — for a listing that might sell in a week.</p>
+  <p>An empty apartment photographs badly and sells slowly. Staging one for a shoot costs between €150 and €400 and takes days to schedule, for a listing that might sell in a week.</p>
   <p>So most empty flats simply went online empty, and underperformed.</p>
 </div></section>
 
@@ -63,7 +63,7 @@
   <h2>What I built</h2>
   <p>An internal web form: upload a photo, pick the room and a furnishing style, get back a staged interior in about thirty seconds. Fifty-three nodes behind a shared access code, with a daily quota the manager can change from a dashboard, and a page showing exactly what it has cost this month.</p>
   <ul>
-    <li>Four actions — furnish, declutter, empty, upscale — detected from explicit fields, never from free text.</li>
+    <li>Four actions (furnish, declutter, empty, upscale), detected from explicit fields, never from free text.</li>
     <li>Thirty furnishing styles, filtered by room, so a kitchen never offers a bedroom style.</li>
     <li>An optional floor plan passed as a second image, so the model respects the real layout.</li>
     <li>A before/after slider, and a copy-image button that puts a PNG straight on the clipboard.</li>
@@ -120,21 +120,21 @@
   <div class="callout pitfall">
     <span class="badge">PITFALL</span>
     <h3>The model kept redecorating the ceiling</h3>
-    <p>Early renders moved the camera and <strong>invented a chandelier</strong>. The client wanted their room, furnished — not a different, nicer room.</p>
-    <p class="outcome"><b>FIX</b> A block of hard constraints pinned to the very end of the prompt — image models weight the end most heavily — plus reframing the whole task as “an in-place photo edit, not a new render”. It is prompt steering, not a guarantee: when a render still drifts, you regenerate.</p>
+    <p>Early renders moved the camera and <strong>invented a chandelier</strong>. The client wanted their room, furnished. Not a different, nicer room.</p>
+    <p class="outcome"><b>FIX</b> A block of hard constraints pinned to the very end of the prompt, because image models weight the end most heavily, plus reframing the whole task as “an in-place photo edit, not a new render”. It is prompt steering, not a guarantee: when a render still drifts, you regenerate.</p>
   </div>
 
   <div class="callout pitfall">
     <span class="badge">PITFALL</span>
     <h3>A random job ID that sometimes said “4K”</h3>
-    <p>The action was detected by scanning the whole request payload for keywords. Job IDs were base-36 random strings — so roughly two percent of them contained <code>4K</code> or <code>HD</code>, and silently triggered a phantom upscale. A free-text client comment saying “clean and empty” could hijack the action the same way.</p>
+    <p>The action was detected by scanning the whole request payload for keywords. Job IDs were base-36 random strings, so roughly two percent of them contained <code>4K</code> or <code>HD</code>, and silently triggered a phantom upscale. A free-text client comment saying “clean and empty” could hijack the action the same way.</p>
     <p class="outcome"><b>FIX</b> Read the explicit action and room fields first. Fall back to scanning only after stripping the job ID, the comments, and internal keys.</p>
   </div>
 
   <div class="callout decision">
     <span class="badge">DECISION</span>
     <h3>Reserve the quota before generating, not after</h3>
-    <p>The obvious design puts the ledger write on a parallel branch — it isn't on the critical path, after all. n8n then runs it <strong>last</strong>, so the “mark done” update finds no row, and every job stays stuck at <code>pending</code>.</p>
+    <p>The obvious design puts the ledger write on a parallel branch. It isn't on the critical path, after all. n8n then runs it <strong>last</strong>, so the “mark done” update finds no row, and every job stays stuck at <code>pending</code>.</p>
     <p class="outcome"><b>TRADE-OFF</b> Reserving up front means a failed generation still burns a credit. That is the correct trade: it also closes the race where two people spend the last unit at once.</p>
   </div>
 
@@ -150,24 +150,24 @@
 
 <section class="sec rv"><div class="wrap">
   <h2>Results</h2>
-  <p>Running in production. The staging workflow is the agency's most-used internal tool, and the same pipeline was later repackaged — rebuilt generically, with no trace of the original — as a product that any agency can self-host.</p>
+  <p>Running in production. The staging workflow is the agency's most-used internal tool, and the same pipeline was later repackaged as a product that any agency can self-host, rebuilt generically, with no trace of the original.</p>
   <p><strong>Still open.</strong> Image quality is judged by a human, not a test. There is no automated check that a render kept the room's geometry; the fallback is the regenerate button.</p>
 </div></section>
 
 <section class="sec rv"><div class="wrap">
   <h2>Stack</h2>
   <ul>
-    <li><strong>n8n</strong>, self-hosted — form, orchestration, quota, cost dashboard</li>
-    <li><strong>Gemini image model</strong> — furnish, declutter, empty, upscale</li>
-    <li><strong>Google Drive</strong> (shared drive) — renders survive the person who made them</li>
-    <li><strong>n8n Data Tables</strong> — the job ledger</li>
+    <li><strong>n8n</strong>, self-hosted: form, orchestration, quota, cost dashboard</li>
+    <li><strong>Gemini image model</strong>: furnish, declutter, empty, upscale</li>
+    <li><strong>Google Drive</strong> (shared drive): renders survive the person who made them</li>
+    <li><strong>n8n Data Tables</strong>: the job ledger</li>
     <li><strong>Vanilla JS front end</strong>, served straight from a webhook</li>
   </ul>
 </div></section>
 
 <section class="sec rv"><div class="wrap">
   <h2>What I took away</h2>
-  <p>Image models weight the end of the prompt. Whatever you care about most goes last — after the client's free-text wishes, not before them.</p>
+  <p>Image models weight the end of the prompt. Whatever you care about most goes last, after the client's free-text wishes, not before them.</p>
   <p>And the bug that cost me the most hours was not in the AI at all. It was a CSS inheritance flag, hidden behind tests that asserted on the wrong thing.</p>
 </div></section>
 

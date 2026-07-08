@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>32 active workflows, and how they don't fall over — Manny Ruesch</title>
+<title>32 active workflows, and how they don't fall over · Manny Ruesch</title>
 <meta name="description" content="Running 32 active n8n workflows for a Berlin real-estate agency: a central error workflow, an eval harness, and the credential trap that broke seven workflows at once.">
 <link rel="canonical" href="https://manny-ruesch.github.io/work/backbone.html">
 <meta property="og:type" content="article">
@@ -42,7 +42,7 @@
     <a href="../index.html#work" class="backlink">← Work</a>
     <div class="kicker">// automation &amp; AI system · for a real-estate agency in Berlin</div>
     <h1>32 active workflows, and how they don't fall over</h1>
-    <p class="lede">Lead capture, CRM sync, monitoring, reporting. The interesting question isn't how to build them — it's how to find out when one quietly stops.</p>
+    <p class="lede">Lead capture, CRM sync, monitoring, reporting. The interesting question isn't how to build them. It's how to find out when one quietly stops.</p>
     <div class="metrics3">
       <div><b>32</b><span>active workflows</span></div>
       <div><b>1</b><span>central error workflow</span></div>
@@ -56,12 +56,12 @@
 <section class="sec rv"><div class="wrap">
   <h2>The problem</h2>
   <p>Automations are easy to build and easy to forget. Thirty-two of them run continuously: capturing leads from four sources, syncing the CRM, watching e-mail authentication, generating reports.</p>
-  <p>Each one is a small promise. When one breaks, it does not raise its hand — it just stops, and a lead goes nowhere, and nobody notices until a person asks a question that the data cannot answer.</p>
+  <p>Each one is a small promise. When one breaks, it does not raise its hand. It just stops, and a lead goes nowhere, and nobody notices until a person asks a question that the data cannot answer.</p>
 </div></section>
 
 <section class="sec rv"><div class="wrap">
   <h2>What I built</h2>
-  <p>Not a workflow — the scaffolding around them.</p>
+  <p>Not a workflow. The scaffolding around them.</p>
   <ul>
     <li>One central error workflow, attached to every significant automation, that emails the failure with context.</li>
     <li>An evaluation harness that replays fixed test cases against the AI assistant and asserts on the answers.</li>
@@ -127,7 +127,7 @@
   <div class="callout decision">
     <span class="badge">DECISION</span>
     <h3>One error workflow, not scattered error handling</h3>
-    <p>Every significant workflow points at the same error handler. It emails what broke, where, and with what input. It found the empty-message bug in the WhatsApp assistant minutes after it first happened — a failure that produced no client-visible symptom other than silence.</p>
+    <p>Every significant workflow points at the same error handler. It emails what broke, where, and with what input. It found the empty-message bug in the WhatsApp assistant minutes after it first happened, a failure that produced no client-visible symptom other than silence.</p>
     <p class="outcome"><b>TRADE-OFF</b> A single point of failure for failure reporting. Worth it: the alternative is thirty-two places to forget.</p>
   </div>
 
@@ -141,7 +141,7 @@
 
   <div class="callout pitfall">
     <span class="badge">PITFALL</span>
-    <h3>Credentials are global — deleting one breaks everything</h3>
+    <h3>Credentials are global, and deleting one breaks everything</h3>
     <p>A colleague reconnected a Google account by deleting the credential and creating it again. The new credential got a new internal ID. <strong>Seven workflows</strong> pointed at the old one and stopped, silently, at once.</p>
     <p class="outcome"><b>FIX</b> Always “Reconnect” in place, never delete-and-recreate. Written into the runbook in bold, because this is the kind of thing you learn once and only once.</p>
   </div>
@@ -159,16 +159,16 @@
 <section class="sec rv"><div class="wrap">
   <h2>Results</h2>
   <p>Thirty-two active workflows, verified by querying the instance rather than trusting my memory of it. Error handling attached to every major one. A handover runbook so that none of this dies with my badge.</p>
-  <p><strong>Still open.</strong> The instance is several versions behind. Some webhooks remain unauthenticated — adding auth would break the front ends that call them, so it needs sequencing, not a flag flip.</p>
+  <p><strong>Still open.</strong> The instance is several versions behind. Some webhooks remain unauthenticated. Adding auth would break the front ends that call them, so it needs sequencing, not a flag flip.</p>
 </div></section>
 
 <section class="sec rv"><div class="wrap">
   <h2>Stack</h2>
   <ul>
     <li><strong>n8n</strong>, self-hosted on a VPS, in Docker</li>
-    <li><strong>onOffice REST API</strong> — HMAC-signed, the system of record</li>
-    <li><strong>NocoDB</strong> and <strong>n8n Data Tables</strong> — storage, ledgers, anonymous events</li>
-    <li><strong>Google Workspace APIs</strong> — Drive, Docs, Gmail, Sheets</li>
+    <li><strong>onOffice REST API</strong>: HMAC-signed, the system of record</li>
+    <li><strong>NocoDB</strong> and <strong>n8n Data Tables</strong>: storage, ledgers, anonymous events</li>
+    <li><strong>Google Workspace APIs</strong>: Drive, Docs, Gmail, Sheets</li>
   </ul>
 </div></section>
 

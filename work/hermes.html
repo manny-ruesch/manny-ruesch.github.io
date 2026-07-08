@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>An agentic WhatsApp assistant, in production — Manny Ruesch</title>
+<title>An agentic WhatsApp assistant, in production · Manny Ruesch</title>
 <meta name="description" content="How I put an AI agent on a real-estate agency's WhatsApp number: three languages, CRM search over 400+ listing fields, and a rule that it can never overwrite a client record.">
 <link rel="canonical" href="https://manny-ruesch.github.io/work/hermes.html">
 <meta property="og:type" content="article">
@@ -42,7 +42,7 @@
     <a href="../index.html#work" class="backlink">← Work</a>
     <div class="kicker">// automation &amp; AI system · for a real-estate agency in Berlin</div>
     <h1>An agentic WhatsApp assistant, in production</h1>
-    <p class="lede">An AI agent that answers clients on WhatsApp in three languages, searches the CRM for matching listings, and writes qualified leads back — without ever overwriting a client record.</p>
+    <p class="lede">An AI agent that answers clients on WhatsApp in three languages, searches the CRM for matching listings, and writes qualified leads back, without ever overwriting a client record.</p>
     <div class="metrics3">
       <div><b>9</b><span>n8n workflows</span></div>
       <div><b>Live</b><span>on a real WhatsApp number</span></div>
@@ -55,7 +55,7 @@
 
 <section class="sec rv"><div class="wrap">
   <h2>The problem</h2>
-  <p>A large share of client conversations never reached the CRM. They happened in personal WhatsApp threads, on agents' phones, after hours. Nobody answers a listing enquiry at 11pm — and the agency's clients are international: German locals, English-speaking expats, French investors.</p>
+  <p>A large share of client conversations never reached the CRM. They happened in personal WhatsApp threads, on agents' phones, after hours. Nobody answers a listing enquiry at 11pm. And the agency's clients are international: German locals, English-speaking expats, French investors.</p>
   <p>Every message that went unanswered was a lead quietly evaporating, with <strong>no trace anywhere</strong> that it had ever existed.</p>
 </div></section>
 
@@ -63,9 +63,9 @@
   <h2>What I built</h2>
   <p>An AI agent connected to the agency's real WhatsApp number through Meta's Cloud API, live since June 2026. It holds a conversation, works out what the person actually wants, and acts on the CRM through two tools of its own.</p>
   <ul>
-    <li>Detects the language and qualifies the contact type — buyer, renter, owner, landlord — and adapts: an owner is never shown listings, they are qualified as a seller lead.</li>
+    <li>Detects the language and qualifies the contact type (buyer, renter, owner, landlord), then adapts: an owner is never shown listings, they are qualified as a seller lead.</li>
     <li>Searches the CRM across 14 criteria: price range, rooms, bedrooms, area, neighbourhood, energy class, elevator, cellar, balcony, floor.</li>
-    <li>Sends one photo per listing, with that listing's description in the caption — not a wall of text followed by loose images.</li>
+    <li>Sends one photo per listing, with that listing's description in the caption, not a wall of text followed by loose images.</li>
     <li>Creates the contact, or recognises a returning one by email, then by phone number.</li>
     <li>Logs every tool call with zero personal data, and emails a weekly report every Monday morning.</li>
   </ul>
@@ -74,7 +74,7 @@
 <section class="sec rv"><div class="wrap">
   <h2>How it works</h2>
   <div class="diag">
-    <svg viewBox="0 0 920 380" role="img" aria-label="A WhatsApp message reaches Meta's Cloud API, then an AI agent running Gemini. The agent calls two tools — listing search and CRM contact — which both talk to the onOffice REST API. A composer splits the reply into text plus one photo per listing. Tool calls are logged to an analytics table that feeds a weekly report.">
+    <svg viewBox="0 0 920 380" role="img" aria-label="A WhatsApp message reaches Meta's Cloud API, then an AI agent running Gemini. The agent calls two tools, listing search and CRM contact, which both talk to the onOffice REST API. A composer splits the reply into text plus one photo per listing. Tool calls are logged to an analytics table that feeds a weekly report.">
       <defs><marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
         <path d="M0 0 L6 3 L0 6 z" fill="rgba(255,255,255,.34)"/></marker></defs>
       <g class="edge" marker-end="url(#ah)">
@@ -116,7 +116,7 @@
       </g>
     </svg>
   </div>
-  <p class="diag-cap">Both tools log every call — search criteria and outcomes, never personal data.</p>
+  <p class="diag-cap">Both tools log every call: search criteria and outcomes, never personal data.</p>
 </div></section>
 
 <section class="sec rv"><div class="wrap">
@@ -124,9 +124,9 @@
 
   <div class="callout pitfall">
     <span class="badge">PITFALL</span>
-    <h3>“No listings found” — when there were twenty-four</h3>
+    <h3>“No listings found”, with twenty-four sitting in the CRM</h3>
     <p>In n8n, <code>$fromAI('bedrooms', …, 'number')</code> <strong>without a fourth argument</strong> marks the field as <em>required</em> in the schema handed to the model. The moment the model omitted an optional parameter, n8n rejected the tool call <strong>before</strong> it ever reached the sub-workflow. The agent saw an error and told the client there was nothing available.</p>
-    <p>It was intermittent — it depended on what the model chose to send — so it never reproduced in testing.</p>
+    <p>It was intermittent, depending on what the model chose to send, so it never reproduced in testing.</p>
     <p class="outcome"><b>FIX</b> Give every <code>$fromAI</code> a default value; the field becomes optional. Coalescing with <code>|| 0</code> does nothing: validation happens before the expression is evaluated.</p>
   </div>
 
@@ -141,7 +141,7 @@
     <span class="badge">PITFALL</span>
     <h3>The duplicate that kept coming back</h3>
     <p>The CRM's address search does not match a contact by phone number. A lead who had only ever given a phone number was recreated as a fresh duplicate every single time they came back.</p>
-    <p class="outcome"><b>FIX</b> An exact filtered read on the phone field, fired only when no email was supplied — email stays authoritative, so the two never cross-match.</p>
+    <p class="outcome"><b>FIX</b> An exact filtered read on the phone field, fired only when no email was supplied. Email stays authoritative, so the two never cross-match.</p>
   </div>
 
   <div class="callout pitfall">
@@ -163,25 +163,25 @@
 <section class="sec rv"><div class="wrap">
   <h2>Results</h2>
   <p>Live on the agency's real WhatsApp number since June 2026. Nine workflows: the production agent, a chat-based twin for testing, two agentic tools, a URL-sync job, an evaluation harness that replays test cases, a stats dashboard, a weekly report, and a dedicated error workflow.</p>
-  <p>That error workflow earned its keep: it surfaced a production failure — the model returning an empty string, which WhatsApp rejects — within minutes, before any client noticed.</p>
-  <p><strong>Still open.</strong> Direct listing links depend on a bug in the agency's website that I don't control; the agent falls back to the category page rather than send a broken URL. An audit also found an API token hard-coded in Code nodes — it needs moving to an environment variable, and the token rotated, because it has been sitting in execution history.</p>
+  <p>That error workflow earned its keep: it surfaced a production failure within minutes, before any client noticed: the model had returned an empty string, which WhatsApp rejects.</p>
+  <p><strong>Still open.</strong> Direct listing links depend on a bug in the agency's website that I don't control; the agent falls back to the category page rather than send a broken URL. An audit also found an API token hard-coded in Code nodes. It needs moving to an environment variable, and the token rotated, because it has been sitting in execution history.</p>
 </div></section>
 
 <section class="sec rv"><div class="wrap">
   <h2>Stack</h2>
   <ul>
-    <li><strong>n8n</strong>, self-hosted on a VPS — agent orchestration, tools, ops workflows</li>
-    <li><strong>Gemini 2.5 Flash</strong> — reasoning, language detection, qualification</li>
-    <li><strong>Meta WhatsApp Cloud API</strong> — inbound webhook, text and image sends</li>
-    <li><strong>onOffice REST API</strong> — HMAC-signed listing and contact operations</li>
-    <li><strong>n8n Data Tables</strong> — anonymous event logging</li>
+    <li><strong>n8n</strong>, self-hosted on a VPS: agent orchestration, tools, ops workflows</li>
+    <li><strong>Gemini 2.5 Flash</strong>: reasoning, language detection, qualification</li>
+    <li><strong>Meta WhatsApp Cloud API</strong>: inbound webhook, text and image sends</li>
+    <li><strong>onOffice REST API</strong>: HMAC-signed listing and contact operations</li>
+    <li><strong>n8n Data Tables</strong>: anonymous event logging</li>
   </ul>
 </div></section>
 
 <section class="sec rv"><div class="wrap">
   <h2>What I took away</h2>
   <p>The hard part of an AI agent is not the prompt. It is everything around it: what happens when the model omits a parameter, when a client replies “ok”, when two people share a phone number, when the model returns an empty string.</p>
-  <p>The prompt took an afternoon. The failure modes took weeks — and an adversarial audit to find the ones I had talked myself out of worrying about.</p>
+  <p>The prompt took an afternoon. The failure modes took weeks, plus an adversarial audit to find the ones I had talked myself out of worrying about.</p>
 </div></section>
 
 <div class="wrap"><nav class="pager" aria-label="Other case studies">

@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>One screen to decide — Manny Ruesch</title>
-<meta name="description" content="A decision dashboard for a Berlin real-estate agency: five data sources, eleven n8n workflows, an AI analyst — and a health score designed to refuse to say “all good” when it is missing data.">
+<title>One screen to decide · Manny Ruesch</title>
+<meta name="description" content="A decision dashboard for a Berlin real-estate agency: five data sources, eleven n8n workflows, an AI analyst, and a health score designed to refuse to say “all good” when it is missing data.">
 <link rel="canonical" href="https://manny-ruesch.github.io/work/dashboard.html">
 <meta property="og:type" content="article">
 <meta property="og:title" content="One screen to decide">
-<meta property="og:description" content="A decision dashboard for a Berlin real-estate agency: five data sources, eleven n8n workflows, an AI analyst — and a health score designed to refuse to say “all good” when it is missing data.">
+<meta property="og:description" content="A decision dashboard for a Berlin real-estate agency: five data sources, eleven n8n workflows, an AI analyst, and a health score designed to refuse to say “all good” when it is missing data.">
 <meta property="og:url" content="https://manny-ruesch.github.io/work/dashboard.html">
 <meta property="og:image" content="https://manny-ruesch.github.io/assets/og/dashboard.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -42,7 +42,7 @@
     <a href="../index.html#work" class="backlink">← Work</a>
     <div class="kicker">// automation &amp; AI system · for a real-estate agency in Berlin</div>
     <h1>One screen to decide</h1>
-    <p class="lede">Search Console, Analytics, PageSpeed, an AI analyst and the CRM, merged into a single live view — with an honest health score that admits what it doesn't know.</p>
+    <p class="lede">Search Console, Analytics, PageSpeed, an AI analyst and the CRM, merged into a single live view, with an honest health score that admits what it doesn't know.</p>
     <div class="metrics3">
       <div><b>11</b><span>n8n workflows behind it</span></div>
       <div><b>5</b><span>data sources</span></div>
@@ -63,8 +63,8 @@
   <h2>What I built</h2>
   <p>A single page. Analytics, Search Console and PageSpeed on one side; the CRM on the other; an AI analyst reading both and writing a verdict at the top.</p>
   <ul>
-    <li>A sticky verdict banner — a traffic light plus a written diagnosis, regenerated on each load.</li>
-    <li>Leads this month by segment — sellers, buyers, renters — compared against the <em>same period</em> last month, not against a projection.</li>
+    <li>A sticky verdict banner: a traffic light plus a written diagnosis, regenerated on each load.</li>
+    <li>Leads this month by segment (sellers, buyers, renters), compared against the <em>same period</em> last month, not against a projection.</li>
     <li>The commercial funnel: viewings, notary appointments, the listings with the most interest, and the ones with none.</li>
     <li>Twelve months of history, rebuilt retroactively from CRM date fields.</li>
     <li>A read-only director's view, so management sees the numbers without an account.</li>
@@ -121,13 +121,13 @@
     <h3>API keys do not belong in a public page</h3>
     <p>The dashboard is a single HTML file served publicly. Two API keys sat in its source, readable by anyone who pressed Ctrl-U.</p>
     <p>Two small n8n workflows now stand in front of them, each guarded by a shared secret and a hard daily call cap.</p>
-    <p class="outcome"><b>TRADE-OFF</b> One key is restricted by HTTP referrer, so it <em>cannot</em> be proxied server-side — it returns 403. It stayed in the page, and I documented why rather than pretending it was fixed.</p>
+    <p class="outcome"><b>TRADE-OFF</b> One key is restricted by HTTP referrer, so it <em>cannot</em> be proxied server-side, because it returns 403. It stayed in the page, and I documented why rather than pretending it was fixed.</p>
   </div>
 
   <div class="callout decision">
     <span class="badge">DECISION</span>
     <h3>A health score that admits ignorance</h3>
-    <p>The score aggregates four pillars. When a data source fails to load, an average over the remaining three looks reassuringly normal — and is meaningless.</p>
+    <p>The score aggregates four pillars. When a data source fails to load, an average over the remaining three looks reassuringly normal. And meaningless.</p>
     <p>Now the header reads <strong>“partial score (2/4 pillars)”</strong>, and the AI analyst is explicitly told, in its prompt, not to conclude that everything is fine when pillars are missing.</p>
     <p class="outcome"><b>TRADE-OFF</b> A dashboard that hides what it doesn't know is worse than no dashboard.</p>
   </div>
@@ -135,14 +135,14 @@
   <div class="callout pitfall">
     <span class="badge">PITFALL</span>
     <h3>Comparing against a projection is comparing against a wish</h3>
-    <p>On the 8th of the month, “69 leads, projected 260 by month end, versus 240 last month” reads like good news. It is arithmetic dressed as insight — the projection is just today's number multiplied up.</p>
+    <p>On the 8th of the month, “69 leads, projected 260 by month end, versus 240 last month” reads like good news. It is arithmetic dressed as insight: the projection is just today's number multiplied up.</p>
     <p class="outcome"><b>FIX</b> Compare the 1st-to-today window against the <em>same window</em> last month. The projection stayed, demoted to a secondary figure where it belongs.</p>
   </div>
 
   <div class="callout decision">
     <span class="badge">DECISION</span>
     <h3>Rebuild history instead of waiting for it</h3>
-    <p>“Can we see the last twelve months, like in Analytics?” The instinct is to start accumulating snapshots and answer in a year. But the CRM stores creation dates, sale dates and activity dates — the history was always there, unqueried.</p>
+    <p>“Can we see the last twelve months, like in Analytics?” The instinct is to start accumulating snapshots and answer in a year. But the CRM stores creation dates, sale dates and activity dates. The history was always there, unqueried.</p>
     <p>Eighty-four counting queries later, twelve months appeared. Closed months are frozen in cache; only the current and previous months are recomputed.</p>
     <p class="outcome"><b>TRADE-OFF</b> The first load takes ten seconds. Every later one takes under two.</p>
   </div>
@@ -151,25 +151,25 @@
 
 <section class="sec rv"><div class="wrap">
   <h2>Results</h2>
-  <p>In daily use. Eleven n8n workflows feed it — leads, listings pipeline, commercial activity, contact sources, follow-up hygiene, twelve-month history. The follow-up hygiene panel surfaced something nobody had measured: <strong>roughly half</strong> of recent leads had gone more than thirty days without contact and had no follow-up scheduled.</p>
+  <p>In daily use. Eleven n8n workflows feed it: leads, listings pipeline, commercial activity, contact sources, follow-up hygiene, twelve-month history. The follow-up hygiene panel surfaced something nobody had measured: <strong>roughly half</strong> of recent leads had gone more than thirty days without contact and had no follow-up scheduled.</p>
   <p><strong>Still open.</strong> Revenue and commission figures exist in the CRM and are deliberately <em>not</em> displayed: the page is public, and locking access down has to come first.</p>
 </div></section>
 
 <section class="sec rv"><div class="wrap">
   <h2>Stack</h2>
   <ul>
-    <li><strong>Vanilla JS + Chart.js</strong> — one self-contained HTML file, no build step</li>
+    <li><strong>Vanilla JS + Chart.js</strong>: one self-contained HTML file, no build step</li>
     <li><strong>GA4 Data API · Search Console API · PageSpeed Insights</strong></li>
-    <li><strong>Gemini</strong> — the written verdict and per-tab syntheses</li>
-    <li><strong>n8n</strong> — key proxies, and eleven workflows querying the CRM</li>
-    <li><strong>onOffice REST API</strong> — HMAC-signed reads over leads, listings and activity</li>
+    <li><strong>Gemini</strong>: the written verdict and per-tab syntheses</li>
+    <li><strong>n8n</strong>: key proxies, and eleven workflows querying the CRM</li>
+    <li><strong>onOffice REST API</strong>: HMAC-signed reads over leads, listings and activity</li>
   </ul>
 </div></section>
 
 <section class="sec rv"><div class="wrap">
   <h2>What I took away</h2>
   <p>The technically interesting part was reconstructing a year of history from date fields. The <em>useful</em> part was making the score say “I don't know”.</p>
-  <p>Every number on a management dashboard will eventually be used to justify a decision. A number that quietly averages away a missing quarter is not a number — it is a liability.</p>
+  <p>Every number on a management dashboard will eventually be used to justify a decision. A number that quietly averages away a missing quarter is not a number. It is a liability.</p>
 </div></section>
 
 <div class="wrap"><nav class="pager" aria-label="Other case studies">
