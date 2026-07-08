@@ -164,7 +164,7 @@
   <h2>Results</h2>
   <p>Live on the agency's real WhatsApp number since June 2026. Nine workflows: the production agent, a chat-based twin for testing, two agentic tools, a URL-sync job, an evaluation harness that replays test cases, a stats dashboard, a weekly report, and a dedicated error workflow.</p>
   <p>That error workflow earned its keep: it surfaced a production failure within minutes, before any client noticed: the model had returned an empty string, which WhatsApp rejects.</p>
-  <p><strong>Still open.</strong> Direct listing links depend on a bug in the agency's website that I don't control; the agent falls back to the category page rather than send a broken URL. An audit also found an API token hard-coded in Code nodes. It needs moving to an environment variable, and the token rotated, because it has been sitting in execution history.</p>
+  <p><strong>Still open.</strong> Direct listing links depend on a bug in the agency's website that I don't control; the agent falls back to the category page rather than send a broken URL. An audit also flagged secrets management: credentials belong in environment variables, not in application code. Externalising and rotating them is a server-side change, documented for whoever picks up the instance.</p>
 </div></section>
 
 <section class="sec rv"><div class="wrap">

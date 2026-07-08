@@ -74,7 +74,7 @@
 <section class="sec rv"><div class="wrap">
   <h2>How it works</h2>
   <div class="diag">
-    <svg viewBox="0 0 920 288" role="img" aria-label="Lead capture, CRM sync and monitoring all run on a single self-hosted n8n instance holding 32 active workflows. Below it sit a central error workflow that catches every major failure and an evaluation harness that replays test cases. A dashed box to the right represents the automated security audit, which found hard-coded keys and unauthenticated webhooks.">
+    <svg viewBox="0 0 920 288" role="img" aria-label="Lead capture, CRM sync and monitoring all run on a single self-hosted n8n instance holding 32 active workflows. Below it sit a central error workflow that catches every major failure and an evaluation harness that replays test cases. A dashed box to the right represents the automated security audit, covering secrets management and endpoint exposure.">
       <defs><marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
         <path d="M0 0 L6 3 L0 6 z" fill="rgba(255,255,255,.34)"/></marker></defs>
       <g class="edge" marker-end="url(#ah)">
@@ -113,8 +113,8 @@
       <g class="dash-b">
         <rect x="600" y="76" width="290" height="88" rx="10"/>
         <text x="745" y="106">Security audit</text>
-        <text class="s" x="745" y="126">hard-coded keys</text>
-        <text class="s" x="745" y="144">unauthenticated webhooks</text>
+        <text class="s" x="745" y="126">secrets management</text>
+        <text class="s" x="745" y="144">endpoint exposure</text>
       </g>
     </svg>
   </div>
@@ -149,9 +149,9 @@
   <div class="callout decision">
     <span class="badge">DECISION</span>
     <h3>Running the audit is easy; acting on it is the job</h3>
-    <p>An automated audit of the instance returned hundreds of findings: hard-coded API keys, unauthenticated webhooks, an outdated version. It would have been very easy to file that report and move on.</p>
+    <p>An automated audit of the instance returned hundreds of findings across secrets management, endpoint exposure and dependency freshness. It would have been very easy to file that report and move on.</p>
     <p>Instead: keys moved behind proxies, execution history purged where a token had been persisted in plain text, retention turned off on the workflows handling personal data.</p>
-    <p class="outcome"><b>HONEST</b> Not all of it is fixed. Tokens remain hard-coded in some Code nodes; moving them requires a server change and a token rotation, and that is documented for whoever comes next.</p>
+    <p class="outcome"><b>HONEST</b> Not all of it is closed. What is left needs a server-side change and a coordinated rotation, so it is sequenced and documented for whoever comes next.</p>
   </div>
 
 </div></section>
@@ -159,7 +159,7 @@
 <section class="sec rv"><div class="wrap">
   <h2>Results</h2>
   <p>Thirty-two active workflows, verified by querying the instance rather than trusting my memory of it. Error handling attached to every major one. A handover runbook so that none of this dies with my badge.</p>
-  <p><strong>Still open.</strong> The instance is several versions behind. Some webhooks remain unauthenticated. Adding auth would break the front ends that call them, so it needs sequencing, not a flag flip.</p>
+  <p><strong>Still open.</strong> The instance is several versions behind. Tightening access to the internal endpoints has to be sequenced rather than switched on in one go, because the front ends that call them would break the moment it changed.</p>
 </div></section>
 
 <section class="sec rv"><div class="wrap">

@@ -121,7 +121,7 @@
     <h3>API keys do not belong in a public page</h3>
     <p>The dashboard is a single HTML file served publicly. Two API keys sat in its source, readable by anyone who pressed Ctrl-U.</p>
     <p>Two small n8n workflows now stand in front of them, each guarded by a shared secret and a hard daily call cap.</p>
-    <p class="outcome"><b>TRADE-OFF</b> One key is restricted by HTTP referrer, so it <em>cannot</em> be proxied server-side, because it returns 403. It stayed in the page, and I documented why rather than pretending it was fixed.</p>
+    <p class="outcome"><b>TRADE-OFF</b> One key is restricted by HTTP referrer, so a server-side proxy <em>cannot</em> use it at all: the request comes back 403. That referrer restriction is what protects it, and I documented the reasoning rather than pretending the proxy covered everything.</p>
   </div>
 
   <div class="callout decision">
