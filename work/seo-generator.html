@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>An SEO article engine in three languages — Manny Ruesch</title>
+<meta name="description" content="Publishing authority content in three languages costs what an editorial agency charges. I built a 49-node pipeline that does it for cents — and stopped chasing AI-detector scores when I proved they contradict each other.">
+<link rel="canonical" href="__SITE_URL__/work/seo-generator.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="An SEO article engine in three languages">
+<meta property="og:description" content="Publishing authority content in three languages costs what an editorial agency charges. I built a 49-node pipeline that does it for cents — and stopped chasing AI-detector scores when I proved they contradict each other.">
+<meta property="og:url" content="__SITE_URL__/work/seo-generator.html">
+<meta property="og:image" content="__SITE_URL__/assets/og/seo-generator.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="theme-color" content="#0A0D12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="stylesheet" href="../assets/case.css">
+</head>
+<body id="top">
+<div id="progress"></div><div id="glow"></div>
+
+<nav id="nav" aria-label="Main">
+  <div class="wrap">
+    <a href="../index.html" class="logo"><span class="mk">MR</span><span>Manny Ruesch</span></a>
+    <div class="navlinks">
+      <a href="../index.html#work" class="hide-sm">Work</a>
+      <a href="../index.html#stack" class="hide-sm">Stack</a>
+      <a href="../index.html#contact" class="hide-sm">Contact</a>
+      <a href="https://www.linkedin.com/in/manny-ruesch" target="_blank" rel="noopener" class="cta">LinkedIn ↗</a>
+    </div>
+  </div>
+</nav>
+
+<header class="case-head">
+  <div class="wrap">
+    <a href="../index.html#work" class="backlink">← Work</a>
+    <div class="kicker">// automation &amp; AI system · for a real-estate agency in Berlin</div>
+    <h1>An SEO article engine in three languages</h1>
+    <p class="lede">A keyword goes in; a German, English and French article come out — each written for a different reader, for about thirty cents.</p>
+    <div class="metrics3">
+      <div><b>3</b><span>languages, 3 personas</span></div>
+      <div><b>~€0.30</b><span>per article</span></div>
+      <div><b>49</b><span>n8n nodes</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="sec rv"><div class="wrap">
+  <h2>The problem</h2>
+  <p>The agency sells to three audiences in three languages. Publishing authority content for all of them, at the cadence search engines reward, costs what an editorial agency charges — tens of thousands a year.</p>
+  <p>Machine translation was not an option either: a French investor and a Berlin local do not need the same article, they need different arguments.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>What I built</h2>
+  <p>A form takes a topic. Forty-nine nodes later, six Google Docs exist: a proofreading copy and a ready-to-paste HTML copy, in German, English and French — each with meta description, structured data, tags and internal links.</p>
+  <ul>
+    <li>Keyword expansion from Google's own autocomplete — free, no API key, real search data.</li>
+    <li>One master article, then two <em>persona adaptations</em>: Berlin locals, international expats, French-speaking investors.</li>
+    <li>Internal links chosen from the live sitemap, bucketed per language.</li>
+    <li>A third mode that takes an article somebody else wrote and translates and formats it through the same chain.</li>
+    <li>Every run emails a summary — with a warning banner in the subject line if any stage degraded.</li>
+  </ul>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>How it works</h2>
+  <div class="diag">
+    <svg viewBox="0 0 920 256" role="img" aria-label="A form takes a topic. Google Autocomplete expands it into real keywords. A master article is written by Gemini, then adapted into English and French for different personas. Meta descriptions, structured data and internal links are generated and merged in. Six Google Docs and an email summary come out. A dashed box marks mandatory human review before anything is published.">
+      <defs><marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+        <path d="M0 0 L6 3 L0 6 z" fill="rgba(255,255,255,.34)"/></marker></defs>
+      <g class="edge" marker-end="url(#ah)">
+        <path d="M156 66 H188"/><path d="M366 66 H398"/><path d="M576 66 H608"/><path d="M756 66 H778"/>
+        <path d="M450 100 C450 142 391 142 391 174"/><path d="M540 100 C540 142 591 142 591 174"/>
+        <path d="M845 92 C845 132 805 132 805 174" stroke-dasharray="4 5"/>
+      </g>
+      <g class="flow">
+        <path d="M156 66 H188"/><path d="M366 66 H398"/><path d="M576 66 H608"/><path d="M756 66 H778"/>
+        <path d="M450 100 C450 142 391 142 391 174"/><path d="M540 100 C540 142 591 142 591 174"/>
+      </g>
+      <g class="bx">
+        <rect x="16" y="40" width="140" height="52" rx="10"/>
+        <text x="86" y="62">Form</text><text class="s" x="86" y="78">topic · mode</text>
+        <rect x="196" y="40" width="170" height="52" rx="10"/>
+        <text x="281" y="62">Autocomplete</text><text class="s" x="281" y="78">free keyword data</text>
+        <rect x="616" y="40" width="140" height="52" rx="10"/>
+        <text x="686" y="62">Adapt EN · FR</text><text class="s" x="686" y="78">persona rewrites</text>
+        <rect x="786" y="40" width="118" height="52" rx="10"/>
+        <text x="845" y="62">6 Docs</text><text class="s" x="845" y="78">+ email</text>
+        <rect x="306" y="180" width="170" height="56" rx="10"/>
+        <text x="391" y="204">Meta · JSON-LD</text><text class="s" x="391" y="220">per language</text>
+        <rect x="506" y="180" width="170" height="56" rx="10"/>
+        <text x="591" y="204">Internal links</text><text class="s" x="591" y="220">from the sitemap</text>
+      </g>
+      <g class="acc-b">
+        <rect x="406" y="32" width="170" height="68" rx="12"/>
+        <text x="491" y="60">Master article</text>
+        <text class="s" x="491" y="78">Gemini 2.5 Pro</text>
+        <text class="s" x="491" y="92">one language</text>
+      </g>
+      <g class="dash-b">
+        <rect x="706" y="182" width="198" height="52" rx="10"/>
+        <text x="805" y="204">Human review</text><text class="s" x="805" y="220">no auto-publish</text>
+      </g>
+    </svg>
+  </div>
+  <p class="diag-cap">Nothing reaches the website without a person reading it first.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Under the hood</h2>
+
+  <div class="callout decision">
+    <span class="badge">DECISION</span>
+    <h3>Adaptations, not translations</h3>
+    <p>The English and French articles are written for different readers, not translated from the German. The expat needs to know what a <em>Milieuschutz</em> zone means for them; the investor needs the yield implications; the local needs neither explained.</p>
+    <p class="outcome"><b>TRADE-OFF</b> Three prompts to maintain instead of one translation call — and three focus keywords, generated per language, instead of a German keyword awkwardly jammed into a French sentence.</p>
+  </div>
+
+  <div class="callout pitfall">
+    <span class="badge">PITFALL</span>
+    <h3>AI detectors disagree with each other</h3>
+    <p>An article scored <strong>82% “AI”</strong> on one detector. I rewrote the voice, tested five strategies, and got it to a modest improvement. Then I ran the <em>same text</em> through a second detector: <strong>27% AI — “strongly convinced this was written by a human”</strong>.</p>
+    <p>Worse, the optimisation was making the prose <em>worse</em>: forcing burstiness produced a mechanical rhythm of its own, which is just a new tell.</p>
+    <p class="outcome"><b>DECISION</b> Stop. Search engines do not penalise AI writing, they penalise bad writing. The only lever that survives scrutiny is a human editor.</p>
+  </div>
+
+  <div class="callout pitfall">
+    <span class="badge">PITFALL</span>
+    <h3>One greedy regex, literal asterisks in every FAQ</h3>
+    <p>The Markdown-to-HTML converter matched bold as <code>\*\*([^*]+)\*\*</code> — a character class that forbids an internal asterisk. Any nested emphasis, like a bolded question containing an italicised term, fell straight through and shipped as literal asterisks on the live site.</p>
+    <p class="outcome"><b>FIX</b> A lazy match, <code>\*\*(.+?)\*\*</code>, applied before italics. Reproduced in Node first, on the exact failing string, before touching the workflow.</p>
+  </div>
+
+  <div class="callout decision">
+    <span class="badge">DECISION</span>
+    <h3>Never publish automatically</h3>
+    <p>The pipeline can write directly to the CMS. It doesn't. It produces documents, and a person decides.</p>
+    <p class="outcome"><b>TRADE-OFF</b> Slower. But a mediocre article published automatically costs more — in brand, and in search ranking — than the twenty minutes of reading it saved.</p>
+  </div>
+
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Results</h2>
+  <p>Articles in three languages, around 1,400 to 1,800 words each, for roughly thirty cents in model costs. The pipeline degrades gracefully: when one adaptation fails, the other two languages still ship, and the notification email says so in its subject line rather than reporting a cheerful success.</p>
+  <p><strong>Still open.</strong> Internal links occasionally come back empty, swallowed by a silent catch three layers down. The warnings are now surfaced to the email; the root cause is next.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Stack</h2>
+  <ul>
+    <li><strong>n8n</strong>, self-hosted — 49 nodes, one linear pipeline, three input modes</li>
+    <li><strong>Gemini 2.5 Pro / Flash</strong> — article, adaptations, metadata, internal linking</li>
+    <li><strong>Google Autocomplete</strong> — keyword expansion, free and unauthenticated</li>
+    <li><strong>Google Drive &amp; Docs API</strong> — six documents per run</li>
+    <li><strong>Sitemap parsing</strong> — internal links resolved per language</li>
+  </ul>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>What I took away</h2>
+  <p>I spent a full day trying to beat an AI detector, and the thing I learned was that the detectors are noise: the same paragraph, unchanged, scored 82% and 27% on two of them.</p>
+  <p>Optimising against a metric you have not validated is how you make a product worse while feeling productive.</p>
+</div></section>
+
+<div class="wrap"><nav class="pager" aria-label="Other case studies">
+  <a href="dashboard.html">← Decision dashboard</a>
+  <a href="deliverability.html">E-mail deliverability →</a>
+</nav></div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="logo"><span class="mk">MR</span></div>
+    <div class="mono">Designed &amp; built by Manny Ruesch · 2026</div>
+    <a href="#top">Back to top ↑</a>
+  </div>
+</footer>
+
+<script src="../assets/site.js"></script>
+</body>
+</html>

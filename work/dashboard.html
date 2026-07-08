@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One screen to decide — Manny Ruesch</title>
+<meta name="description" content="A decision dashboard for a Berlin real-estate agency: five data sources, eleven n8n workflows, an AI analyst — and a health score designed to refuse to say “all good” when it is missing data.">
+<link rel="canonical" href="__SITE_URL__/work/dashboard.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="One screen to decide">
+<meta property="og:description" content="A decision dashboard for a Berlin real-estate agency: five data sources, eleven n8n workflows, an AI analyst — and a health score designed to refuse to say “all good” when it is missing data.">
+<meta property="og:url" content="__SITE_URL__/work/dashboard.html">
+<meta property="og:image" content="__SITE_URL__/assets/og/dashboard.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="theme-color" content="#0A0D12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="stylesheet" href="../assets/case.css">
+</head>
+<body id="top">
+<div id="progress"></div><div id="glow"></div>
+
+<nav id="nav" aria-label="Main">
+  <div class="wrap">
+    <a href="../index.html" class="logo"><span class="mk">MR</span><span>Manny Ruesch</span></a>
+    <div class="navlinks">
+      <a href="../index.html#work" class="hide-sm">Work</a>
+      <a href="../index.html#stack" class="hide-sm">Stack</a>
+      <a href="../index.html#contact" class="hide-sm">Contact</a>
+      <a href="https://www.linkedin.com/in/manny-ruesch" target="_blank" rel="noopener" class="cta">LinkedIn ↗</a>
+    </div>
+  </div>
+</nav>
+
+<header class="case-head">
+  <div class="wrap">
+    <a href="../index.html#work" class="backlink">← Work</a>
+    <div class="kicker">// automation &amp; AI system · for a real-estate agency in Berlin</div>
+    <h1>One screen to decide</h1>
+    <p class="lede">Search Console, Analytics, PageSpeed, an AI analyst and the CRM, merged into a single live view — with an honest health score that admits what it doesn't know.</p>
+    <div class="metrics3">
+      <div><b>11</b><span>n8n workflows behind it</span></div>
+      <div><b>5</b><span>data sources</span></div>
+      <div><b>12 months</b><span>history, reconstructed</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="sec rv"><div class="wrap">
+  <h2>The problem</h2>
+  <p>Decisions were made on manual exports, pulled from four different tools, at four different moments, by whoever remembered. Nobody could answer “are we doing better than last month?” without an afternoon of spreadsheet work.</p>
+  <p>Worse: the marketing numbers and the sales numbers lived in different worlds. Traffic was measured, leads were measured, and nothing connected them.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>What I built</h2>
+  <p>A single page. Analytics, Search Console and PageSpeed on one side; the CRM on the other; an AI analyst reading both and writing a verdict at the top.</p>
+  <ul>
+    <li>A sticky verdict banner — a traffic light plus a written diagnosis, regenerated on each load.</li>
+    <li>Leads this month by segment — sellers, buyers, renters — compared against the <em>same period</em> last month, not against a projection.</li>
+    <li>The commercial funnel: viewings, notary appointments, the listings with the most interest, and the ones with none.</li>
+    <li>Twelve months of history, rebuilt retroactively from CRM date fields.</li>
+    <li>A read-only director's view, so management sees the numbers without an account.</li>
+  </ul>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>How it works</h2>
+  <div class="diag">
+    <svg viewBox="0 0 920 256" role="img" aria-label="Google APIs are called from the browser by a single-page dashboard. An AI analyst reads the assembled data and returns a written verdict shown in a banner. Below the dashboard, an n8n proxy holds the API keys and eleven n8n workflows query the onOffice CRM. A dashed box shows a read-only director view.">
+      <defs><marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+        <path d="M0 0 L6 3 L0 6 z" fill="rgba(255,255,255,.34)"/></marker></defs>
+      <g class="edge" marker-end="url(#ah)">
+        <path d="M166 66 H198"/><path d="M366 66 H398"/><path d="M586 66 H618"/>
+        <path d="M300 92 C300 140 331 140 331 174"/><path d="M340 92 C340 150 541 150 541 174"/>
+        <path d="M636 208 H682" stroke-dasharray="4 5"/>
+      </g>
+      <g class="flow">
+        <path d="M166 66 H198"/><path d="M366 66 H398"/><path d="M586 66 H618"/>
+        <path d="M300 92 C300 140 331 140 331 174"/><path d="M340 92 C340 150 541 150 541 174"/>
+      </g>
+      <g class="bx">
+        <rect x="16" y="40" width="150" height="52" rx="10"/>
+        <text x="91" y="62">Google APIs</text><text class="s" x="91" y="78">GA4 · GSC · PageSpeed</text>
+        <rect x="206" y="40" width="160" height="52" rx="10"/>
+        <text x="286" y="62">Dashboard</text><text class="s" x="286" y="78">one HTML page</text>
+        <rect x="618" y="40" width="150" height="52" rx="10"/>
+        <text x="693" y="62">Verdict banner</text><text class="s" x="693" y="78">traffic light + prose</text>
+        <rect x="246" y="180" width="170" height="56" rx="10"/>
+        <text x="331" y="204">n8n proxy</text><text class="s" x="331" y="220">holds the API keys</text>
+        <rect x="446" y="180" width="190" height="56" rx="10"/>
+        <text x="541" y="204">11 CRM workflows</text><text class="s" x="541" y="220">leads · funnel · history</text>
+      </g>
+      <g class="acc-b">
+        <rect x="398" y="32" width="188" height="68" rx="12"/>
+        <text x="492" y="60">AI analyst</text>
+        <text class="s" x="492" y="78">Gemini</text>
+        <text class="s" x="492" y="92">verdict + synthesis</text>
+      </g>
+      <g class="dash-b">
+        <rect x="682" y="182" width="222" height="52" rx="10"/>
+        <text x="793" y="204">Director view</text><text class="s" x="793" y="220">read-only, no login</text>
+      </g>
+    </svg>
+  </div>
+  <p class="diag-cap">Google APIs are called straight from the browser. The CRM and the AI analyst go through n8n, which holds the keys.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Under the hood</h2>
+
+  <div class="callout decision">
+    <span class="badge">DECISION</span>
+    <h3>API keys do not belong in a public page</h3>
+    <p>The dashboard is a single HTML file served publicly. Two API keys sat in its source, readable by anyone who pressed Ctrl-U.</p>
+    <p>Two small n8n workflows now stand in front of them, each guarded by a shared secret and a hard daily call cap.</p>
+    <p class="outcome"><b>TRADE-OFF</b> One key is restricted by HTTP referrer, so it <em>cannot</em> be proxied server-side — it returns 403. It stayed in the page, and I documented why rather than pretending it was fixed.</p>
+  </div>
+
+  <div class="callout decision">
+    <span class="badge">DECISION</span>
+    <h3>A health score that admits ignorance</h3>
+    <p>The score aggregates four pillars. When a data source fails to load, an average over the remaining three looks reassuringly normal — and is meaningless.</p>
+    <p>Now the header reads <strong>“partial score (2/4 pillars)”</strong>, and the AI analyst is explicitly told, in its prompt, not to conclude that everything is fine when pillars are missing.</p>
+    <p class="outcome"><b>TRADE-OFF</b> A dashboard that hides what it doesn't know is worse than no dashboard.</p>
+  </div>
+
+  <div class="callout pitfall">
+    <span class="badge">PITFALL</span>
+    <h3>Comparing against a projection is comparing against a wish</h3>
+    <p>On the 8th of the month, “69 leads, projected 260 by month end, versus 240 last month” reads like good news. It is arithmetic dressed as insight — the projection is just today's number multiplied up.</p>
+    <p class="outcome"><b>FIX</b> Compare the 1st-to-today window against the <em>same window</em> last month. The projection stayed, demoted to a secondary figure where it belongs.</p>
+  </div>
+
+  <div class="callout decision">
+    <span class="badge">DECISION</span>
+    <h3>Rebuild history instead of waiting for it</h3>
+    <p>“Can we see the last twelve months, like in Analytics?” The instinct is to start accumulating snapshots and answer in a year. But the CRM stores creation dates, sale dates and activity dates — the history was always there, unqueried.</p>
+    <p>Eighty-four counting queries later, twelve months appeared. Closed months are frozen in cache; only the current and previous months are recomputed.</p>
+    <p class="outcome"><b>TRADE-OFF</b> The first load takes ten seconds. Every later one takes under two.</p>
+  </div>
+
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Results</h2>
+  <p>In daily use. Eleven n8n workflows feed it — leads, listings pipeline, commercial activity, contact sources, follow-up hygiene, twelve-month history. The follow-up hygiene panel surfaced something nobody had measured: <strong>roughly half</strong> of recent leads had gone more than thirty days without contact and had no follow-up scheduled.</p>
+  <p><strong>Still open.</strong> Revenue and commission figures exist in the CRM and are deliberately <em>not</em> displayed: the page is public, and locking access down has to come first.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Stack</h2>
+  <ul>
+    <li><strong>Vanilla JS + Chart.js</strong> — one self-contained HTML file, no build step</li>
+    <li><strong>GA4 Data API · Search Console API · PageSpeed Insights</strong></li>
+    <li><strong>Gemini</strong> — the written verdict and per-tab syntheses</li>
+    <li><strong>n8n</strong> — key proxies, and eleven workflows querying the CRM</li>
+    <li><strong>onOffice REST API</strong> — HMAC-signed reads over leads, listings and activity</li>
+  </ul>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>What I took away</h2>
+  <p>The technically interesting part was reconstructing a year of history from date fields. The <em>useful</em> part was making the score say “I don't know”.</p>
+  <p>Every number on a management dashboard will eventually be used to justify a decision. A number that quietly averages away a missing quarter is not a number — it is a liability.</p>
+</div></section>
+
+<div class="wrap"><nav class="pager" aria-label="Other case studies">
+  <a href="staging.html">← AI home-staging</a>
+  <a href="seo-generator.html">SEO article engine →</a>
+</nav></div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="logo"><span class="mk">MR</span></div>
+    <div class="mono">Designed &amp; built by Manny Ruesch · 2026</div>
+    <a href="#top">Back to top ↑</a>
+  </div>
+</footer>
+
+<script src="../assets/site.js"></script>
+</body>
+</html>

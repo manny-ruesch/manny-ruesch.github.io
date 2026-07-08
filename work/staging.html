@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>An empty room, furnished in ~33 seconds — Manny Ruesch</title>
+<meta name="description" content="How I replaced a €150–400 property photo shoot with an AI pipeline that furnishes an empty room in about half a minute — and what it took to stop the model from redecorating the ceiling.">
+<link rel="canonical" href="__SITE_URL__/work/staging.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="An empty room, furnished in ~33 seconds">
+<meta property="og:description" content="How I replaced a €150–400 property photo shoot with an AI pipeline that furnishes an empty room in about half a minute — and what it took to stop the model from redecorating the ceiling.">
+<meta property="og:url" content="__SITE_URL__/work/staging.html">
+<meta property="og:image" content="__SITE_URL__/assets/og/staging.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="theme-color" content="#0A0D12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="stylesheet" href="../assets/case.css">
+</head>
+<body id="top">
+<div id="progress"></div><div id="glow"></div>
+
+<nav id="nav" aria-label="Main">
+  <div class="wrap">
+    <a href="../index.html" class="logo"><span class="mk">MR</span><span>Manny Ruesch</span></a>
+    <div class="navlinks">
+      <a href="../index.html#work" class="hide-sm">Work</a>
+      <a href="../index.html#stack" class="hide-sm">Stack</a>
+      <a href="../index.html#contact" class="hide-sm">Contact</a>
+      <a href="https://www.linkedin.com/in/manny-ruesch" target="_blank" rel="noopener" class="cta">LinkedIn ↗</a>
+    </div>
+  </div>
+</nav>
+
+<header class="case-head">
+  <div class="wrap">
+    <a href="../index.html#work" class="backlink">← Work</a>
+    <div class="kicker">// automation &amp; AI system · for a real-estate agency in Berlin</div>
+    <h1>An empty room, furnished in ~33 seconds</h1>
+    <p class="lede">Raw listing photos go in, fully-staged interiors come out — replacing a €150–400, multi-day photo shoot with a pipeline that runs while the agent is still on the phone.</p>
+    <div class="metrics3">
+      <div><b>~33 s</b><span>per photo</span></div>
+      <div><b>~175</b><span>listings per month</span></div>
+      <div><b>53</b><span>n8n nodes</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="sec rv"><div class="wrap">
+  <h2>The problem</h2>
+  <p>An empty apartment photographs badly and sells slowly. Staging one for a shoot costs between €150 and €400 and takes days to schedule — for a listing that might sell in a week.</p>
+  <p>So most empty flats simply went online empty, and underperformed.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>What I built</h2>
+  <p>An internal web form: upload a photo, pick the room and a furnishing style, get back a staged interior in about thirty seconds. Fifty-three nodes behind a shared access code, with a daily quota the manager can change from a dashboard, and a page showing exactly what it has cost this month.</p>
+  <ul>
+    <li>Four actions — furnish, declutter, empty, upscale — detected from explicit fields, never from free text.</li>
+    <li>Thirty furnishing styles, filtered by room, so a kitchen never offers a bedroom style.</li>
+    <li>An optional floor plan passed as a second image, so the model respects the real layout.</li>
+    <li>A before/after slider, and a copy-image button that puts a PNG straight on the clipboard.</li>
+  </ul>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>How it works</h2>
+  <div class="diag">
+    <svg viewBox="0 0 920 256" role="img" aria-label="An agent uploads a photo through a web form. A prompt builder assembles the instructions, with hard constraints placed last, and a job ledger reserves the quota before generation. The image model returns a staged render, which is stored on a shared Drive and shown on a result page with a before-and-after slider. The ledger also feeds a usage and cost page.">
+      <defs><marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+        <path d="M0 0 L6 3 L0 6 z" fill="rgba(255,255,255,.34)"/></marker></defs>
+      <g class="edge" marker-end="url(#ah)">
+        <path d="M134 66 H166"/><path d="M314 66 H346"/><path d="M534 66 H566"/><path d="M706 66 H738"/>
+        <path d="M410 100 C410 142 384 142 384 174"/><path d="M478 100 C478 142 564 142 564 174"/>
+        <path d="M642 208 H690" stroke-dasharray="4 5"/>
+      </g>
+      <g class="flow">
+        <path d="M134 66 H166"/><path d="M314 66 H346"/><path d="M534 66 H566"/><path d="M706 66 H738"/>
+        <path d="M410 100 C410 142 384 142 384 174"/><path d="M478 100 C478 142 564 142 564 174"/>
+      </g>
+      <g class="bx">
+        <rect x="16" y="40" width="118" height="52" rx="10"/>
+        <text x="75" y="62">Agent</text><text class="s" x="75" y="78">uploads a photo</text>
+        <rect x="174" y="40" width="140" height="52" rx="10"/>
+        <text x="244" y="62">Web form</text><text class="s" x="244" y="78">room + style</text>
+        <rect x="574" y="40" width="132" height="52" rx="10"/>
+        <text x="640" y="62">Shared Drive</text><text class="s" x="640" y="78">stores the render</text>
+        <rect x="746" y="40" width="158" height="52" rx="10"/>
+        <text x="825" y="62">Result page</text><text class="s" x="825" y="78">before / after slider</text>
+        <rect x="306" y="180" width="156" height="56" rx="10"/>
+        <text x="384" y="204">Prompt builder</text><text class="s" x="384" y="220">constraints last</text>
+        <rect x="486" y="180" width="156" height="56" rx="10"/>
+        <text x="564" y="204">Job ledger</text><text class="s" x="564" y="220">reserved up front</text>
+      </g>
+      <g class="acc-b">
+        <rect x="354" y="32" width="180" height="68" rx="12"/>
+        <text x="444" y="60">Image model</text>
+        <text class="s" x="444" y="78">furnish · declutter · empty</text>
+        <text class="s" x="444" y="92">+ camera lock</text>
+      </g>
+      <g class="dash-b">
+        <rect x="690" y="182" width="214" height="52" rx="10"/>
+        <text x="797" y="204">Usage &amp; cost</text><text class="s" x="797" y="220">daily quota, editable</text>
+      </g>
+    </svg>
+  </div>
+  <p class="diag-cap">The quota is reserved before generation, never after.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Under the hood</h2>
+
+  <div class="callout pitfall">
+    <span class="badge">PITFALL</span>
+    <h3>The model kept redecorating the ceiling</h3>
+    <p>Early renders moved the camera and <strong>invented a chandelier</strong>. The client wanted their room, furnished — not a different, nicer room.</p>
+    <p class="outcome"><b>FIX</b> A block of hard constraints pinned to the very end of the prompt — image models weight the end most heavily — plus reframing the whole task as “an in-place photo edit, not a new render”. It is prompt steering, not a guarantee: when a render still drifts, you regenerate.</p>
+  </div>
+
+  <div class="callout pitfall">
+    <span class="badge">PITFALL</span>
+    <h3>A random job ID that sometimes said “4K”</h3>
+    <p>The action was detected by scanning the whole request payload for keywords. Job IDs were base-36 random strings — so roughly two percent of them contained <code>4K</code> or <code>HD</code>, and silently triggered a phantom upscale. A free-text client comment saying “clean and empty” could hijack the action the same way.</p>
+    <p class="outcome"><b>FIX</b> Read the explicit action and room fields first. Fall back to scanning only after stripping the job ID, the comments, and internal keys.</p>
+  </div>
+
+  <div class="callout decision">
+    <span class="badge">DECISION</span>
+    <h3>Reserve the quota before generating, not after</h3>
+    <p>The obvious design puts the ledger write on a parallel branch — it isn't on the critical path, after all. n8n then runs it <strong>last</strong>, so the “mark done” update finds no row, and every job stays stuck at <code>pending</code>.</p>
+    <p class="outcome"><b>TRADE-OFF</b> Reserving up front means a failed generation still burns a credit. That is the correct trade: it also closes the race where two people spend the last unit at once.</p>
+  </div>
+
+  <div class="callout pitfall">
+    <span class="badge">PITFALL</span>
+    <h3>The before/after slider that never moved</h3>
+    <p>The handle dragged, the CSS variable updated, and the image stayed frozen at fifty percent. The cause was one line added weeks earlier: <code>@property --pos { inherits: false }</code>. The variable changed on the parent; the children reading it no longer inherited it.</p>
+    <p>Every test I had written checked <em>the variable</em>. None checked <em>the rendered pixel</em>.</p>
+    <p class="outcome"><b>FIX</b> <code>inherits: true</code>, then a rewrite onto a native <code>&lt;input type="range"&gt;</code>. The lesson outlived the bug: assert on what is painted, not on what you set.</p>
+  </div>
+
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Results</h2>
+  <p>Running in production. The staging workflow is the agency's most-used internal tool, and the same pipeline was later repackaged — rebuilt generically, with no trace of the original — as a product that any agency can self-host.</p>
+  <p><strong>Still open.</strong> Image quality is judged by a human, not a test. There is no automated check that a render kept the room's geometry; the fallback is the regenerate button.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Stack</h2>
+  <ul>
+    <li><strong>n8n</strong>, self-hosted — form, orchestration, quota, cost dashboard</li>
+    <li><strong>Gemini image model</strong> — furnish, declutter, empty, upscale</li>
+    <li><strong>Google Drive</strong> (shared drive) — renders survive the person who made them</li>
+    <li><strong>n8n Data Tables</strong> — the job ledger</li>
+    <li><strong>Vanilla JS front end</strong>, served straight from a webhook</li>
+  </ul>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>What I took away</h2>
+  <p>Image models weight the end of the prompt. Whatever you care about most goes last — after the client's free-text wishes, not before them.</p>
+  <p>And the bug that cost me the most hours was not in the AI at all. It was a CSS inheritance flag, hidden behind tests that asserted on the wrong thing.</p>
+</div></section>
+
+<div class="wrap"><nav class="pager" aria-label="Other case studies">
+  <a href="hermes.html">← WhatsApp assistant</a>
+  <a href="dashboard.html">Decision dashboard →</a>
+</nav></div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="logo"><span class="mk">MR</span></div>
+    <div class="mono">Designed &amp; built by Manny Ruesch · 2026</div>
+    <a href="#top">Back to top ↑</a>
+  </div>
+</footer>
+
+<script src="../assets/site.js"></script>
+</body>
+</html>

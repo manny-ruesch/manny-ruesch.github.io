@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catching e-mail failures nobody sees — Manny Ruesch</title>
+<meta name="description" content="Building a DMARC monitoring pipeline that parses reports from a dozen mailbox providers, tells forwarding apart from spoofing, and refuses to cry wolf.">
+<link rel="canonical" href="__SITE_URL__/work/deliverability.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Catching e-mail failures nobody sees">
+<meta property="og:description" content="Building a DMARC monitoring pipeline that parses reports from a dozen mailbox providers, tells forwarding apart from spoofing, and refuses to cry wolf.">
+<meta property="og:url" content="__SITE_URL__/work/deliverability.html">
+<meta property="og:image" content="__SITE_URL__/assets/og/deliverability.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="theme-color" content="#0A0D12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="stylesheet" href="../assets/case.css">
+</head>
+<body id="top">
+<div id="progress"></div><div id="glow"></div>
+
+<nav id="nav" aria-label="Main">
+  <div class="wrap">
+    <a href="../index.html" class="logo"><span class="mk">MR</span><span>Manny Ruesch</span></a>
+    <div class="navlinks">
+      <a href="../index.html#work" class="hide-sm">Work</a>
+      <a href="../index.html#stack" class="hide-sm">Stack</a>
+      <a href="../index.html#contact" class="hide-sm">Contact</a>
+      <a href="https://www.linkedin.com/in/manny-ruesch" target="_blank" rel="noopener" class="cta">LinkedIn ↗</a>
+    </div>
+  </div>
+</nav>
+
+<header class="case-head">
+  <div class="wrap">
+    <a href="../index.html#work" class="backlink">← Work</a>
+    <div class="kicker">// automation &amp; AI system · for a real-estate agency in Berlin</div>
+    <h1>Catching e-mail failures nobody sees</h1>
+    <p class="lede">The e-mails that sell apartments can fail silently. Nobody reads raw DMARC reports — so I built something that does, and only speaks when it matters.</p>
+    <div class="metrics3">
+      <div><b>~12</b><span>mailbox providers monitored</span></div>
+      <div><b>36</b><span>n8n nodes</span></div>
+      <div><b>4 h</b><span>healthcheck interval</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="sec rv"><div class="wrap">
+  <h2>The problem</h2>
+  <p>Every mailbox provider will happily send you a daily report saying who has been sending mail using your domain, and whether it authenticated. They arrive as compressed XML attachments. Nobody, anywhere, reads them.</p>
+  <p>Which means a domain can be spoofed, or a legitimate mail stream can start failing authentication, and the first signal is a client saying “I never got your email” — weeks later, about an apartment that has since sold to someone else.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>What I built</h2>
+  <p>A mailbox receives the reports. A pipeline unzips them, parses the XML, resolves every sending IP to its owner, classifies each result, and writes it all to a database. It alerts only when a human should act.</p>
+  <ul>
+    <li>Every failing IP is enriched with its owner, network and country — free, no API key.</li>
+    <li>Failures from a known forwarder are relabelled as forwarding, not spoofing.</li>
+    <li>Unparseable reports go to a dead-letter table rather than killing the run.</li>
+    <li>A weekly AI-written digest: pass rate per source, alignment, week-on-week trend, new IPs.</li>
+    <li>A separate healthcheck every four hours: if no report has arrived in 24 hours, something is broken upstream.</li>
+  </ul>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>How it works</h2>
+  <div class="diag">
+    <svg viewBox="0 0 920 256" role="img" aria-label="A mailbox receives daily DMARC reports over IMAP. They are unzipped and parsed, with unreadable ones sent to a dead-letter table. Each result is classified as pass, fail or forward after resolving the sending IP's owner, then written to a database. One branch decides whether to alert; another writes a weekly AI digest. A dashed box shows a healthcheck running every four hours.">
+      <defs><marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+        <path d="M0 0 L6 3 L0 6 z" fill="rgba(255,255,255,.34)"/></marker></defs>
+      <g class="edge" marker-end="url(#ah)">
+        <path d="M156 66 H188"/><path d="M366 66 H398"/><path d="M586 66 H618"/>
+        <path d="M450 100 C450 142 391 142 391 174"/><path d="M540 100 C540 142 591 142 591 174"/>
+        <path d="M693 92 C693 132 797 132 797 174" stroke-dasharray="4 5"/>
+      </g>
+      <g class="flow">
+        <path d="M156 66 H188"/><path d="M366 66 H398"/><path d="M586 66 H618"/>
+        <path d="M450 100 C450 142 391 142 391 174"/><path d="M540 100 C540 142 591 142 591 174"/>
+      </g>
+      <g class="bx">
+        <rect x="16" y="40" width="140" height="52" rx="10"/>
+        <text x="86" y="62">Mailbox</text><text class="s" x="86" y="78">IMAP · daily reports</text>
+        <rect x="196" y="40" width="170" height="52" rx="10"/>
+        <text x="281" y="62">Unzip + parse</text><text class="s" x="281" y="78">bad ones → dead letter</text>
+        <rect x="618" y="40" width="150" height="52" rx="10"/>
+        <text x="693" y="62">Database</text><text class="s" x="693" y="78">every record kept</text>
+        <rect x="306" y="180" width="170" height="56" rx="10"/>
+        <text x="391" y="204">Alert?</text><text class="s" x="391" y="220">silent if all forwards</text>
+        <rect x="506" y="180" width="170" height="56" rx="10"/>
+        <text x="591" y="204">Weekly digest</text><text class="s" x="591" y="220">AI-written</text>
+      </g>
+      <g class="acc-b">
+        <rect x="398" y="32" width="188" height="68" rx="12"/>
+        <text x="492" y="60">Classify</text>
+        <text class="s" x="492" y="78">pass · fail · forward</text>
+        <text class="s" x="492" y="92">IP owner resolved</text>
+      </g>
+      <g class="dash-b">
+        <rect x="690" y="182" width="214" height="52" rx="10"/>
+        <text x="797" y="204">Healthcheck</text><text class="s" x="797" y="220">every 4 hours</text>
+      </g>
+    </svg>
+  </div>
+  <p class="diag-cap">An alert that fires on forwarding is an alert people learn to ignore.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Under the hood</h2>
+
+  <div class="callout decision">
+    <span class="badge">DECISION</span>
+    <h3>A forward is not an attack</h3>
+    <p>When someone auto-forwards your mail, the forwarding server relays it from <em>its own</em> IP. Authentication fails. The report calls it a failure. It looks exactly like spoofing.</p>
+    <p>So the pipeline learns which IP ranges belong to the legitimate sending infrastructure, and relabels failures from anywhere else as forwarding. If <strong>every</strong> failure in a batch is a forward, no alert fires at all.</p>
+    <p class="outcome"><b>TRADE-OFF</b> Deliberately conservative — only one known sender is reclassified. A false “all clear” is far worse than a false alarm.</p>
+  </div>
+
+  <div class="callout pitfall">
+    <span class="badge">PITFALL</span>
+    <h3>The alert that only looked at the first ten</h3>
+    <p>The alerting logic evaluated a <em>sample</em> of failing IPs — the first ten, sliced for a readable email. A real spoofing source sitting at position eleven would never have triggered anything.</p>
+    <p>It was found by an adversarial audit, not by a test, and not by me.</p>
+    <p class="outcome"><b>FIX</b> Evaluate every failing IP for the alert decision; keep the slice for the email body only. Those are two different jobs and they had been conflated.</p>
+  </div>
+
+  <div class="callout decision">
+    <span class="badge">DECISION</span>
+    <h3>A dead-letter queue, not a dead workflow</h3>
+    <p>One malformed report from one provider used to abort the entire run — losing every valid report in the same batch.</p>
+    <p class="outcome"><b>TRADE-OFF</b> Bad reports now land in their own table and the run continues. Someone has to look at that table. Nobody does, until the count grows — which is roughly the correct amount of attention for the problem.</p>
+  </div>
+
+  <div class="callout decision">
+    <span class="badge">DECISION</span>
+    <h3>Naming the blind spot out loud</h3>
+    <p>The monitored domain is the transactional one. The <strong>marketing</strong> newsletters — the ones that actually sell apartments — go out from a second domain that has no monitoring at all, and whose DNS I don't have access to.</p>
+    <p class="outcome"><b>HONEST</b> The most sophisticated part of this system watches the wrong domain. Saying so in the handover was worth more than any feature I could have added.</p>
+  </div>
+
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Results</h2>
+  <p>Reports flowing in from around a dozen mailbox providers, with authentication failures at effectively zero. An adversarial audit of the pipeline found one high-severity bug — the sampling blind spot above — which is now fixed.</p>
+  <p><strong>Still open.</strong> Both domains sit in monitoring-only mode. The path to enforcement is mapped: confirm every legitimate sender aligns, then ramp the policy in stages. And the marketing domain still needs its own monitoring first.</p>
+  <p>Honest verdict: for a five-person agency, this is <em>over-built</em>. The remaining value is not more features — it is closing the blind spot and handing it over cleanly.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Stack</h2>
+  <ul>
+    <li><strong>n8n</strong>, self-hosted — 36 nodes, plus a separate healthcheck workflow</li>
+    <li><strong>IMAP</strong> — the reports arrive as compressed XML attachments</li>
+    <li><strong>NocoDB</strong> — records, and a dead-letter table for the unreadable ones</li>
+    <li><strong>Free IP-reputation API</strong> — owner, network, country, datacenter flag</li>
+    <li><strong>Gemini</strong> — the weekly digest and its TL;DR</li>
+  </ul>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>What I took away</h2>
+  <p>The bug that matters is the one that fails silently. This whole system exists because of a class of failure that produces no error, no bounce, no complaint — just an email that never arrives.</p>
+  <p>And the most valuable thing I wrote about it was not code. It was the sentence admitting which domain it doesn't watch.</p>
+</div></section>
+
+<div class="wrap"><nav class="pager" aria-label="Other case studies">
+  <a href="seo-generator.html">← SEO article engine</a>
+  <a href="backbone.html">Automation backbone →</a>
+</nav></div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="logo"><span class="mk">MR</span></div>
+    <div class="mono">Designed &amp; built by Manny Ruesch · 2026</div>
+    <a href="#top">Back to top ↑</a>
+  </div>
+</footer>
+
+<script src="../assets/site.js"></script>
+</body>
+</html>
