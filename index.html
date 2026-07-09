@@ -380,7 +380,14 @@ a.card:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
 /* progress bar, cursor glow, nav and reveal now live in assets/site.js */
 (function(){
   const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(RM)return;
+  if(RM){
+    /* Animations are off, but the metrics must still show their real values,
+       not the 0 they start at in the HTML. The count-up below never runs. */
+    document.querySelectorAll('.metrics .num').forEach(n=>{
+      n.textContent=(n.dataset.prefix||'')+n.dataset.to+(n.dataset.suffix||'');
+    });
+    return;
+  }
 
   /* card 3D tilt + spotlight */
   document.querySelectorAll('.card').forEach(card=>{
