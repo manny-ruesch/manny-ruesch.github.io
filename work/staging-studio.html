@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI home-staging, rebuilt as a product · Manny Ruesch</title>
+<meta name="description" content="Taking an internal AI home-staging tool and rebuilding it, from scratch, as a generic self-hostable product: one config block, the buyer's own API key, and a form that can't drain their budget.">
+<link rel="canonical" href="https://manny-ruesch.github.io/work/staging-studio.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AI home-staging, rebuilt as a product">
+<meta property="og:description" content="Taking an internal AI home-staging tool and rebuilding it, from scratch, as a generic self-hostable product: one config block, the buyer's own API key, and a form that can't drain their budget.">
+<meta property="og:url" content="https://manny-ruesch.github.io/work/staging-studio.html">
+<meta property="og:image" content="https://manny-ruesch.github.io/assets/og/staging-studio.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="theme-color" content="#0A0D12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="stylesheet" href="../assets/case.css">
+</head>
+<body id="top">
+<div id="progress"></div><div id="glow"></div>
+
+<nav id="nav" aria-label="Main">
+  <div class="wrap">
+    <a href="../index.html" class="logo"><span class="mk">MR</span><span>Manny Ruesch</span></a>
+    <div class="navlinks">
+      <a href="../index.html#work" class="hide-sm">Work</a>
+      <a href="../index.html#stack" class="hide-sm">Stack</a>
+      <a href="../index.html#contact" class="hide-sm">Contact</a>
+      <a href="https://www.linkedin.com/in/manny-ruesch" target="_blank" rel="noopener" class="cta">LinkedIn ↗</a>
+    </div>
+  </div>
+</nav>
+
+<header class="case-head">
+  <div class="wrap">
+    <a href="../index.html#work" class="backlink">← Work</a>
+    <div class="kicker">// product · self-hosted, rebrandable</div>
+    <h1>AI home-staging, rebuilt as a product</h1>
+    <p class="lede">I built the staging pipeline internally first. Then I asked a harder question: could any agency run this without me? So I rebuilt it from scratch, generic, self-hostable, and impossible to trace back to where it came from.</p>
+    <div class="metrics3">
+      <div><b>1</b><span>config block re-skins it</span></div>
+      <div><b>0</b><span>data leaves the buyer's server</span></div>
+      <div><b>3</b><span>languages, 30 styles</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="sec rv"><div class="wrap">
+  <h2>The problem</h2>
+  <p>The internal version (<a href="staging.html">the case study is here</a>) worked, but it was welded to one agency's infrastructure, brand and CRM. A tool is not a product.</p>
+  <p>And the market it would sell into has a specific pain: agencies pay for AI SaaS subscriptions they barely use, and hand their listing photos to a third party in the process. In France and Germany, that second part is not a detail. It is a data-sovereignty objection that kills the sale.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>What I built</h2>
+  <p>A clean-room rebuild: same capability, none of the original. It runs on the buyer's own n8n, calls the image model with the buyer's own API key, and stores renders on the buyer's own Drive. I never see their data, and neither does anyone else.</p>
+  <ul>
+    <li>One <code>CONFIG</code> block at the top re-skins the entire product: logo, colours, the 30-style catalogue, and the interface language (EN / FR / DE).</li>
+    <li>Native n8n Data Tables instead of an external database, so a buyer wires up two or three credentials, not five.</li>
+    <li>A one-click table setup, a usage-and-cost page, and a README credentials card, so the product supports itself instead of me.</li>
+    <li>Access code, editable daily quota and a honeypot, so a public form cannot quietly burn through the buyer's API budget.</li>
+  </ul>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>How it works</h2>
+  <div class="diag">
+    <svg viewBox="0 0 920 256" role="img" aria-label="A buyer uploads a photo through a rebrandable form. The form is driven by a single config block that sets the logo, colours, styles and language. The image model is called with the buyer's own API key, and the render is stored on the buyer's own Drive and shown on a result page. An access-and-quota gate protects the buyer's API budget, and a usage-and-cost page reports spend.">
+      <defs><marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+        <path d="M0 0 L6 3 L0 6 z" fill="rgba(255,255,255,.34)"/></marker></defs>
+      <g class="edge" marker-end="url(#ah)">
+        <path d="M134 66 H166"/><path d="M314 66 H346"/><path d="M534 66 H566"/><path d="M706 66 H738"/>
+        <path d="M410 100 C410 142 384 142 384 174"/><path d="M478 100 C478 142 564 142 564 174"/>
+        <path d="M642 208 H690" stroke-dasharray="4 5"/>
+      </g>
+      <g class="flow">
+        <path d="M134 66 H166"/><path d="M314 66 H346"/><path d="M534 66 H566"/><path d="M706 66 H738"/>
+        <path d="M410 100 C410 142 384 142 384 174"/><path d="M478 100 C478 142 564 142 564 174"/>
+      </g>
+      <g class="bx">
+        <rect x="16" y="40" width="118" height="52" rx="10"/>
+        <text x="75" y="62">Buyer</text><text class="s" x="75" y="78">uploads a photo</text>
+        <rect x="174" y="40" width="140" height="52" rx="10"/>
+        <text x="244" y="62">Rebrandable form</text><text class="s" x="244" y="78">their logo · language</text>
+        <rect x="574" y="40" width="132" height="52" rx="10"/>
+        <text x="640" y="62">Their Drive</text><text class="s" x="640" y="78">renders stay with them</text>
+        <rect x="746" y="40" width="158" height="52" rx="10"/>
+        <text x="825" y="62">Result page</text><text class="s" x="825" y="78">before / after</text>
+        <rect x="306" y="180" width="156" height="56" rx="10"/>
+        <text x="384" y="204">CONFIG block</text><text class="s" x="384" y="220">logo · colours · styles</text>
+        <rect x="486" y="180" width="156" height="56" rx="10"/>
+        <text x="564" y="204">Access + quota</text><text class="s" x="564" y="220">protects their budget</text>
+      </g>
+      <g class="acc-b">
+        <rect x="354" y="32" width="180" height="68" rx="12"/>
+        <text x="444" y="60">Image model</text>
+        <text class="s" x="444" y="78">the buyer's own key</text>
+        <text class="s" x="444" y="92">pay per image</text>
+      </g>
+      <g class="dash-b">
+        <rect x="690" y="182" width="214" height="52" rx="10"/>
+        <text x="797" y="204">Usage &amp; cost</text><text class="s" x="797" y="220">cents per image</text>
+      </g>
+    </svg>
+  </div>
+  <p class="diag-cap">It runs on the buyer's own n8n, with the buyer's own key. The photos never leave their infrastructure.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Under the hood</h2>
+
+  <div class="callout decision">
+    <span class="badge">DECISION</span>
+    <h3>Self-hosted, not a SaaS</h3>
+    <p>The whole product runs on the buyer's own n8n instance, calling the AI with the buyer's own API key. Their listing photos never touch my servers, because I don't have any in the loop.</p>
+    <p class="outcome"><b>TRADE-OFF</b> No recurring subscription revenue, and the buyer has to wire up a few credentials. In exchange, the data-sovereignty objection that kills SaaS deals in the EU simply doesn't apply, and I have zero infrastructure to run.</p>
+  </div>
+
+  <div class="callout decision">
+    <span class="badge">DECISION</span>
+    <h3>Everything re-skins from one block</h3>
+    <p>Logo, colours, the 30-style catalogue, the interface language: all of it lives in a single <code>CONFIG</code> node at the top. One edit turns the product into the buyer's product. No hunting through nodes.</p>
+    <p class="outcome"><b>TRADE-OFF</b> Front-loading that config discipline cost real time. It is what makes the difference between a demo and something a stranger can actually operate.</p>
+  </div>
+
+  <div class="callout decision">
+    <span class="badge">DECISION</span>
+    <h3>A public form must not be able to drain a wallet</h3>
+    <p>The moment the form is public, anyone who finds the URL is spending the buyer's API budget. So the product ships an access code, a daily quota the buyer edits from a dashboard, and a honeypot field checked server-side.</p>
+    <p class="outcome"><b>TRADE-OFF</b> A little friction for the buyer's own staff. The alternative is a stranger turning their AI bill into a denial-of-wallet attack overnight.</p>
+  </div>
+
+  <div class="callout pitfall">
+    <span class="badge">PITFALL</span>
+    <h3>“Generic” has to be proven, not assumed</h3>
+    <p>Shipping a clean-room version means <em>zero</em> trace of where it came from. I grepped the whole build for the original brand, city and domain. Fun trap: a naive search for the company name flagged the German word <code>herunterladen</code> (“download”), which contains the same letters.</p>
+    <p class="outcome"><b>FIX</b> Whole-word, case-aware matching, and a manual read of every hit. The exported product has no residue, verified before it could ever leave my machine.</p>
+  </div>
+
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Results</h2>
+  <p>A self-contained product a buyer imports, configures from one block, and runs entirely on their own stack, in English, French or German. Validated end to end: a real photo through the real pipeline, then the throwaway test instance deleted and the exported JSON checked for leftovers.</p>
+  <p><strong>What it demonstrates.</strong> The interesting part here isn't the AI, it's the productisation: turning something that worked for one team into something a stranger can install, brand, protect and pay for, without me in the room.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Stack</h2>
+  <ul>
+    <li><strong>n8n</strong>, self-hosted by the buyer: the product ships as a single importable workflow</li>
+    <li><strong>Gemini image model</strong>: called with the buyer's own key, billed to them</li>
+    <li><strong>n8n Data Tables</strong>: the job ledger and quota, no external database</li>
+    <li><strong>Google Drive</strong>: the buyer's own, so renders stay in their hands</li>
+    <li><strong>Vanilla JS front end</strong>, re-skinned entirely from the CONFIG block</li>
+  </ul>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>What I took away</h2>
+  <p>A tool solves your problem. A product solves a stranger's problem when you are not there to help. The gap between the two is almost entirely config, guardrails and documentation, not features.</p>
+  <p>And in the EU market, “your data never leaves your server” is not a footnote. It is the whole pitch.</p>
+</div></section>
+
+<div class="wrap"><nav class="pager" aria-label="Other case studies">
+  <a href="../index.html#work">← All work</a>
+  <a href="seo-studio.html">SEO engine, as a product →</a>
+</nav></div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="logo"><span class="mk">MR</span></div>
+    <div class="mono">Designed &amp; built by Manny Ruesch · 2026</div>
+    <a href="#top">Back to top ↑</a>
+  </div>
+</footer>
+
+<script src="../assets/site.js"></script>
+</body>
+</html>

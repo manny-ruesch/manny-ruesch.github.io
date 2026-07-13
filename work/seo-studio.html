@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A three-language SEO engine, as a product · Manny Ruesch</title>
+<meta name="description" content="Packaging a multilingual SEO article engine so anyone can run it: one config block for the brand voice, free keyword data by design, and the honest choice not to promise it beats AI detectors.">
+<link rel="canonical" href="https://manny-ruesch.github.io/work/seo-studio.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="A three-language SEO engine, as a product">
+<meta property="og:description" content="Packaging a multilingual SEO article engine so anyone can run it: one config block for the brand voice, free keyword data by design, and the honest choice not to promise it beats AI detectors.">
+<meta property="og:url" content="https://manny-ruesch.github.io/work/seo-studio.html">
+<meta property="og:image" content="https://manny-ruesch.github.io/assets/og/seo-studio.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="theme-color" content="#0A0D12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="stylesheet" href="../assets/case.css">
+</head>
+<body id="top">
+<div id="progress"></div><div id="glow"></div>
+
+<nav id="nav" aria-label="Main">
+  <div class="wrap">
+    <a href="../index.html" class="logo"><span class="mk">MR</span><span>Manny Ruesch</span></a>
+    <div class="navlinks">
+      <a href="../index.html#work" class="hide-sm">Work</a>
+      <a href="../index.html#stack" class="hide-sm">Stack</a>
+      <a href="../index.html#contact" class="hide-sm">Contact</a>
+      <a href="https://www.linkedin.com/in/manny-ruesch" target="_blank" rel="noopener" class="cta">LinkedIn ↗</a>
+    </div>
+  </div>
+</nav>
+
+<header class="case-head">
+  <div class="wrap">
+    <a href="../index.html#work" class="backlink">← Work</a>
+    <div class="kicker">// product · self-hosted, rebrandable</div>
+    <h1>A three-language SEO engine, as a product</h1>
+    <p class="lede">The internal version wrote authority content in German, English and French for one company. I rebuilt it, generic, so any small business could point it at their own brand and run it for the cost of a Gemini call.</p>
+    <div class="metrics3">
+      <div><b>1</b><span>config block sets the voice</span></div>
+      <div><b>€0</b><span>keyword data, by design</span></div>
+      <div><b>3</b><span>languages, 3 personas</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="sec rv"><div class="wrap">
+  <h2>The problem</h2>
+  <p>The internal engine (<a href="seo-generator.html">the case study is here</a>) was tuned to one brand's voice, one domain, one set of internal links. To become a product it had to forget all of that and learn it from a config file instead.</p>
+  <p>There was also a positioning trap. The market for “AI writes your blog” is saturated and mostly junk. If the product was going to be worth anything, its pitch had to be something the junk couldn't claim.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>What I built</h2>
+  <p>A clean-room rebuild driven by a single <code>CONFIG</code> block. The buyer writes their brand voice, three reader personas and their domain once; every prompt, every internal-link lookup and every piece of on-page markup reads from it.</p>
+  <ul>
+    <li>One keyword goes in; a German, English and French article comes out, each adapted to a different reader, not translated.</li>
+    <li>Keyword research runs on Google's autocomplete endpoint, which is free and needs no key, so the buyer's only cost is the Gemini call.</li>
+    <li>A bring-your-own-keyword mode, for buyers who already know what they want to rank for.</li>
+    <li>Full on-page package per article: meta description, JSON-LD schema, internal links from the sitemap, and ready-to-paste HTML.</li>
+  </ul>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>How it works</h2>
+  <div class="diag">
+    <svg viewBox="0 0 920 256" role="img" aria-label="A buyer submits a topic. Google Autocomplete expands it for free. A config block holding the brand voice and personas drives the Gemini engine, which writes a master article and adapts it into English and French. An on-page package of meta, schema and internal links is attached, and documents come out. A dashed box marks mandatory human review before publishing.">
+      <defs><marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+        <path d="M0 0 L6 3 L0 6 z" fill="rgba(255,255,255,.34)"/></marker></defs>
+      <g class="edge" marker-end="url(#ah)">
+        <path d="M156 66 H188"/><path d="M366 66 H398"/><path d="M576 66 H608"/><path d="M756 66 H778"/>
+        <path d="M450 100 C450 142 391 142 391 174"/><path d="M540 100 C540 142 591 142 591 174"/>
+        <path d="M845 92 C845 132 805 132 805 174" stroke-dasharray="4 5"/>
+      </g>
+      <g class="flow">
+        <path d="M156 66 H188"/><path d="M366 66 H398"/><path d="M576 66 H608"/><path d="M756 66 H778"/>
+        <path d="M450 100 C450 142 391 142 391 174"/><path d="M540 100 C540 142 591 142 591 174"/>
+      </g>
+      <g class="bx">
+        <rect x="16" y="40" width="140" height="52" rx="10"/>
+        <text x="86" y="62">Buyer</text><text class="s" x="86" y="78">topic · language</text>
+        <rect x="196" y="40" width="170" height="52" rx="10"/>
+        <text x="281" y="62">Autocomplete</text><text class="s" x="281" y="78">free · no key</text>
+        <rect x="616" y="40" width="140" height="52" rx="10"/>
+        <text x="686" y="62">Adapt EN · FR</text><text class="s" x="686" y="78">per persona</text>
+        <rect x="786" y="40" width="118" height="52" rx="10"/>
+        <text x="845" y="62">Docs</text><text class="s" x="845" y="78">+ HTML</text>
+        <rect x="306" y="180" width="170" height="56" rx="10"/>
+        <text x="391" y="204">CONFIG block</text><text class="s" x="391" y="220">brand voice · personas</text>
+        <rect x="506" y="180" width="170" height="56" rx="10"/>
+        <text x="591" y="204">On-page package</text><text class="s" x="591" y="220">meta · schema · links</text>
+      </g>
+      <g class="acc-b">
+        <rect x="406" y="32" width="170" height="68" rx="12"/>
+        <text x="491" y="60">Master article</text>
+        <text class="s" x="491" y="78">Gemini</text>
+        <text class="s" x="491" y="92">voice from CONFIG</text>
+      </g>
+      <g class="dash-b">
+        <rect x="706" y="182" width="198" height="52" rx="10"/>
+        <text x="805" y="204">Human review</text><text class="s" x="805" y="220">no auto-publish</text>
+      </g>
+    </svg>
+  </div>
+  <p class="diag-cap">The buyer edits one block. Everything downstream reads their brand voice, personas and domain from it.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Under the hood</h2>
+
+  <div class="callout decision">
+    <span class="badge">DECISION</span>
+    <h3>One config block owns the whole personality</h3>
+    <p>Brand voice, three personas, domain, internal-link rules: all in one node. The prompts stopped hard-coding a company and started reading from it. That single change is what turned a bespoke workflow into something a buyer can make their own.</p>
+    <p class="outcome"><b>TRADE-OFF</b> Rewiring every prompt and every downstream node to a central config was tedious and invisible work. It is also the entire reason the product exists.</p>
+  </div>
+
+  <div class="callout decision">
+    <span class="badge">DECISION</span>
+    <h3>Free keyword data, on purpose</h3>
+    <p>The keyword step calls Google's public autocomplete endpoint, not a paid SEO API. It returns real search suggestions, for nothing. So the buyer's running cost is just the Gemini call, and the pitch is honest: no hidden subscription bolted on.</p>
+    <p class="outcome"><b>TRADE-OFF</b> No search-volume numbers, which a paid API would give. For a small business publishing a handful of articles a month, that data was never worth the monthly bill.</p>
+  </div>
+
+  <div class="callout decision">
+    <span class="badge">DECISION</span>
+    <h3>Not promising to beat AI detectors</h3>
+    <p>Every competitor in this space promises “100% human, undetectable”. I had already proven, on the internal version, that the detectors contradict each other, the same text scored 82% AI on one and 27% on another. So the product ships a strong, configurable brand voice and human review, and refuses to sell a number I know is noise.</p>
+    <p class="outcome"><b>TRADE-OFF</b> A less flashy sales line. But a claim that falls apart the first time a buyer tests it is worse than no claim.</p>
+  </div>
+
+  <div class="callout pitfall">
+    <span class="badge">HONEST</span>
+    <h3>What v1 doesn't do yet</h3>
+    <p>The output is fully trilingual, but the form labels and the orchestration prompts the buyer edits are still in French. A buyer who doesn't read French can run it, but configuring it deeply assumes they do.</p>
+    <p class="outcome"><b>NEXT</b> An English configuration pack is the obvious first upgrade, and it is scoped rather than hand-waved.</p>
+  </div>
+
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Results</h2>
+  <p>A self-contained engine that produces three-language articles, each with a full on-page SEO package, for cents per run. Validated end to end on a real topic, then the test instance torn down and the export checked for any trace of the original brand.</p>
+  <p><strong>What it demonstrates.</strong> Product judgement, more than code: choosing a free data source over a billable one, and turning down the dishonest sales claim everyone else in the category makes.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Stack</h2>
+  <ul>
+    <li><strong>n8n</strong>, self-hosted by the buyer: ships as one importable workflow</li>
+    <li><strong>Gemini</strong>: the master article and its two persona adaptations</li>
+    <li><strong>Google Autocomplete</strong>: keyword expansion, free and unauthenticated</li>
+    <li><strong>Google Drive &amp; Docs</strong>: the buyer's own, article plus ready-to-paste HTML</li>
+    <li><strong>A single CONFIG node</strong>: brand voice, personas, domain, link rules</li>
+  </ul>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>What I took away</h2>
+  <p>The hardest product decisions were the ones about what <em>not</em> to build and what <em>not</em> to claim. Picking the free keyword source and refusing the “undetectable” promise both cost me a flashier pitch, and both were right.</p>
+  <p>Honesty is a feature. It is the one a saturated market can't copy.</p>
+</div></section>
+
+<div class="wrap"><nav class="pager" aria-label="Other case studies">
+  <a href="staging-studio.html">← AI home-staging, as a product</a>
+  <a href="../index.html#work">All work →</a>
+</nav></div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="logo"><span class="mk">MR</span></div>
+    <div class="mono">Designed &amp; built by Manny Ruesch · 2026</div>
+    <a href="#top">Back to top ↑</a>
+  </div>
+</footer>
+
+<script src="../assets/site.js"></script>
+</body>
+</html>
