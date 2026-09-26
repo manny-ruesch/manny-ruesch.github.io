@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Critic-Refine: an autonomous 3-tier committee for AI code · Manny Ruesch</title>
+<meta name="description" content="How I built a self-contained Actor-Critic-Judge committee skill for Hermes Agent that catches memory leaks, timing attacks, and edge-case deadlocks before delivery.">
+<link rel="canonical" href="https://manny-ruesch.github.io/work/critic-refine.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Critic-Refine: an autonomous 3-tier committee for AI code">
+<meta property="og:description" content="How I built a self-contained Actor-Critic-Judge committee skill for Hermes Agent that catches memory leaks, timing attacks, and edge-case deadlocks before delivery.">
+<meta property="og:url" content="https://manny-ruesch.github.io/work/critic-refine.html">
+<meta property="og:image" content="https://manny-ruesch.github.io/assets/og/home.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="theme-color" content="#0A0D12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="stylesheet" href="../assets/case.css">
+</head>
+<body id="top">
+<div id="progress"></div><div id="glow"></div>
+
+<nav id="nav" aria-label="Main">
+  <div class="wrap">
+    <a href="../index.html" class="logo"><span class="mk">MR</span><span>Manny Ruesch</span></a>
+    <div class="navlinks">
+      <a href="../index.html#work" class="hide-sm">Work</a>
+      <a href="../index.html#stack" class="hide-sm">Stack</a>
+      <a href="../index.html#contact" class="hide-sm">Contact</a>
+      <a href="https://www.linkedin.com/in/manny-ruesch" target="_blank" rel="noopener" class="cta">LinkedIn ↗</a>
+    </div>
+  </div>
+</nav>
+
+<header class="case-head">
+  <div class="wrap">
+    <a href="../index.html#work" class="backlink">← Work</a>
+    <div class="kicker">// autonomous agents · hermes agent skill</div>
+    <h1>An autonomous committee that stress-tests AI code before you see it</h1>
+    <p class="lede">Single-pass LLMs produce code that compiles but crashes under edge cases. Critic-Refine simulates a 3-tier adversarial committee: a generator, a polymorphic domain critic, and a judge executing mental dry-runs with explicit trade-offs.</p>
+    <div class="metrics3">
+      <div><b>3-tier</b><span>Actor-Critic-Judge</span></div>
+      <div><b>0–100</b><span>Calibrated confidence</span></div>
+      <div><b>&lt; 8 s</b><span>In-turn turnaround</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="sec rv"><div class="wrap">
+  <h2>The problem</h2>
+  <p>Single-pass AI generators suffer from structural complacency: they write code that looks clean, passes basic happy-path unit tests, and satisfies the prompt on the surface.</p>
+  <p>In production, however, subtle failure modes remain undetected: floating-point precision imprecisions (<code>1e-16</code>) causing CPU micro-spins, silent <code>float('nan')</code> bypasses freezing thread pools, timing attacks in token comparisons, or memory leaks under concurrency. Standard chat assistants lack a built-in adversarial counterweight to catch these issues before handing code to the engineer.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>What I built</h2>
+  <p>A native, production-grade skill for <strong>Hermes Agent</strong> (v1.0.0) that intercepts complex engineering tasks and runs an internal 3-role committee before generating the final response.</p>
+  <ul>
+    <li><strong>The Generator (Actor):</strong> Architectures the first-pass implementation, prioritizing functional coverage and core logic.</li>
+    <li><strong>The Polymorphic Critic:</strong> Dynamically adopts the domain persona of the harshest auditor (SecOps cryptographer, concurrency specialist, DBA, distributed systems engineer) to attack the solution.</li>
+    <li><strong>The Mental Dry-Run:</strong> The Judge executes mental stress tests on boundary conditions (null pointers, inf, network partitions, high contention) and triggers automated revision loops (max 3).</li>
+    <li><strong>Radical Trade-Off Transparency:</strong> The output documents what was intentionally sacrificed (e.g. latency vs. idempotency) alongside a 0–100 confidence score and residual production risks.</li>
+  </ul>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>How it works</h2>
+  <div class="diag">
+    <svg viewBox="0 0 920 256" role="img" aria-label="A user prompt is received by the Generator. It produces an initial draft which is passed to the Polymorphic Critic for an adversarial teardown. If critical flaws exist, an iteration loop feeds fixes back to the Generator (capped at 3 cycles). The Judge runs a mental dry-run, reconciles trade-offs, and outputs a 4-section executive report.">
+      <defs>
+        <marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+          <path d="M0 0 L6 3 L0 6 z" fill="rgba(255,255,255,.34)"/>
+        </marker>
+      </defs>
+      <g class="edge" marker-end="url(#ah)">
+        <path d="M124 70 H160"/>
+        <path d="M310 70 H350"/>
+        <path d="M530 70 H570"/>
+        <path d="M720 70 H760"/>
+        <path d="M440 106 V150 H235 V98"/>
+      </g>
+      <g class="flow">
+        <path d="M124 70 H160"/>
+        <path d="M310 70 H350"/>
+        <path d="M530 70 H570"/>
+        <path d="M720 70 H760"/>
+      </g>
+      <g class="bx">
+        <rect x="14" y="44" width="110" height="52" rx="10"/>
+        <text x="69" y="66">User Prompt</text><text class="s" x="69" y="82">high-stakes task</text>
+
+        <rect x="160" y="44" width="150" height="52" rx="10"/>
+        <text x="235" y="66">01 · Generator</text><text class="s" x="235" y="82">first-pass solution</text>
+
+        <rect x="570" y="40" width="150" height="60" rx="10"/>
+        <text x="645" y="64">03 · Judge Arbitrator</text><text class="s" x="645" y="80">dry-run &amp; trade-offs</text>
+
+        <rect x="760" y="44" width="146" height="52" rx="10"/>
+        <text x="833" y="66">Output Report</text><text class="s" x="833" y="82">audit + solution</text>
+
+        <rect x="250" y="150" width="220" height="48" rx="8"/>
+        <text x="360" y="172">Iteration Loop (max 3x)</text><text class="s" x="360" y="186">if critical vulnerabilities found</text>
+      </g>
+      <g class="acc-b">
+        <rect x="350" y="38" width="180" height="64" rx="12"/>
+        <text x="440" y="64">02 · Polymorphic Critic</text>
+        <text class="s" x="440" y="80">SecOps · Concurrency · DBA</text>
+      </g>
+    </svg>
+  </div>
+  <p class="diag-cap">Adversarial audit is executed before the user ever sees a character of code.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Under the hood</h2>
+
+  <div class="callout pitfall">
+    <span class="badge">PITFALL</span>
+    <h3>The silent float('nan') infinite loop trap</h3>
+    <p>In standard rate limiter or validation code, guards like <code>if tokens &lt;= 0: raise ValueError</code> look airtight. But in Python and IEEE 754, comparisons against <code>float('nan')</code> always return <code>False</code>.</p>
+    <p>If an input payload passes <code>NaN</code>, it slips right past the validator into the while-loop, where <code>self.tokens &gt;= tokens</code> is permanently <code>False</code>, triggering a <strong>100% CPU infinite spin that hangs the worker thread</strong>.</p>
+    <p class="outcome"><b>FIX</b> The Critic systematically checks numeric boundary conditions and enforces <code>math.isfinite()</code> across all arithmetic entry points.</p>
+  </div>
+
+  <div class="callout decision">
+    <span class="badge">DECISION</span>
+    <h3>In-turn multi-persona reasoning vs. isolated subagent processes</h3>
+    <p>Hermes Agent can spawn independent background OS subagents via <code>delegate_task</code>, each with isolated terminal and context. While powerful, multi-agent spawning incurs 30 to 60 seconds of process coordination latency.</p>
+    <p class="outcome"><b>TRADE-OFF</b> For 95% of tasks, Critic-Refine executes as a sequential multi-role Chain-of-Thought in a single fast turn (&lt; 8 seconds). Background subagents are reserved only for full repository deep-dives and terminal execution suites.</p>
+  </div>
+
+  <div class="callout pitfall">
+    <span class="badge">PITFALL</span>
+    <h3>The illusion of "flawless" AI code</h3>
+    <p>Most AI assistants present their code as universally optimal. In real software engineering, every production decision involves trade-offs: mutexes prevent race conditions but introduce lock contention; synchronous fsync ensures durability but throttles throughput.</p>
+    <p class="outcome"><b>DECISION</b> The Judge is strictly forbidden from claiming perfection. It must explicitly articulate the trade-offs made and score the residual risks before clearing deployment.</p>
+  </div>
+
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Results</h2>
+  <p>Benchmarked across complex distributed and concurrent tasks:</p>
+  <ul>
+    <li><strong>Token Bucket Rate Limiter:</strong> Caught IEEE 754 micro-spin (sub-millisecond busy-waits) and reentrant deadlocks on <code>threading.Lock</code>.</li>
+    <li><strong>Payment Webhooks:</strong> Replaced variable-time string comparisons with <code>hmac.compare_digest</code> (eliminating timing attacks) and blocked memory-bomb DoS attacks via stream chunk capping.</li>
+    <li><strong>Write-Ahead Log Engine:</strong> Replaced fragile JSON appending with binary frame CRC32 verification and asynchronous group commit batching.</li>
+  </ul>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Stack</h2>
+  <ul>
+    <li><strong>Hermes Agent</strong>: Open-source agent runtime by Nous Research</li>
+    <li><strong>Skill Engine</strong>: Declarative markdown-based procedural agent memory</li>
+    <li><strong>Multi-Agent Protocol</strong>: Actor-Critic adversarial pipeline with calibrated scoring</li>
+    <li><strong>Google AI Studio (Gemini Flash)</strong>: High-throughput reasoning backbone (&gt;180 tokens/sec)</li>
+  </ul>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>What I took away</h2>
+  <p>Adversarial tension beats model size. A lightweight, cost-effective model constrained by an aggressive critic consistently out-engineers an unchecked flagship model that is left to grade its own work.</p>
+</div></section>
+
+<div class="wrap"><nav class="pager" aria-label="Other case studies">
+  <a href="backbone.html">← Automation backbone</a>
+  <a href="staging.html">AI Home-Staging →</a>
+</nav></div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="logo"><span class="mk">MR</span></div>
+    <div class="mono">Designed &amp; built by Manny Ruesch · 2026</div>
+    <a href="#top">Back to top ↑</a>
+  </div>
+</footer>
+
+<script src="../assets/site.js"></script>
+</body>
+</html>
