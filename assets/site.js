@@ -81,4 +81,77 @@ document.querySelectorAll('.rv').forEach(el=>io.observe(el));
   if(footMk)new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){boot(footMk);o.disconnect();}}),{threshold:.5}).observe(footMk);
 })();
 
+/* ---- before / after comparison slider ---- */
+(function(){
+  document.querySelectorAll('.ba-slider').forEach(slider=>{
+    let dragging=false,pos=50;
+    function setP(clientX){
+      const r=slider.getBoundingClientRect();
+      const x=Math.max(0,Math.min(clientX-r.left,r.width));
+      pos=(x/r.width)*100;
+      slider.style.setProperty('--pos',pos.toFixed(1)+'%');
+    }
+    slider.addEventListener('pointerdown',e=>{
+      dragging=true;
+      slider.setPointerCapture(e.pointerId);
+      setP(e.clientX);
+      e.preventDefault();
+      e.stopPropagation();
+    });
+    slider.addEventListener('pointermove',e=>{
+      if(!dragging)return;
+      setP(e.clientX);
+      e.preventDefault();
+      e.stopPropagation();
+    });
+    function end(e){
+      if(!dragging)return;
+      dragging=false;
+      try{slider.releasePointerCapture(e.pointerId);}catch(_){}
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    slider.addEventListener('pointerup',end);
+    slider.addEventListener('pointercancel',end);
+    slider.addEventListener('click',e=>{
+      e.preventDefault();
+      e.stopPropagation();
+    });
+    slider.addEventListener('keydown',e=>{
+      if(e.key==='ArrowLeft'){pos=Math.max(0,pos-5);slider.style.setProperty('--pos',pos+'%');e.preventDefault();}
+      else if(e.key==='ArrowRight'){pos=Math.min(100,pos+5);slider.style.setProperty('--pos',pos+'%');e.preventDefault();}
+    });
+  });
+})();
+
+/* ---- copy email to clipboard ---- */
+(function(){
+  const btn=document.getElementById('copy-email-btn');
+  const txt=document.getElementById('copy-btn-text');
+  const toast=document.getElementById('toast');
+  let timer;
+  if(!btn)return;
+  btn.addEventListener('click',()=>{
+    const email=btn.dataset.email||'manny.ruesch@gmail.com';
+    function showSuccess(){
+      if(txt)txt.textContent='Copied!';
+      if(toast){
+        toast.classList.add('show');
+        clearTimeout(timer);
+        timer=setTimeout(()=>{
+          toast.classList.remove('show');
+          if(txt)txt.textContent='Copy email';
+        },2800);
+      }
+    }
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(email).then(showSuccess).catch(()=>{
+        window.location.href='mailto:'+email;
+      });
+    } else {
+      window.location.href='mailto:'+email;
+    }
+  });
+})();
+
 })();

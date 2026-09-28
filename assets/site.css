@@ -63,12 +63,30 @@ a{color:inherit;text-decoration:none}
 @media(max-width:640px){.navlinks a.hide-sm{display:none}}
 
 /* ---- BUTTONS ---- */
-.btn{display:inline-flex;align-items:center;gap:10px;font-weight:500;font-size:.95rem;padding:14px 26px;border-radius:999px;transition:.28s var(--ease)}
-.btn.primary{background:var(--acc);color:#052019}
+.btn{display:inline-flex;align-items:center;gap:10px;font-weight:500;font-size:.95rem;padding:14px 26px;border-radius:999px;transition:.28s var(--ease);cursor:pointer;font-family:inherit;text-decoration:none}
+.btn.primary{background:var(--acc);color:#052019;border:1px solid transparent}
 .btn.primary:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(94,234,212,.28)}
-.btn.ghost{border:1px solid var(--line2);color:var(--text)}
+.btn.ghost{border:1px solid var(--line2);color:var(--text);background:transparent}
 .btn.ghost:hover{border-color:var(--acc);color:var(--acc)}
 .btn.mag{will-change:transform;transition:transform .18s var(--ease),box-shadow .28s,background .28s,color .28s}
+
+/* ---- BEFORE / AFTER SLIDER ---- */
+.ba-slider{position:relative;width:100%;aspect-ratio:4/3;border-radius:12px;overflow:hidden;border:1px solid var(--line2);background:#0d1118;user-select:none;-webkit-user-select:none;touch-action:none;cursor:ew-resize}
+.ba-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;display:block}
+.ba-after-wrap{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;clip-path:inset(0 0 0 calc(var(--pos, 50%)));pointer-events:none}
+.ba-handle{position:absolute;top:0;bottom:0;left:var(--pos, 50%);width:0;pointer-events:none;z-index:10;transform:translateX(-50%)}
+.ba-line{position:absolute;top:0;bottom:0;left:50%;width:2px;background:#fff;box-shadow:0 0 8px rgba(0,0,0,.6),0 0 10px var(--acc);transform:translateX(-50%)}
+.ba-button{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:36px;height:36px;border-radius:50%;background:rgba(10,13,18,.88);backdrop-filter:blur(8px);border:2px solid #fff;box-shadow:0 4px 14px rgba(0,0,0,.6),0 0 12px var(--acc);display:flex;align-items:center;justify-content:center;color:var(--acc);gap:2px}
+.ba-button svg{width:11px;height:11px}
+.ba-badge{position:absolute;top:10px;font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.14em;padding:3px 8px;border-radius:6px;z-index:5;pointer-events:none}
+.ba-badge-before{left:10px;color:#fff;background:rgba(0,8,10,.7);border:1px solid rgba(255,255,255,.1)}
+.ba-badge-after{right:10px;color:#052019;background:var(--acc);font-weight:600}
+
+/* ---- TOAST NOTIFICATION ---- */
+#toast{position:fixed;bottom:28px;right:28px;background:rgba(17,22,33,.94);backdrop-filter:blur(14px);border:1px solid var(--acc);color:var(--text);padding:12px 22px;border-radius:999px;font-size:.82rem;display:flex;align-items:center;gap:10px;box-shadow:0 12px 32px rgba(0,0,0,.55),0 0 20px var(--acc-dim);z-index:100;opacity:0;transform:translateY(16px) scale(.95);pointer-events:none;transition:opacity .3s var(--ease),transform .3s var(--ease)}
+#toast svg{color:var(--acc);flex-shrink:0}
+#toast.show{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+@media(max-width:640px){#toast{bottom:20px;right:20px;left:20px;justify-content:center;font-size:.76rem}}
 
 /* ---- FOOTER ---- */
 footer{border-top:1px solid var(--line);padding:36px 0}
