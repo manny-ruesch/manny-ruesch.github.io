@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700;800;900&family=JetBrains+Mono:wght@600;700;800&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 1200px;
+    height: 900px;
+    background-color: #ECECEC;
+    background-image: 
+      radial-gradient(rgba(0, 0, 0, 0.16) 1.5px, transparent 1.5px),
+      linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+    background-size: 24px 24px, 120px 120px, 120px 120px;
+    overflow: hidden;
+    font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  }
+  .canvas {
+    width: 1200px;
+    height: 900px;
+    padding: 38px 42px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .board {
+    width: 100%;
+    height: 100%;
+    background: #FFFFFF;
+    border: 4px solid #000000;
+    box-shadow: 14px 14px 0px #000000;
+    border-radius: 8px;
+    padding: 36px 42px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+  }
+
+  /* TOP STATUS STRIP */
+  .top-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .badge-black {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 800;
+    color: #FFFFFF;
+    background: #000000;
+    border: 2px solid #000000;
+    padding: 7px 16px;
+    border-radius: 4px;
+    letter-spacing: 0.06em;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    box-shadow: 3px 3px 0px rgba(0,0,0,0.15);
+  }
+  .badge-black .dot {
+    width: 9px;
+    height: 9px;
+    background: #FF385C;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #FF385C;
+  }
+  .badge-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    font-weight: 800;
+    color: #000000;
+    background: #FFF0F2;
+    border: 2.5px solid #000000;
+    box-shadow: 3px 3px 0px #000000;
+    padding: 6px 16px;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+  }
+
+  /* MAIN 2-COLUMN GRID */
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 36px;
+    align-items: center;
+    flex: 1;
+    margin: 10px 0;
+  }
+
+  /* LEFT HERO */
+  .left-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    color: #000000;
+    background: #FFE8EC;
+    border: 2px solid #FF385C;
+    padding: 4px 10px;
+    border-radius: 3px;
+    margin-bottom: 12px;
+    align-self: flex-start;
+  }
+  h1 {
+    font-size: 50px;
+    line-height: 1.02;
+    letter-spacing: -0.04em;
+    font-weight: 900;
+    color: #000000;
+    text-transform: uppercase;
+  }
+  h1 .tag-red {
+    background: #FF385C;
+    color: #FFFFFF;
+    padding: 2px 10px;
+    display: inline-block;
+    border: 3px solid #000000;
+    box-shadow: 4px 4px 0px #000000;
+    transform: rotate(-1.5deg);
+    margin: 4px 0;
+  }
+  .tagline {
+    font-family: 'Inter', sans-serif;
+    font-size: 17px;
+    line-height: 1.45;
+    color: #333333;
+    font-weight: 600;
+    margin-top: 14px;
+    max-width: 44ch;
+  }
+
+  /* STATS ROW */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 22px;
+  }
+  .stat-card {
+    background: #FFFFFF;
+    border: 2.5px solid #000000;
+    box-shadow: 4px 4px 0px #000000;
+    border-radius: 5px;
+    padding: 12px 14px;
+  }
+  .stat-num {
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1;
+    color: #000000;
+    letter-spacing: -0.02em;
+  }
+  .stat-num span {
+    color: #FF385C;
+  }
+  .stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 800;
+    color: #555555;
+    text-transform: uppercase;
+    margin-top: 4px;
+    letter-spacing: 0.04em;
+  }
+
+  /* RIGHT VISUAL SHOWCASE */
+  .right-col {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  /* BEFORE / AFTER SPLIT WINDOW */
+  .split-window {
+    position: relative;
+    background: #000000;
+    border: 3.5px solid #000000;
+    box-shadow: 10px 10px 0px #000000;
+    border-radius: 6px;
+    overflow: hidden;
+    height: 320px;
+  }
+  .split-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+  }
+  .half {
+    width: 50%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+  .half img {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 200%;
+    object-fit: cover;
+  }
+  .half.left img {
+    left: 0;
+  }
+  .half.right img {
+    right: 0;
+  }
+  /* Laser divider */
+  .laser-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 4px;
+    background: #FF385C;
+    transform: translateX(-50%);
+    box-shadow: 0 0 12px #FF385C, 0 0 20px rgba(255, 56, 92, 0.8);
+    z-index: 10;
+  }
+  .laser-handle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 28px;
+    height: 28px;
+    background: #FF385C;
+    border: 2.5px solid #000000;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #FF385C;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFFFFF;
+    font-size: 11px;
+    font-weight: 900;
+    z-index: 12;
+  }
+  .badge-pos-left {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 8;
+    background: rgba(0, 0, 0, 0.85);
+    color: #FFFFFF;
+    border: 1.5px solid #FFFFFF;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 3px;
+    letter-spacing: 0.08em;
+  }
+  .badge-pos-right {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 8;
+    background: #FF385C;
+    color: #FFFFFF;
+    border: 1.5px solid #000000;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    font-weight: 900;
+    padding: 3px 8px;
+    border-radius: 3px;
+    letter-spacing: 0.08em;
+    box-shadow: 2px 2px 0px #000000;
+  }
+  .window-footer {
+    position: absolute;
+    bottom: 10px;
+    left: 12px;
+    right: 12px;
+    z-index: 8;
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid #000000;
+    padding: 6px 12px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .wf-text {
+    font-size: 12px;
+    font-weight: 800;
+    color: #000000;
+  }
+  .wf-metric {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 800;
+    color: #FF385C;
+  }
+
+  /* SECOND MINI FLOATING PROOF CARD */
+  .proof-card {
+    background: #F8F8F8;
+    border: 2.5px solid #000000;
+    box-shadow: 6px 6px 0px #000000;
+    border-radius: 6px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+  }
+  .proof-left {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .proof-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: #000000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .proof-title .live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10B981;
+    box-shadow: 0 0 6px #10B981;
+  }
+  .proof-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: #555555;
+  }
+  .sticker-badge {
+    background: #FFE8EC;
+    color: #E02447;
+    border: 2px solid #000000;
+    box-shadow: 3px 3px 0px #000000;
+    padding: 5px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 800;
+    border-radius: 3px;
+    transform: rotate(2deg);
+  }
+
+  /* BOTTOM FOOTER BAR */
+  .footer-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 18px;
+    border-top: 3.5px solid #000000;
+    margin-top: 4px;
+  }
+  .tech-pills {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .tech-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    font-weight: 800;
+    color: #000000;
+    background: #F0F0F0;
+    border: 2px solid #000000;
+    padding: 6px 12px;
+    border-radius: 4px;
+  }
+  .tech-pill.accent {
+    background: #000000;
+    color: #FFFFFF;
+  }
+  .brand-block {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .brand-block svg {
+    width: 44px;
+    height: 44px;
+    overflow: visible;
+  }
+  .brand-author {
+    display: flex;
+    flex-direction: column;
+  }
+  .brand-author .name {
+    font-size: 21px;
+    font-weight: 900;
+    color: #000000;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  .brand-author .url {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: #666666;
+  }
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="board">
+
+    <!-- TOP STATUS -->
+    <div class="top-strip">
+      <div class="badge-black">
+        <span class="dot"></span>
+        <span>PRODUCTION AI SYSTEMS &amp; AUTOMATION</span>
+      </div>
+      <div class="badge-pill">AVAILABLE FOR FREELANCE &amp; CONTRACTS</div>
+    </div>
+
+    <!-- MAIN GRID -->
+    <div class="content-grid">
+      
+      <!-- LEFT HERO COLUMN -->
+      <div class="left-col">
+        <div class="eyebrow">▸ 11 SYSTEMS SHIPPED IN PRODUCTION</div>
+        <h1>
+          END-TO-END<br>
+          <span class="tag-red">AI &amp; AUTOMATION</span><br>
+          ENGINEERING.
+        </h1>
+        <p class="tagline">
+          I build autonomous n8n workflows, generative AI pipelines, and custom agents that turn hundreds of hours of manual work into self-running systems.
+        </p>
+
+        <!-- STATS ROW -->
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-num">32<span>+</span></div>
+            <div class="stat-label">Workflows Live</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">~33<span>s</span></div>
+            <div class="stat-label">AI Render Speed</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">24<span>/7</span></div>
+            <div class="stat-label">Autonomous Uptime</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT VISUAL COLUMN -->
+      <div class="right-col">
+        
+        <!-- BEFORE/AFTER SPLIT WINDOW -->
+        <div class="split-window">
+          <span class="badge-pos-left">RAW LISTING</span>
+          <span class="badge-pos-right">AI STAGED · 33s</span>
+          <div class="split-inner">
+            <div class="half left">
+              <img src="./staging-before.png" alt="Raw empty flat">
+            </div>
+            <div class="half right">
+              <img src="./staging-after.png" alt="Staged luxury interior">
+            </div>
+          </div>
+          <div class="laser-line"></div>
+          <div class="laser-handle">⇄</div>
+          <div class="window-footer">
+            <span class="wf-text">AI Home-Staging Pipeline</span>
+            <span class="wf-metric">53 n8n nodes · ComfyUI</span>
+          </div>
+        </div>
+
+        <!-- FLOATING PROOF CARD -->
+        <div class="proof-card">
+          <div class="proof-left">
+            <div class="proof-title">
+              <span class="live-dot"></span>
+              <span>Autonomous Agent &amp; CRM Sync</span>
+            </div>
+            <div class="proof-sub">WhatsApp AI · 3 Languages · Zero Overwrites</div>
+          </div>
+          <div class="sticker-badge">⚡️ 10x ROI</div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- BOTTOM FOOTER STRIP -->
+    <div class="footer-bar">
+      <div class="tech-pills">
+        <span class="tech-pill accent">n8n Expert</span>
+        <span class="tech-pill">Gemini 2.5 Flash</span>
+        <span class="tech-pill">Python</span>
+        <span class="tech-pill">APIs &amp; Webhooks</span>
+        <span class="tech-pill">DMARC</span>
+      </div>
+
+      <div class="brand-block">
+        <svg viewBox="0 0 100 100" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M30 14 H66 Q82 14 82 30 V44 M82 56 V70 Q82 86 66 86 H30 Q14 86 14 70 V30 Q14 14 30 14" stroke="#000000" stroke-opacity="0.25" stroke-width="3"/>
+          <path d="M66 50 H94" stroke="#FF385C" stroke-width="3"/>
+          <g stroke="#000000" stroke-width="3.6">
+            <line x1="28" y1="66" x2="28" y2="34"/><line x1="28" y1="34" x2="40" y2="54"/>
+            <line x1="40" y1="54" x2="52" y2="34"/><line x1="52" y1="34" x2="52" y2="66"/>
+            <line x1="52" y1="34" x2="66" y2="37"/><line x1="66" y1="37" x2="66" y2="50"/>
+            <line x1="66" y1="50" x2="52" y2="50"/><line x1="52" y1="50" x2="68" y2="66"/>
+          </g>
+          <g fill="#FF385C">
+            <circle cx="40" cy="54" r="4.2"/><circle cx="52" cy="34" r="4.2"/><circle cx="66" cy="50" r="4.2"/>
+          </g>
+          <circle cx="94" cy="50" r="3.6" fill="#FF385C"/>
+        </svg>
+        <div class="brand-author">
+          <span class="name">Manny Ruesch</span>
+          <span class="url">manny-ruesch.github.io</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
