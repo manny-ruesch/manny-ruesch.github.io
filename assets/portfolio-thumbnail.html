@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700;800&family=JetBrains+Mono:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 1200px;
+    height: 900px;
+    background-color: #F0F0F0;
+    background-image: radial-gradient(rgba(0, 0, 0, 0.13) 1.5px, transparent 1.5px);
+    background-size: 24px 24px;
+    overflow: hidden;
+    font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  }
+  .frame {
+    width: 1200px;
+    height: 900px;
+    padding: 44px 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .main-card {
+    background: #FFFFFF;
+    border: 3.5px solid #000000;
+    box-shadow: 12px 12px 0px #000000;
+    border-radius: 8px;
+    padding: 42px 46px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+  }
+  .top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .pill-kicker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13.5px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: #FFFFFF;
+    background: #000000;
+    padding: 8px 18px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .pill-kicker .dot {
+    width: 8.5px;
+    height: 8.5px;
+    background: #FF385C;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #FF385C;
+  }
+  .pill-avail {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: #000000;
+    background: #F0F0F0;
+    border: 2.5px solid #000000;
+    padding: 6px 16px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+  .hero-block {
+    margin-top: 14px;
+  }
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13.5px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: #FF385C;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-size: 52px;
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    font-weight: 800;
+    color: #000000;
+    max-width: 22ch;
+  }
+  h1 .red {
+    color: #FF385C;
+  }
+  .desc {
+    font-family: 'Inter', sans-serif;
+    font-size: 19px;
+    line-height: 1.45;
+    color: #444444;
+    font-weight: 500;
+    margin-top: 12px;
+    max-width: 48ch;
+  }
+
+  /* 4 Showcase project tiles */
+  .grid-showcase {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin: 18px 0;
+  }
+  .p-tile {
+    background: #FAFAFA;
+    border: 2.5px solid #000000;
+    box-shadow: 5px 5px 0px #000000;
+    border-radius: 6px;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .p-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .p-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: #FFFFFF;
+    background: #000000;
+    padding: 3px 8px;
+    border-radius: 3px;
+  }
+  .p-metric {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 800;
+    color: #FF385C;
+  }
+  .p-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: #000000;
+    letter-spacing: -0.01em;
+  }
+  .p-desc {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #555555;
+    line-height: 1.35;
+    font-weight: 500;
+  }
+
+  /* Bottom row */
+  .bottom-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 20px;
+    border-top: 3px solid #000000;
+  }
+  .tags-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .badge-metric {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13.5px;
+    font-weight: 800;
+    color: #000000;
+    background: #FFF0F2;
+    border: 2px solid #FF385C;
+    padding: 7px 15px;
+    border-radius: 4px;
+  }
+  .badge-tech {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: #000000;
+    background: #F0F0F0;
+    border: 2px solid #000000;
+    padding: 7px 14px;
+    border-radius: 4px;
+  }
+  .brand-group {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .brand-group svg {
+    width: 48px;
+    height: 48px;
+    overflow: visible;
+  }
+  .brand-text {
+    display: flex;
+    flex-direction: column;
+  }
+  .brand-name {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #000000;
+    line-height: 1.1;
+  }
+  .brand-url {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: #666666;
+  }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="main-card">
+    
+    <!-- TOP STATUS -->
+    <div class="top-row">
+      <div class="pill-kicker">
+        <span class="dot"></span>
+        <span>PORTFOLIO // AI SYSTEMS &amp; AUTOMATION</span>
+      </div>
+      <div class="pill-avail">FREELANCE &amp; REMOTE AVAILABLE</div>
+    </div>
+
+    <!-- HERO TITLE -->
+    <div class="hero-block">
+      <div class="eyebrow">// 11 PRODUCTION SYSTEMS SHIPPED</div>
+      <h1>End-to-End <span class="red">AI Systems</span> &amp;<br>Marketing Automation.</h1>
+      <p class="desc">Autonomous agent pipelines, self-hosted n8n workflows, generative AI tools, and real-time executive decision dashboards.</p>
+    </div>
+
+    <!-- 4 SHOWCASE PROJECT TILES -->
+    <div class="grid-showcase">
+      <div class="p-tile">
+        <div class="p-top">
+          <span class="p-tag">PROJECT 01</span>
+          <span class="p-metric">~33s PER PHOTO · 53 NODES</span>
+        </div>
+        <div class="p-title">AI Home-Staging Pipeline</div>
+        <div class="p-desc">Generative in-place room furnishing pipeline replacing €150-400 photo shoots.</div>
+      </div>
+
+      <div class="p-tile">
+        <div class="p-top">
+          <span class="p-tag">PROJECT 02</span>
+          <span class="p-metric">5 SOURCES · GEMINI AI</span>
+        </div>
+        <div class="p-title">Real-Time Marketing Dashboard</div>
+        <div class="p-desc">Unified live intelligence merging Search Console, Analytics, and prioritized AI insights.</div>
+      </div>
+
+      <div class="p-tile">
+        <div class="p-top">
+          <span class="p-tag">PROJECT 04</span>
+          <span class="p-metric">24/7 LIVE · CRM SYNC</span>
+        </div>
+        <div class="p-title">Autonomous WhatsApp AI Agent</div>
+        <div class="p-desc">Multilingual client qualification &amp; listing recommendation directly linked to CRM.</div>
+      </div>
+
+      <div class="p-tile">
+        <div class="p-top">
+          <span class="p-tag">PROJECT 06</span>
+          <span class="p-metric">32 LIVE WORKFLOWS</span>
+        </div>
+        <div class="p-title">Core Automation Backbone</div>
+        <div class="p-desc">Orchestration engine eliminating ~720 manual operations/mo with proactive error catch.</div>
+      </div>
+    </div>
+
+    <!-- BOTTOM BAR -->
+    <div class="bottom-row">
+      <div class="tags-wrap">
+        <span class="badge-metric">32+ WORKFLOWS</span>
+        <span class="badge-tech">n8n</span>
+        <span class="badge-tech">Gemini / LLMs</span>
+        <span class="badge-tech">Python</span>
+        <span class="badge-tech">APIs</span>
+      </div>
+
+      <div class="brand-group">
+        <svg viewBox="0 0 100 100" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M30 14 H66 Q82 14 82 30 V44 M82 56 V70 Q82 86 66 86 H30 Q14 86 14 70 V30 Q14 14 30 14" stroke="#000000" stroke-opacity="0.25" stroke-width="3"/>
+          <path d="M66 50 H94" stroke="#FF385C" stroke-width="3"/>
+          <g stroke="#000000" stroke-width="3.6">
+            <line x1="28" y1="66" x2="28" y2="34"/><line x1="28" y1="34" x2="40" y2="54"/>
+            <line x1="40" y1="54" x2="52" y2="34"/><line x1="52" y1="34" x2="52" y2="66"/>
+            <line x1="52" y1="34" x2="66" y2="37"/><line x1="66" y1="37" x2="66" y2="50"/>
+            <line x1="66" y1="50" x2="52" y2="50"/><line x1="52" y1="50" x2="68" y2="66"/>
+          </g>
+          <g fill="#FF385C">
+            <circle cx="40" cy="54" r="4.2"/><circle cx="52" cy="34" r="4.2"/><circle cx="66" cy="50" r="4.2"/>
+          </g>
+          <circle cx="94" cy="50" r="3.6" fill="#FF385C"/>
+        </svg>
+        <div class="brand-text">
+          <span class="brand-name">Manny Ruesch</span>
+          <span class="brand-url">manny-ruesch.github.io</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
