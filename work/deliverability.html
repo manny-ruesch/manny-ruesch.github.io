@@ -71,44 +71,211 @@
     <li>A weekly AI-written digest: pass rate per source, alignment, week-on-week trend, new IPs.</li>
     <li>A separate healthcheck every four hours: if no report has arrived in 24 hours, something is broken upstream.</li>
   </ul>
+
+  <!-- INTERACTIVE DMARC INSPECTOR & INCIDENT TRIAGE SIMULATOR -->
+  <div class="sim-container" id="dmarc-sim" style="margin:32px 0 28px;background:#FFFFFF;border:var(--bw) solid #000000;box-shadow:var(--hard-shadow-lg);border-radius:6px;overflow:hidden">
+    <div class="sim-header">
+      <div class="sim-badge"><span class="dot-live"></span> LIVE DMARC REPORT &amp; INCIDENT TRIAGE SIMULATOR</div>
+      <div class="sim-title">Inspect Inbound XML Attachments &amp; IP Geolocation Triage</div>
+      <p class="sim-intro">Select a provider report below to see how raw DMARC XML is parsed, enriched with ASN data, and filtered to prevent false forwarding alarms while catching genuine spoofing.</p>
+    </div>
+
+    <!-- PRESET CONTROLS -->
+    <div class="sim-controls">
+      <span class="ctrl-label">SELECT INBOUND PROVIDER REPORT:</span>
+      <div class="sim-presets">
+        <button type="button" class="preset-btn active" data-report="google-pass">1. 🟢 Google Workspace (Valid SPF + DKIM)</button>
+        <button type="button" class="preset-btn" data-report="forwarder">2. 🟡 Auto-Forwarder (SPF Fail / DKIM Pass)</button>
+        <button type="button" class="preset-btn" data-report="spoofing">3. 🔴 Phishing Spoof Attack (Rogue Host)</button>
+      </div>
+    </div>
+
+    <!-- 2-COL LAYOUT: RAW XML + ENRICHED TRIAGE -->
+    <div class="dmarc-layout">
+      <!-- RAW XML SNIPPET -->
+      <div class="dmarc-xml-col">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #334155;color:#38BDF8;font-size:0.7rem;font-weight:800">
+          <span>// INBOUND XML ATTACHMENT</span>
+          <span id="dmarc-org">google.com</span>
+        </div>
+        <pre id="dmarc-xml" style="margin:0;white-space:pre-wrap;word-break:break-all;font-size:0.72rem;line-height:1.45"></pre>
+      </div>
+
+      <!-- ENRICHED ANALYSIS -->
+      <div class="dmarc-analysis-col">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font-family:'Space Grotesk',sans-serif;font-size:0.88rem;font-weight:800;color:#000000">PIPELINE TRIAGE ANALYSIS</span>
+          <span id="dmarc-action-badge" class="auth-pill pass">ARCHIVED SILENT</span>
+        </div>
+
+        <div class="auth-pills" id="dmarc-pills">
+          <!-- Injected dynamically -->
+        </div>
+
+        <div style="background:#F8F8F8;border:2px solid #000000;border-radius:4px;padding:12px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:#666666;font-weight:700">SENDING INFRASTRUCTURE ENRICHMENT</div>
+          <div id="dmarc-enrich" style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;font-weight:800;color:#000000;margin-top:4px">
+            <!-- Injected dynamically -->
+          </div>
+        </div>
+
+        <div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:0.82rem;font-weight:800;margin-bottom:4px">EXECUTIVE VERDICT</div>
+          <p id="dmarc-verdict" style="font-size:0.84rem;color:#333333;margin:0;line-height:1.45">
+            <!-- Injected dynamically -->
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SPECS STRIP -->
+    <div class="sim-specs">
+      <div><b>INGESTION</b> <span>Daily IMAP attachment pull</span></div>
+      <div><b>ENRICHMENT</b> <span>BGP / ASN / Whois (Zero API cost)</span></div>
+      <div><b>STORAGE</b> <span>Self-hosted NocoDB SQL table</span></div>
+      <div><b>HEALTHCHECK</b> <span class="cost-tag">Every 4 hours (Alerts if silent &gt;24h)</span></div>
+    </div>
+  </div>
+
 </div></section>
 
 <section class="sec rv"><div class="wrap">
   <h2>How it works</h2>
   <div class="diag">
-    <svg viewBox="0 0 920 256" role="img" aria-label="A mailbox receives daily DMARC reports over IMAP. They are unzipped and parsed, with unreadable ones sent to a dead-letter table. Each result is classified as pass, fail or forward after resolving the sending IP's owner, then written to a database. One branch decides whether to alert; another writes a weekly AI digest. A dashed box shows a healthcheck running every four hours.">
-      <defs><marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
-        <path d="M0 0 L6 3 L0 6 z" fill="rgba(255,255,255,.34)"/></marker></defs>
+    <svg viewBox="0 0 920 280" role="img" aria-label="A mailbox receives daily DMARC reports over IMAP. They are unzipped and parsed, with unreadable ones sent to a dead-letter table. Each result is classified as pass, fail or forward after resolving the sending IP's owner, then written to a database. One branch decides whether to alert; another writes a weekly AI digest. A dashed box shows a healthcheck running every four hours.">
+      <defs>
+        <marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#000000"/>
+        </marker>
+        <marker id="ah-red" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#FF385C"/>
+        </marker>
+        <filter id="diag-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+
+      <!-- BASE CONDUITS -->
       <g class="edge" marker-end="url(#ah)">
-        <path d="M156 66 H188"/><path d="M366 66 H398"/><path d="M586 66 H618"/>
-        <path d="M450 100 C450 142 391 142 391 174"/><path d="M540 100 C540 142 591 142 591 174"/>
-        <path d="M693 92 C693 132 797 132 797 174" stroke-dasharray="4 5"/>
+        <path d="M 156 66 L 196 66"/>
+        <path d="M 366 66 L 406 66"/>
+        <path d="M 594 66 L 634 66"/>
+        <path d="M 460 102 C 460 144 391 144 391 180"/>
+        <path d="M 540 102 C 540 144 591 144 591 180"/>
+        <path d="M 700 92 C 700 134 797 134 797 180" stroke-dasharray="5 5"/>
       </g>
-      <g class="flow">
-        <path d="M156 66 H188"/><path d="M366 66 H398"/><path d="M586 66 H618"/>
-        <path d="M450 100 C450 142 391 142 391 174"/><path d="M540 100 C540 142 591 142 591 174"/>
+
+      <!-- LASER FLOW PULSES -->
+      <g class="flow" marker-end="url(#ah-red)">
+        <path d="M 156 66 L 196 66"/>
+        <path d="M 366 66 L 406 66"/>
+        <path d="M 594 66 L 634 66"/>
+        <path d="M 460 102 C 460 144 391 144 391 180"/>
+        <path d="M 540 102 C 540 144 591 144 591 180"/>
       </g>
-      <g class="bx">
-        <rect x="16" y="40" width="140" height="52" rx="10"/>
-        <text x="86" y="62">Mailbox</text><text class="s" x="86" y="78">IMAP · daily reports</text>
-        <rect x="196" y="40" width="170" height="52" rx="10"/>
-        <text x="281" y="62">Unzip + parse</text><text class="s" x="281" y="78">bad ones → dead letter</text>
-        <rect x="618" y="40" width="150" height="52" rx="10"/>
-        <text x="693" y="62">Database</text><text class="s" x="693" y="78">every record kept</text>
-        <rect x="306" y="180" width="170" height="56" rx="10"/>
-        <text x="391" y="204">Alert?</text><text class="s" x="391" y="220">silent if all forwards</text>
-        <rect x="506" y="180" width="170" height="56" rx="10"/>
-        <text x="591" y="204">Weekly digest</text><text class="s" x="591" y="220">AI-written</text>
+
+      <!-- FLYING DATA PHOTONS -->
+      <g class="diag-photons">
+        <!-- Mailbox to Unzip -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 156 66 L 196 66" dur="1.2s" repeatCount="indefinite" begin="0s"/>
+        </circle>
+        <!-- Unzip to Classify -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 366 66 L 406 66" dur="1.2s" repeatCount="indefinite" begin="0.35s"/>
+        </circle>
+        <!-- Classify to Database -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 594 66 L 634 66" dur="1.2s" repeatCount="indefinite" begin="0.75s"/>
+        </circle>
+        <!-- Classify down to Alert -->
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 460 102 C 460 144 391 144 391 180" dur="1.5s" repeatCount="indefinite" begin="0.6s"/>
+        </circle>
+        <!-- Classify down to Weekly Digest -->
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 540 102 C 540 144 591 144 591 180" dur="1.5s" repeatCount="indefinite" begin="0.6s"/>
+        </circle>
+        <!-- Database to Healthcheck -->
+        <circle r="3.5" fill="#000000">
+          <animateMotion path="M 700 92 C 700 134 797 134 797 180" dur="2s" repeatCount="indefinite" begin="1s"/>
+        </circle>
       </g>
-      <g class="acc-b">
-        <rect x="398" y="32" width="188" height="68" rx="12"/>
-        <text x="492" y="60">Classify</text>
-        <text class="s" x="492" y="78">pass · fail · forward</text>
-        <text class="s" x="492" y="92">IP owner resolved</text>
+
+      <!-- NEO-BRUTALIST CARDS -->
+
+      <!-- 01: MAILBOX -->
+      <g class="diag-node">
+        <rect x="20" y="44" width="140" height="52" rx="4" fill="#000000"/>
+        <rect x="16" y="40" width="140" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="22" y="46" width="60" height="11" rx="2" fill="#000000"/>
+        <text x="52" y="55" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">INGESTION</text>
+        <text x="86" y="70" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Mailbox</text>
+        <text x="86" y="83" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">IMAP · daily reports</text>
       </g>
-      <g class="dash-b">
-        <rect x="690" y="182" width="214" height="52" rx="10"/>
-        <text x="797" y="204">Healthcheck</text><text class="s" x="797" y="220">every 4 hours</text>
+
+      <!-- 02: UNZIP + PARSE -->
+      <g class="diag-node">
+        <rect x="200" y="44" width="170" height="52" rx="4" fill="#000000"/>
+        <rect x="196" y="40" width="170" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="202" y="46" width="60" height="11" rx="2" fill="#000000"/>
+        <text x="232" y="55" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">EXTRACTOR</text>
+        <text x="281" y="70" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Unzip + parse</text>
+        <text x="281" y="83" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">bad ones → dead letter</text>
+      </g>
+
+      <!-- 03: CLASSIFY & ENRICH (AI CORE) -->
+      <g class="diag-node">
+        <rect x="410" y="32" width="188" height="70" rx="4" fill="#000000"/>
+        <rect x="406" y="28" width="188" height="70" rx="4" fill="#FFF2F4" stroke="#FF385C" stroke-width="3"/>
+        <circle cx="422" cy="42" r="3.5" fill="#FF385C"/>
+        <circle cx="422" cy="42" r="3.5" stroke="#FF385C" fill="none" class="diag-ping"/>
+        <text x="434" y="45" fill="#FF385C" font-family="'JetBrains Mono'" font-size="8" font-weight="800">✦ IP ENRICH &amp; TRIAGE</text>
+        <text x="500" y="66" font-family="'Space Grotesk'" font-size="15" font-weight="800" fill="#FF385C" text-anchor="middle">Classify</text>
+        <text x="500" y="80" font-family="'JetBrains Mono'" font-size="9.5" font-weight="700" fill="#000000" text-anchor="middle">pass · fail · forward</text>
+        <text x="500" y="92" font-family="'JetBrains Mono'" font-size="9" font-weight="700" fill="#E02447" text-anchor="middle">IP owner resolved</text>
+      </g>
+
+      <!-- 04: DATABASE -->
+      <g class="diag-node">
+        <rect x="638" y="44" width="150" height="52" rx="4" fill="#000000"/>
+        <rect x="634" y="40" width="150" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="640" y="46" width="68" height="11" rx="2" fill="#000000"/>
+        <text x="674" y="55" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">PERSISTENCE</text>
+        <text x="709" y="70" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">NocoDB SQL</text>
+        <text x="709" y="83" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">every record kept</text>
+      </g>
+
+      <!-- 05: ALERT -->
+      <g class="diag-node">
+        <rect x="310" y="184" width="170" height="56" rx="4" fill="#000000"/>
+        <rect x="306" y="180" width="170" height="56" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="312" y="186" width="60" height="11" rx="2" fill="#000000"/>
+        <text x="342" y="195" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">FILTER GATE</text>
+        <text x="391" y="210" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Alert Logic?</text>
+        <text x="391" y="225" font-family="'JetBrains Mono'" font-size="10" font-weight="600" fill="#555555" text-anchor="middle">silent if all forwards</text>
+      </g>
+
+      <!-- 06: WEEKLY DIGEST -->
+      <g class="diag-node">
+        <rect x="510" y="184" width="170" height="56" rx="4" fill="#000000"/>
+        <rect x="506" y="180" width="170" height="56" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="512" y="186" width="68" height="11" rx="2" fill="#000000"/>
+        <text x="546" y="195" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">AI SUMMARY</text>
+        <text x="591" y="210" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Weekly digest</text>
+        <text x="591" y="225" font-family="'JetBrains Mono'" font-size="10" font-weight="600" fill="#555555" text-anchor="middle">Gemini executive brief</text>
+      </g>
+
+      <!-- 07: HEALTHCHECK -->
+      <g class="diag-node">
+        <rect x="694" y="184" width="214" height="56" rx="4" fill="#000000"/>
+        <rect x="690" y="180" width="214" height="56" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2" stroke-dasharray="5 4"/>
+        <text x="797" y="208" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Healthcheck Watchdog</text>
+        <text x="797" y="224" font-family="'JetBrains Mono'" font-size="10" font-weight="600" fill="#555555" text-anchor="middle">triggers if idle &gt; 24h</text>
       </g>
     </svg>
   </div>
@@ -131,6 +298,27 @@
     <h3>The alert that only looked at the first ten</h3>
     <p>The alerting logic evaluated a <em>sample</em> of failing IPs: the first ten, sliced for a readable email. A real spoofing source sitting at position eleven would never have triggered anything.</p>
     <p>It was found by an adversarial audit, not by a test, and not by me.</p>
+
+    <!-- SAMPLING BUG COMPARISON MATRIX -->
+    <div class="detector-card" style="margin:18px 0 14px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:0.74rem;font-weight:800;letter-spacing:0.06em;color:#555555">// ADVERSARIAL AUDIT DISCOVERY · SAMPLING BLIND SPOT</div>
+      <div class="det-grid">
+        <div class="det-box danger">
+          <span class="det-name">Flawed Sliced Evaluation</span>
+          <div class="det-score">BLIND SPOT <span style="font-size:0.85rem;font-weight:800">AT INDEX #11</span></div>
+          <span class="det-verdict">❌ Evaluated <code>batch.slice(0, 10)</code>. Rogue spoofing IPs at pos 11+ went completely undetected.</span>
+        </div>
+        <div class="det-box success">
+          <span class="det-name">Dual-Stream Separation</span>
+          <div class="det-score">100% AUDIT <span style="font-size:0.85rem;font-weight:800">UNBOUNDED</span></div>
+          <span class="det-verdict">✅ Alert trigger evaluates 100% of IPs in batch; slicing is restricted strictly to visual email layout.</span>
+        </div>
+      </div>
+      <div class="det-takeaway">
+        <b>ARCHITECTURAL RULE:</b> Never decouple alerting logic from full-set evaluation. Visual presentation limits (truncation/slices) must never dictate business rule evaluation.
+      </div>
+    </div>
+
     <p class="outcome"><b>FIX</b> Evaluate every failing IP for the alert decision; keep the slice for the email body only. Those are two different jobs and they had been conflated.</p>
   </div>
 
@@ -190,5 +378,155 @@
 </footer>
 
 <script src="../assets/site.js"></script>
+<script>
+(function() {
+  const DMARC_REPORTS = {
+    'google-pass': {
+      org: 'google.com (Report-ID: 172839219)',
+      xml: `<feedback>
+  <report_metadata>
+    <org_name>google.com</org_name>
+    <email>noreply-dmarc-support@google.com</email>
+    <report_id>172839219</report_id>
+    <date_range><begin>1726000000</begin><end>1726086400</end></date_range>
+  </report_metadata>
+  <policy_published>
+    <domain>agency-domain.de</domain>
+    <p>none</p><sp>none</sp><pct>100</pct>
+  </policy_published>
+  <record>
+    <row>
+      <source_ip>209.85.220.41</source_ip>
+      <count>142</count>
+      <policy_evaluated>
+        <disposition>none</disposition>
+        <dkim>pass</dkim>
+        <spf>pass</spf>
+      </policy_evaluated>
+    </row>
+    <auth_results>
+      <dkim><domain>agency-domain.de</domain><result>pass</result></dkim>
+      <spf><domain>agency-domain.de</domain><scope>mfrom</scope><result>pass</result></spf>
+    </auth_results>
+  </record>
+</feedback>`,
+      actionBadge: { text: 'ARCHIVED SILENT', class: 'pass' },
+      pills: [
+        { text: 'DKIM: PASS (agency-domain.de)', class: 'pass' },
+        { text: 'SPF: PASS (Aligned)', class: 'pass' },
+        { text: 'DMARC: 100% ALIGNED', class: 'pass' },
+        { text: 'VOLUME: 142 MSGS', class: 'pass' }
+      ],
+      enrich: "IP 209.85.220.41 · GOOGLE LLC (AS15169) · United States · Datacenter: Yes · Reputation: Clean (0/94 Blocklists)",
+      verdict: "Toutes les signatures DKIM et alignements SPF sont strictement conformes avec Google Workspace. Les 142 courriels ont été délivrés en boîte de réception sans anomalie. Ingestion silencieuse dans NocoDB sans alerte humaine requise."
+    },
+    'forwarder': {
+      org: 'yahoo.com (Report-ID: 884729104)',
+      xml: `<feedback>
+  <report_metadata>
+    <org_name>Yahoo! Inc.</org_name>
+    <email>postmaster@yahoo.com</email>
+    <report_id>884729104</report_id>
+  </report_metadata>
+  <policy_published><domain>agency-domain.de</domain><p>none</p></policy_published>
+  <record>
+    <row>
+      <source_ip>212.227.15.14</source_ip>
+      <count>18</count>
+      <policy_evaluated>
+        <disposition>none</disposition>
+        <dkim>pass</dkim>
+        <spf>fail</spf>
+      </policy_evaluated>
+    </row>
+    <auth_results>
+      <dkim><domain>agency-domain.de</domain><result>pass</result></dkim>
+      <spf><domain>kundenserver.de</domain><result>pass</result></spf>
+    </auth_results>
+  </record>
+</feedback>`,
+      actionBadge: { text: 'FORWARDING EXEMPT', class: 'warn' },
+      pills: [
+        { text: 'DKIM: PASS (Preserved)', class: 'pass' },
+        { text: 'SPF: SOFTFAIL (Forwarder IP)', class: 'warn' },
+        { text: 'TRIAGE: LEGITIMATE FORWARD', class: 'pass' },
+        { text: 'ALERT: MUTED (No false alarm)', class: 'warn' }
+      ],
+      enrich: "IP 212.227.15.14 · 1&1 IONOS SE (AS8560) · Germany · Type: Relayed MTA / Auto-forwarder",
+      verdict: "L'échec SPF est causé par un transfert automatique de boîte mail par un client vers Yahoo via Ionos. La signature cryptographique originale DKIM est restée intacte. La règle métier n8n requalifie l'événement en 'Transfert légitime' et coupe l'alerte pour éviter la fatigue d'alarme."
+    },
+    'spoofing': {
+      org: 'outlook.com (Report-ID: 994827163)',
+      xml: `<feedback>
+  <report_metadata>
+    <org_name>Microsoft Corporation</org_name>
+    <report_id>994827163</report_id>
+  </report_metadata>
+  <policy_published><domain>agency-domain.de</domain><p>none</p></policy_published>
+  <record>
+    <row>
+      <source_ip>185.220.101.5</source_ip>
+      <count>63</count>
+      <policy_evaluated>
+        <disposition>none</disposition>
+        <dkim>fail</dkim>
+        <spf>fail</spf>
+      </policy_evaluated>
+    </row>
+    <auth_results>
+      <dkim><result>none</result></dkim>
+      <spf><domain>agency-domain.de</domain><result>fail</result></spf>
+    </auth_results>
+  </record>
+</feedback>`,
+      actionBadge: { text: 'CRITICAL SPOOF ALERT ⚠️', class: 'fail' },
+      pills: [
+        { text: 'DKIM: NONE (0 Signature)', class: 'fail' },
+        { text: 'SPF: HARD FAIL', class: 'fail' },
+        { text: 'CLASSIFICATION: ROGUE SPOOF', class: 'fail' },
+        { text: 'INCIDENT TRIGGERED', class: 'fail' }
+      ],
+      enrich: "IP 185.220.101.5 · TOR EXIT NODE / BULLETPROOF HOST (AS208323) · Russia/Seychelles · Abuse score: 98%",
+      verdict: "63 emails frauduleux ont tenté d'usurper le domaine de l'agence depuis un serveur hébergé offshore. SPF et DKIM sont totalement absents. La notification d'incident immédiate est envoyée sur Telegram avec IP, ASN et pré-remplissage du ticket de signalement d'abus."
+    }
+  };
+
+  let activeReport = 'google-pass';
+  const orgEl = document.getElementById('dmarc-org');
+  const xmlEl = document.getElementById('dmarc-xml');
+  const badgeEl = document.getElementById('dmarc-action-badge');
+  const pillsEl = document.getElementById('dmarc-pills');
+  const enrichEl = document.getElementById('dmarc-enrich');
+  const verdictEl = document.getElementById('dmarc-verdict');
+
+  function renderReport() {
+    const d = DMARC_REPORTS[activeReport];
+    if (!d) return;
+
+    if (orgEl) orgEl.textContent = d.org;
+    if (xmlEl) xmlEl.textContent = d.xml;
+    if (badgeEl) {
+      badgeEl.textContent = d.actionBadge.text;
+      badgeEl.className = `auth-pill ${d.actionBadge.class}`;
+    }
+    if (pillsEl) {
+      pillsEl.innerHTML = d.pills.map(p => `<span class="auth-pill ${p.class}">${p.text}</span>`).join('');
+    }
+    if (enrichEl) enrichEl.textContent = d.enrich;
+    if (verdictEl) verdictEl.textContent = d.verdict;
+  }
+
+  document.querySelectorAll('#dmarc-sim .preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#dmarc-sim .preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeReport = btn.dataset.report;
+      renderReport();
+    });
+  });
+
+  renderReport();
+})();
+</script>
 </body>
 </html>

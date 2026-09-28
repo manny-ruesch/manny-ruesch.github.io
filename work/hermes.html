@@ -71,50 +71,236 @@
     <li>Creates the contact, or recognises a returning one by email, then by phone number.</li>
     <li>Logs every tool call with zero personal data, and emails a weekly report every Monday morning.</li>
   </ul>
+
+  <!-- INTERACTIVE WHATSAPP CONVERSATION & AGENT REASONING SIMULATOR -->
+  <div class="wa-sim-container" id="whatsapp-sim">
+    <div class="sim-header">
+      <div class="sim-badge"><span class="dot-live"></span> LIVE WHATSAPP AGENT REASONING SIMULATOR</div>
+      <div class="sim-title">Test the Inbound Chat → 14-Criteria CRM Search Engine</div>
+      <p class="sim-intro">Select a real customer message below to observe the agent's live decision-making: intent qualification, sub-workflow tool invocation, and non-overwriting CRM writes.</p>
+    </div>
+
+    <!-- PRESET PROMPTS -->
+    <div class="sim-controls">
+      <span class="ctrl-label">SELECT REAL INBOUND MESSAGE:</span>
+      <div class="sim-presets">
+        <button type="button" class="preset-btn active" data-scenario="de-buyer">1. 🇩🇪 3-Zimmer Kauf (Balkon + Aufzug)</button>
+        <button type="button" class="preset-btn" data-scenario="en-expat">2. 🇬🇧 Expat Relocation (Mitte · Pet friendly)</button>
+        <button type="button" class="preset-btn" data-scenario="fr-owner">3. 🇫🇷 Propriétaire (Estimation Vente)</button>
+      </div>
+    </div>
+
+    <!-- INTERACTIVE 2-PANE PHONE & TERMINAL -->
+    <div class="wa-layout">
+      <!-- PHONE CHAT -->
+      <div class="wa-phone">
+        <div class="wa-phone-head">
+          <div class="wa-avatar">MR</div>
+          <div class="wa-contact-info">
+            <span class="wa-contact-name">Hermes Assistant · Agency Live</span>
+            <span class="wa-contact-status">online · automated assistant</span>
+          </div>
+        </div>
+        <div class="wa-messages-area" id="wa-chat">
+          <!-- Injected dynamically -->
+        </div>
+      </div>
+
+      <!-- AGENT REASONING TERMINAL -->
+      <div class="wa-reasoning-panel">
+        <div class="wa-panel-head">
+          <span class="wa-panel-title">⚡️ GEMINI 2.5 FLASH · AGENT THOUGHT TRACE</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:#10B981">LATENCY: ~1.4s</span>
+        </div>
+        <div class="wa-panel-body" id="wa-reasoning">
+          <!-- Injected dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- SPECS STRIP -->
+    <div class="sim-specs">
+      <div><b>CHANNEL</b> <span>Meta Cloud API (Webhook)</span></div>
+      <div><b>MEMORY DEPTH</b> <span>12-message sliding window</span></div>
+      <div><b>CRM PROTOCOL</b> <span>HMAC-SHA256 REST API (onOffice)</span></div>
+      <div><b>FALLBACK GATE</b> <span class="cost-tag">Deduped activity log (Zero overwrites)</span></div>
+    </div>
+  </div>
+
 </div></section>
 
 <section class="sec rv"><div class="wrap">
   <h2>How it works</h2>
   <div class="diag">
     <svg viewBox="0 0 920 380" role="img" aria-label="A WhatsApp message reaches Meta's Cloud API, then an AI agent running Gemini. The agent calls two tools, listing search and CRM contact, which both talk to the onOffice REST API. A composer splits the reply into text plus one photo per listing. Tool calls are logged to an analytics table that feeds a weekly report.">
-      <defs><marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
-        <path d="M0 0 L6 3 L0 6 z" fill="rgba(255,255,255,.34)"/></marker></defs>
+      <defs>
+        <marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#000000"/>
+        </marker>
+        <marker id="ah-red" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#FF385C"/>
+        </marker>
+        <filter id="diag-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+
+      <!-- BASE CONDUITS -->
       <g class="edge" marker-end="url(#ah)">
-        <path d="M134 66 H166"/><path d="M314 66 H346"/><path d="M534 66 H566"/><path d="M706 66 H738"/>
-        <path d="M410 100 C410 142 384 142 384 174"/><path d="M478 100 C478 142 564 142 564 174"/>
-        <path d="M384 236 V294"/><path d="M564 236 V294"/>
-        <path d="M642 208 H698" stroke-dasharray="4 5"/>
+        <path d="M 134 66 L 174 66"/>
+        <path d="M 314 66 L 354 66"/>
+        <path d="M 534 66 L 574 66"/>
+        <path d="M 706 66 L 746 66"/>
+        <path d="M 410 100 C 410 142 384 142 384 180"/>
+        <path d="M 478 100 C 478 142 564 142 564 180"/>
+        <path d="M 384 236 L 384 300"/>
+        <path d="M 564 236 L 564 300"/>
+        <path d="M 642 208 L 698 208" stroke-dasharray="5 5"/>
       </g>
-      <g class="flow">
-        <path d="M134 66 H166"/><path d="M314 66 H346"/><path d="M534 66 H566"/><path d="M706 66 H738"/>
-        <path d="M410 100 C410 142 384 142 384 174"/><path d="M478 100 C478 142 564 142 564 174"/>
-        <path d="M384 236 V294"/><path d="M564 236 V294"/>
+
+      <!-- LASER FLOW PULSES -->
+      <g class="flow" marker-end="url(#ah-red)">
+        <path d="M 134 66 L 174 66"/>
+        <path d="M 314 66 L 354 66"/>
+        <path d="M 534 66 L 574 66"/>
+        <path d="M 706 66 L 746 66"/>
+        <path d="M 410 100 C 410 142 384 142 384 180"/>
+        <path d="M 478 100 C 478 142 564 142 564 180"/>
+        <path d="M 384 236 L 384 300"/>
+        <path d="M 564 236 L 564 300"/>
       </g>
-      <g class="bx">
-        <rect x="16" y="40" width="118" height="52" rx="10"/>
-        <text x="75" y="62">Client</text><text class="s" x="75" y="78">WhatsApp</text>
-        <rect x="174" y="40" width="140" height="52" rx="10"/>
-        <text x="244" y="62">Meta Cloud API</text><text class="s" x="244" y="78">inbound webhook</text>
-        <rect x="574" y="40" width="132" height="52" rx="10"/>
-        <text x="640" y="62">Composer</text><text class="s" x="640" y="78">splits the reply</text>
-        <rect x="746" y="40" width="158" height="52" rx="10"/>
-        <text x="825" y="62">Reply</text><text class="s" x="825" y="78">text + 1 photo / listing</text>
-        <rect x="306" y="180" width="156" height="56" rx="10"/>
-        <text x="384" y="204">Tool · Search</text><text class="s" x="384" y="220">14 criteria</text>
-        <rect x="486" y="180" width="156" height="56" rx="10"/>
-        <text x="564" y="204">Tool · CRM</text><text class="s" x="564" y="220">dedupe + log activity</text>
-        <rect x="306" y="300" width="336" height="52" rx="10"/>
-        <text x="474" y="322">onOffice · REST API</text><text class="s" x="474" y="338">400+ fields · HMAC-signed</text>
+
+      <!-- FLYING DATA PHOTONS -->
+      <g class="diag-photons">
+        <!-- Client to Meta -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 134 66 L 174 66" dur="1.2s" repeatCount="indefinite" begin="0s"/>
+        </circle>
+        <!-- Meta to AI Agent -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 314 66 L 354 66" dur="1.2s" repeatCount="indefinite" begin="0.35s"/>
+        </circle>
+        <!-- Agent down to Tool Search -->
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 410 100 C 410 142 384 142 384 180" dur="1.6s" repeatCount="indefinite" begin="0.6s"/>
+        </circle>
+        <!-- Agent down to Tool CRM -->
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 478 100 C 478 142 564 142 564 180" dur="1.6s" repeatCount="indefinite" begin="0.6s"/>
+        </circle>
+        <!-- Tools to onOffice -->
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 384 236 L 384 300" dur="1.2s" repeatCount="indefinite" begin="1.1s"/>
+        </circle>
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 564 236 L 564 300" dur="1.2s" repeatCount="indefinite" begin="1.1s"/>
+        </circle>
+        <!-- Agent to Composer -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 534 66 L 574 66" dur="1.2s" repeatCount="indefinite" begin="0.8s"/>
+        </circle>
+        <!-- Composer to Reply -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 706 66 L 746 66" dur="1.2s" repeatCount="indefinite" begin="1.1s"/>
+        </circle>
+        <!-- CRM to Analytics -->
+        <circle r="3.5" fill="#000000">
+          <animateMotion path="M 642 208 L 698 208" dur="1.4s" repeatCount="indefinite" begin="1.3s"/>
+        </circle>
       </g>
-      <g class="acc-b">
-        <rect x="354" y="32" width="180" height="68" rx="12"/>
-        <text x="444" y="60">AI agent</text>
-        <text class="s" x="444" y="78">Gemini 2.5 Flash</text>
-        <text class="s" x="444" y="92">+ 12-message memory</text>
+
+      <!-- NEO-BRUTALIST CARDS -->
+
+      <!-- 01: CLIENT -->
+      <g class="diag-node">
+        <rect x="20" y="44" width="118" height="52" rx="4" fill="#000000"/>
+        <rect x="16" y="40" width="118" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="22" y="46" width="38" height="11" rx="2" fill="#000000"/>
+        <text x="41" y="55" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">USER</text>
+        <text x="75" y="70" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Client</text>
+        <text x="75" y="83" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">WhatsApp</text>
       </g>
-      <g class="dash-b">
-        <rect x="698" y="182" width="204" height="52" rx="10"/>
-        <text x="800" y="204">Analytics</text><text class="s" x="800" y="220">data table → weekly report</text>
+
+      <!-- 02: META CLOUD API -->
+      <g class="diag-node">
+        <rect x="178" y="44" width="140" height="52" rx="4" fill="#000000"/>
+        <rect x="174" y="40" width="140" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="180" y="46" width="56" height="11" rx="2" fill="#000000"/>
+        <text x="208" y="55" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">GATEWAY</text>
+        <text x="244" y="70" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Meta Cloud API</text>
+        <text x="244" y="83" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">inbound webhook</text>
+      </g>
+
+      <!-- 03: AI AGENT (GEMINI) -->
+      <g class="diag-node">
+        <rect x="358" y="32" width="180" height="70" rx="4" fill="#000000"/>
+        <rect x="354" y="28" width="180" height="70" rx="4" fill="#FFF2F4" stroke="#FF385C" stroke-width="3"/>
+        <circle cx="370" cy="42" r="3.5" fill="#FF385C"/>
+        <circle cx="370" cy="42" r="3.5" stroke="#FF385C" fill="none" class="diag-ping"/>
+        <text x="382" y="45" fill="#FF385C" font-family="'JetBrains Mono'" font-size="8" font-weight="800">✦ AI AGENT · LIVE 24/7</text>
+        <text x="444" y="66" font-family="'Space Grotesk'" font-size="15" font-weight="800" fill="#FF385C" text-anchor="middle">AI agent</text>
+        <text x="444" y="81" font-family="'JetBrains Mono'" font-size="9.5" font-weight="700" fill="#000000" text-anchor="middle">Gemini 2.5 Flash</text>
+        <text x="444" y="93" font-family="'JetBrains Mono'" font-size="9" font-weight="700" fill="#E02447" text-anchor="middle">+ 12-msg context</text>
+      </g>
+
+      <!-- 04: COMPOSER -->
+      <g class="diag-node">
+        <rect x="578" y="44" width="132" height="52" rx="4" fill="#000000"/>
+        <rect x="574" y="40" width="132" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="580" y="46" width="56" height="11" rx="2" fill="#000000"/>
+        <text x="608" y="55" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">FORMATTER</text>
+        <text x="640" y="70" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Composer</text>
+        <text x="640" y="83" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">splits the reply</text>
+      </g>
+
+      <!-- 05: REPLY -->
+      <g class="diag-node">
+        <rect x="750" y="44" width="158" height="52" rx="4" fill="#000000"/>
+        <rect x="746" y="40" width="158" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="752" y="46" width="46" height="11" rx="2" fill="#000000"/>
+        <text x="775" y="55" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">OUTBOUND</text>
+        <text x="825" y="70" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Reply</text>
+        <text x="825" y="83" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">text + 1 photo / listing</text>
+      </g>
+
+      <!-- 06: TOOL SEARCH -->
+      <g class="diag-node">
+        <rect x="310" y="184" width="156" height="56" rx="4" fill="#000000"/>
+        <rect x="306" y="180" width="156" height="56" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="312" y="186" width="60" height="11" rx="2" fill="#000000"/>
+        <text x="342" y="195" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">AGENT TOOL</text>
+        <text x="384" y="210" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Tool · Search</text>
+        <text x="384" y="225" font-family="'JetBrains Mono'" font-size="10" font-weight="600" fill="#555555" text-anchor="middle">14 query criteria</text>
+      </g>
+
+      <!-- 07: TOOL CRM -->
+      <g class="diag-node">
+        <rect x="490" y="184" width="156" height="56" rx="4" fill="#000000"/>
+        <rect x="486" y="180" width="156" height="56" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="492" y="186" width="56" height="11" rx="2" fill="#000000"/>
+        <text x="520" y="195" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">SAFE WRITE</text>
+        <text x="564" y="210" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Tool · CRM</text>
+        <text x="564" y="225" font-family="'JetBrains Mono'" font-size="10" font-weight="600" fill="#555555" text-anchor="middle">dedupe + activity log</text>
+      </g>
+
+      <!-- 08: ONOFFICE REST API -->
+      <g class="diag-node">
+        <rect x="310" y="304" width="336" height="52" rx="4" fill="#000000"/>
+        <rect x="306" y="300" width="336" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <text x="474" y="322" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">onOffice · REST API</text>
+        <text x="474" y="338" font-family="'JetBrains Mono'" font-size="10" font-weight="600" fill="#555555" text-anchor="middle">400+ fields · HMAC-signed transactions</text>
+      </g>
+
+      <!-- 09: ANALYTICS -->
+      <g class="diag-node">
+        <rect x="702" y="184" width="204" height="56" rx="4" fill="#000000"/>
+        <rect x="698" y="180" width="204" height="56" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2" stroke-dasharray="5 4"/>
+        <text x="800" y="208" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Analytics &amp; Report</text>
+        <text x="800" y="224" font-family="'JetBrains Mono'" font-size="10" font-weight="600" fill="#555555" text-anchor="middle">data table → weekly summary</text>
       </g>
     </svg>
   </div>
@@ -136,6 +322,27 @@
     <span class="badge">DECISION</span>
     <h3>Never overwrite a client record</h3>
     <p>An adversarial audit showed that an unverified email address could trigger an update to a third party's record. So when the agent meets a contact it already knows, it <strong>never writes to that record</strong>. It appends an entry to the CRM's activity log instead.</p>
+
+    <!-- SAFE WRITE COMPARISON MATRIX -->
+    <div class="detector-card" style="margin:18px 0 14px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:0.74rem;font-weight:800;letter-spacing:0.06em;color:#555555">// ADVERSARIAL AUDIT DISCOVERY · CLIENT RECORD INTEGRITY</div>
+      <div class="det-grid">
+        <div class="det-box danger">
+          <span class="det-name">Standard Direct CRM Overwrite</span>
+          <div class="det-score">CORRUPTION <span style="font-size:0.85rem;font-weight:800">RISK</span></div>
+          <span class="det-verdict">❌ Unverified inbound phone/email overwrites existing buyer profile</span>
+        </div>
+        <div class="det-box success">
+          <span class="det-name">Hermes Append-Only Architecture</span>
+          <div class="det-score">100% ISOLATED <span style="font-size:0.85rem;font-weight:800">SAFE</span></div>
+          <span class="det-verdict">✅ Appends timestamped log entry to CRM activity timeline. Zero destructive writes.</span>
+        </div>
+      </div>
+      <div class="det-takeaway">
+        <b>ARCHITECTURAL RULE:</b> Conversational AI bots must never possess unilateral UPDATE/DELETE permissions on client database rows. Append-only ledger pattern guarantees total tamper resistance.
+      </div>
+    </div>
+
     <p class="outcome"><b>TRADE-OFF</b> We lose automatic record enrichment. We gain the structural impossibility of corrupting client data.</p>
   </div>
 
@@ -202,5 +409,172 @@
 </footer>
 
 <script src="../assets/site.js"></script>
+<script>
+(function() {
+  const WA_SCENARIOS = {
+    'de-buyer': {
+      userMsg: "Guten Tag, wir suchen eine 3-Zimmer-Wohnung zum Kauf in Prenzlauer Berg bis 650.000 €, gerne mit Balkon und Aufzug.",
+      time: "14:22",
+      botReply: "Guten Tag! Ich habe in unserer onOffice-Datenbank 2 passende Eigentumswohnungen in Prenzlauer Berg gefunden, die Ihren Kriterien entsprechen:",
+      listing: {
+        title: "Lichtdurchflutete 3-Zimmer Altbauwohnung",
+        loc: "Prenzlauer Berg · 84 m²",
+        price: "619.000 €",
+        details: "3 Zimmer · Balkon zum Innenhof · Aufzug · Energieklasse C (88 kWh/m²a)"
+      },
+      reasoning: [
+        {
+          type: 'intent',
+          title: '1. INTENT & LANGUAGE DETECTED',
+          payload: 'Lang: "de" | Intent: "BUYER_LEAD" | Urgency: Medium | Qual: Qualified buyer'
+        },
+        {
+          type: 'tool',
+          title: '2. TOOL CALL: searchListings',
+          payload: '{"action":"buy", "city":"Berlin", "district":"Prenzlauer Berg", "price_max":650000, "rooms_min":3, "balcony":true, "elevator":true}'
+        },
+        {
+          type: 'crm',
+          title: '3. onOffice HMAC QUERY EXECUTED',
+          payload: 'HTTP POST /api/v1/estates | 14 criteria matched | Response: 2 objects found | Energy sort applied (Ranked C > E)'
+        },
+        {
+          type: 'tool',
+          title: '4. TOOL CALL: logContactActivity',
+          payload: 'Phone: +49 176 ... | Action: Append entry to Activity Log (Never overwrite core client record) | Status: 200 OK'
+        },
+        {
+          type: 'crm',
+          title: '5. COMPOSER OUTPUT PREPARED',
+          payload: '1 introductory bubble + 1 high-res primary photo with metadata caption. Zero loose image walls.'
+        }
+      ]
+    },
+    'en-expat': {
+      userMsg: "Hi! Relocating from London with my partner next month. Need a furnished 2-bed under €2,200/month near Mitte with elevator. Dog-friendly?",
+      time: "19:04",
+      botReply: "Welcome! Here is our current premium furnished 2-bedroom rental matching your relocation criteria near Mitte:",
+      listing: {
+        title: "Modern Furnished 2-Bedroom Designer Loft",
+        loc: "Mitte / Torstraße · 76 m²",
+        price: "€1,950 / month warm",
+        details: "2 Beds · Fully furnished · 3rd Floor with elevator · Pets allowed on request"
+      },
+      reasoning: [
+        {
+          type: 'intent',
+          title: '1. INTENT & LANGUAGE DETECTED',
+          payload: 'Lang: "en" | Intent: "RENTER_EXPAT" | Urgency: High (Relocation next month) | Qual: Premium tenant'
+        },
+        {
+          type: 'tool',
+          title: '2. TOOL CALL: searchListings',
+          payload: '{"action":"rent", "district":"Mitte", "price_max":2200, "bedrooms_min":2, "furnished":true, "elevator":true, "pets_allowed":true}'
+        },
+        {
+          type: 'crm',
+          title: '3. onOffice HMAC QUERY EXECUTED',
+          payload: 'Query executed against rental inventory | 1 matching verified unit | Pet policy validated against lease terms'
+        },
+        {
+          type: 'tool',
+          title: '4. TOOL CALL: logContactActivity',
+          payload: 'Returning phone lookup: No match | New prospect tagged: "Expat-UK-Relocation" | Append-only lead creation'
+        },
+        {
+          type: 'crm',
+          title: '5. COMPOSER OUTPUT PREPARED',
+          payload: 'Expat context parsed: Formatted warm rental fee + English viewing booking invite generated.'
+        }
+      ]
+    },
+    'fr-owner': {
+      userMsg: "Bonjour, je suis propriétaire d'un 2 pièces à Charlottenburg et souhaite faire estimer sa valeur pour une mise en vente.",
+      time: "21:38",
+      botReply: "Bonjour ! Nous pouvons parfaitement réaliser une estimation confidentielle et détaillée de votre bien à Charlottenburg.",
+      listing: {
+        title: "Estimation Vendeur · Mandat Exclusif",
+        loc: "Charlottenburg · 2 Pièces",
+        price: "Étude de marché personnalisée",
+        details: "Analyse des transactions notariées récentes · Évaluation DPE · Aucun bien à la vente proposé (Protection vendeur)"
+      },
+      reasoning: [
+        {
+          type: 'intent',
+          title: '1. INTENT & LANGUAGE DETECTED',
+          payload: 'Lang: "fr" | Intent: "SELLER_LEAD" (High Value) | Rule: NEVER display buyer listings to owners'
+        },
+        {
+          type: 'tool',
+          title: '2. TOOL CALL: logContactActivity',
+          payload: '{"contact_type":"owner_seller", "property_type":"apartment", "district":"Charlottenburg", "language":"fr"}'
+        },
+        {
+          type: 'crm',
+          title: '3. CRM PIPELINE ACTION',
+          payload: 'Created seller opportunity ticket in onOffice | Notification dispatched to senior listing broker'
+        },
+        {
+          type: 'tool',
+          title: '4. BEHAVIOR ADAPTATION',
+          payload: 'Skipped listing search entirely. Diverted agent flow into valuation questionnaire.'
+        },
+        {
+          type: 'crm',
+          title: '5. COMPOSER OUTPUT PREPARED',
+          payload: 'Reassuring French consultation message with direct calendar link for appraisal call.'
+        }
+      ]
+    }
+  };
+
+  let activeScen = 'de-buyer';
+  const chatArea = document.getElementById('wa-chat');
+  const reasoningArea = document.getElementById('wa-reasoning');
+
+  function renderWA() {
+    const data = WA_SCENARIOS[activeScen];
+    if (!data) return;
+
+    if (chatArea) {
+      chatArea.innerHTML = `
+        <div class="wa-bubble user">
+          ${data.userMsg}
+          <div class="wa-bubble-time">${data.time} ✓✓</div>
+        </div>
+        <div class="wa-bubble agent">
+          ${data.botReply}
+          <div class="wa-listing-preview">
+            <b>${data.listing.title}</b><br>
+            <span>${data.listing.loc} · <strong>${data.listing.price}</strong></span><br>
+            <span style="color:#555555;font-size:0.72rem">${data.listing.details}</span>
+          </div>
+          <div class="wa-bubble-time">${data.time}</div>
+        </div>
+      `;
+    }
+
+    if (reasoningArea) {
+      reasoningArea.innerHTML = data.reasoning.map(r => `
+        <div class="wa-step">
+          <div class="wa-step-lbl ${r.type}">✦ ${r.title}</div>
+          <div class="wa-step-payload">${r.payload}</div>
+        </div>
+      `).join('');
+    }
+  }
+
+  document.querySelectorAll('#whatsapp-sim .preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#whatsapp-sim .preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeScen = btn.dataset.scenario;
+      renderWA();
+    });
+  });
+
+  renderWA();
+})();
+</script>
 </body>
 </html>

@@ -70,50 +70,193 @@
     <li><strong>The Mental Dry-Run:</strong> The Judge executes mental stress tests on boundary conditions (null pointers, inf, network partitions, high contention) and triggers automated revision loops (max 3).</li>
     <li><strong>Radical Trade-Off Transparency:</strong> The output documents what was intentionally sacrificed (e.g. latency vs. idempotency) alongside a 0–100 confidence score and residual production risks.</li>
   </ul>
+
+  <!-- INTERACTIVE CRITIC-REFINE COMMITTEE SIMULATOR -->
+  <div class="sim-container" id="critic-sim" style="margin:32px 0 28px;background:#FFFFFF;border:var(--bw) solid #000000;box-shadow:var(--hard-shadow-lg);border-radius:6px;overflow:hidden">
+    <div class="sim-header">
+      <div class="sim-badge"><span class="dot-live"></span> LIVE 3-ROLE AGENT COMMITTEE SIMULATOR</div>
+      <div class="sim-title">Test Adversarial Code Audit, Flaw Teardown &amp; Convergence</div>
+      <p class="sim-intro">Select a high-stakes engineering task below to see the Generator's first draft, the Polymorphic Critic's attack vectors, and how the Judge Arbitrator patches subtle failure modes before delivery.</p>
+    </div>
+
+    <!-- PRESET CONTROLS -->
+    <div class="sim-controls">
+      <span class="ctrl-label">SELECT HIGH-STAKES PROBLEM:</span>
+      <div class="sim-presets">
+        <button type="button" class="preset-btn active" data-task="token-bucket">1. ⚡️ Token Bucket (float('nan') &amp; Concurrency)</button>
+        <button type="button" class="preset-btn" data-task="hmac-auth">2. 🛡 HMAC Auth (Timing Attack Side-Channel)</button>
+        <button type="button" class="preset-btn" data-task="ledger-math">3. 💰 Ledger Math (Binary Floating-Point Drift)</button>
+      </div>
+    </div>
+
+    <!-- 2-COL LAYOUT: AUDIT TEARDOWN + ARBITRATED FIX -->
+    <div class="critic-layout">
+      <!-- LEFT: GENERATOR DRAFT + CRITIC ATTACK -->
+      <div class="critic-left-col">
+        <div class="critic-role-box">
+          <div class="critic-role-title" style="color:#94A3B8">
+            <span>01 · GENERATOR FIRST-PASS DRAFT</span>
+            <span style="color:#F59E0B">INITIAL CONFIDENCE: <span id="cr-init-conf">52%</span></span>
+          </div>
+          <pre id="cr-gen-code" style="margin:0;color:#E2E8F0;font-size:0.72rem;line-height:1.45;white-space:pre-wrap"></pre>
+        </div>
+
+        <div class="critic-role-box" style="border-color:#EF4444;background:#180D11">
+          <div class="critic-role-title" style="color:#EF4444">
+            <span id="cr-critic-persona">02 · POLYMORPHIC CRITIC (SECOPS / THREAD AUDITOR)</span>
+            <span>CRITICAL FLAW FOUND ⚠️</span>
+          </div>
+          <div id="cr-critic-teardown" style="color:#FCA5A5;font-size:0.73rem;line-height:1.45"></div>
+        </div>
+      </div>
+
+      <!-- RIGHT: JUDGE ARBITRATION + REFINED CODE -->
+      <div class="critic-right-col">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-family:'Space Grotesk',sans-serif;font-size:0.88rem;font-weight:800;color:#000000">03 · JUDGE ARBITRATOR &amp; FINAL GATE</span>
+          <span id="cr-calibrated-conf" class="auth-pill pass">FINAL SCORE: 96 / 100</span>
+        </div>
+
+        <div style="background:#0F172A;border:2px solid #000000;border-radius:4px;padding:12px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:#38BDF8;font-weight:800;margin-bottom:6px">// HARDENED PRODUCTION IMPLEMENTATION</div>
+          <pre id="cr-fixed-code" style="margin:0;color:#34D399;font-family:'JetBrains Mono',monospace;font-size:0.72rem;line-height:1.45;white-space:pre-wrap"></pre>
+        </div>
+
+        <div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:0.82rem;font-weight:800;margin-bottom:4px">RADICAL TRADE-OFF TRANSPARENCY</div>
+          <p id="cr-tradeoff" style="font-size:0.83rem;color:#333333;margin:0;line-height:1.45"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SPECS STRIP -->
+    <div class="sim-specs">
+      <div><b>RUNTIME</b> <span>Hermes Agent native skill (v1.0.0)</span></div>
+      <div><b>TURNAROUND</b> <span>&lt; 8 seconds (Single in-turn COT)</span></div>
+      <div><b>MAX REVISIONS</b> <span>3 convergence passes</span></div>
+      <div><b>CONFIDENCE CALIBRATION</b> <span class="cost-tag">Brier score calibrated (0-100)</span></div>
+    </div>
+  </div>
+
 </div></section>
 
 <section class="sec rv"><div class="wrap">
   <h2>How it works</h2>
   <div class="diag">
-    <svg viewBox="0 0 920 256" role="img" aria-label="A user prompt is received by the Generator. It produces an initial draft which is passed to the Polymorphic Critic for an adversarial teardown. If critical flaws exist, an iteration loop feeds fixes back to the Generator (capped at 3 cycles). The Judge runs a mental dry-run, reconciles trade-offs, and outputs a 4-section executive report.">
+    <svg viewBox="0 0 920 280" role="img" aria-label="A user prompt is received by the Generator. It produces an initial draft which is passed to the Polymorphic Critic for an adversarial teardown. If critical flaws exist, an iteration loop feeds fixes back to the Generator (capped at 3 cycles). The Judge runs a mental dry-run, reconciles trade-offs, and outputs a 4-section executive report.">
       <defs>
-        <marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
-          <path d="M0 0 L6 3 L0 6 z" fill="rgba(255,255,255,.34)"/>
+        <marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#000000"/>
         </marker>
+        <marker id="ah-red" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#FF385C"/>
+        </marker>
+        <filter id="diag-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
       </defs>
+
+      <!-- BASE CONDUITS -->
       <g class="edge" marker-end="url(#ah)">
-        <path d="M124 70 H160"/>
-        <path d="M310 70 H350"/>
-        <path d="M530 70 H570"/>
-        <path d="M720 70 H760"/>
-        <path d="M440 106 V150 H235 V98"/>
+        <path d="M 124 70 L 160 70"/>
+        <path d="M 310 70 L 350 70"/>
+        <path d="M 530 70 L 570 70"/>
+        <path d="M 720 70 L 760 70"/>
+        <path d="M 440 106 C 440 160 235 160 235 106"/>
       </g>
-      <g class="flow">
-        <path d="M124 70 H160"/>
-        <path d="M310 70 H350"/>
-        <path d="M530 70 H570"/>
-        <path d="M720 70 H760"/>
+
+      <!-- LASER FLOW PULSES -->
+      <g class="flow" marker-end="url(#ah-red)">
+        <path d="M 124 70 L 160 70"/>
+        <path d="M 310 70 L 350 70"/>
+        <path d="M 530 70 L 570 70"/>
+        <path d="M 720 70 L 760 70"/>
+        <path d="M 440 106 C 440 160 235 160 235 106"/>
       </g>
-      <g class="bx">
-        <rect x="14" y="44" width="110" height="52" rx="10"/>
-        <text x="69" y="66">User Prompt</text><text class="s" x="69" y="82">high-stakes task</text>
 
-        <rect x="160" y="44" width="150" height="52" rx="10"/>
-        <text x="235" y="66">01 · Generator</text><text class="s" x="235" y="82">first-pass solution</text>
-
-        <rect x="570" y="40" width="150" height="60" rx="10"/>
-        <text x="645" y="64">03 · Judge Arbitrator</text><text class="s" x="645" y="80">dry-run &amp; trade-offs</text>
-
-        <rect x="760" y="44" width="146" height="52" rx="10"/>
-        <text x="833" y="66">Output Report</text><text class="s" x="833" y="82">audit + solution</text>
-
-        <rect x="250" y="150" width="220" height="48" rx="8"/>
-        <text x="360" y="172">Iteration Loop (max 3x)</text><text class="s" x="360" y="186">if critical vulnerabilities found</text>
+      <!-- FLYING DATA PHOTONS -->
+      <g class="diag-photons">
+        <!-- Prompt to Generator -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 124 70 L 160 70" dur="1s" repeatCount="indefinite" begin="0s"/>
+        </circle>
+        <!-- Generator to Critic -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 310 70 L 350 70" dur="1s" repeatCount="indefinite" begin="0.3s"/>
+        </circle>
+        <!-- Critic to Judge -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 530 70 L 570 70" dur="1s" repeatCount="indefinite" begin="0.6s"/>
+        </circle>
+        <!-- Judge to Output -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 720 70 L 760 70" dur="1s" repeatCount="indefinite" begin="0.9s"/>
+        </circle>
+        <!-- Backward Refine Loop -->
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 440 106 C 440 160 235 160 235 106" dur="1.8s" repeatCount="indefinite" begin="1.2s"/>
+        </circle>
       </g>
-      <g class="acc-b">
-        <rect x="350" y="38" width="180" height="64" rx="12"/>
-        <text x="440" y="64">02 · Polymorphic Critic</text>
-        <text class="s" x="440" y="80">SecOps · Concurrency · DBA</text>
+
+      <!-- NEO-BRUTALIST CARDS -->
+
+      <!-- 01: USER PROMPT -->
+      <g class="diag-node">
+        <rect x="18" y="48" width="110" height="52" rx="4" fill="#000000"/>
+        <rect x="14" y="44" width="110" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <text x="69" y="66" font-family="'Space Grotesk'" font-size="13" font-weight="800" fill="#000000" text-anchor="middle">User Prompt</text>
+        <text x="69" y="80" font-family="'JetBrains Mono'" font-size="9" font-weight="600" fill="#555555" text-anchor="middle">high-stakes task</text>
+      </g>
+
+      <!-- 02: GENERATOR -->
+      <g class="diag-node">
+        <rect x="164" y="48" width="150" height="52" rx="4" fill="#000000"/>
+        <rect x="160" y="44" width="150" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="166" y="50" width="56" height="11" rx="2" fill="#000000"/>
+        <text x="194" y="59" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">ROLE #1</text>
+        <text x="235" y="70" font-family="'Space Grotesk'" font-size="13.5" font-weight="800" fill="#000000" text-anchor="middle">01 · Generator</text>
+        <text x="235" y="84" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">first-pass solution</text>
+      </g>
+
+      <!-- 03: POLYMORPHIC CRITIC -->
+      <g class="diag-node">
+        <rect x="354" y="40" width="180" height="66" rx="4" fill="#000000"/>
+        <rect x="350" y="36" width="180" height="66" rx="4" fill="#FFF2F4" stroke="#FF385C" stroke-width="3"/>
+        <circle cx="366" cy="50" r="3.5" fill="#FF385C"/>
+        <circle cx="366" cy="50" r="3.5" stroke="#FF385C" fill="none" class="diag-ping"/>
+        <text x="378" y="53" fill="#FF385C" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800">✦ ADVERSARIAL ROLE #2</text>
+        <text x="440" y="72" font-family="'Space Grotesk'" font-size="14.5" font-weight="800" fill="#FF385C" text-anchor="middle">Polymorphic Critic</text>
+        <text x="440" y="88" font-family="'JetBrains Mono'" font-size="9" font-weight="700" fill="#000000" text-anchor="middle">SecOps · Concurrency · DBA</text>
+      </g>
+
+      <!-- 04: JUDGE ARBITRATOR -->
+      <g class="diag-node">
+        <rect x="574" y="42" width="150" height="62" rx="4" fill="#000000"/>
+        <rect x="570" y="38" width="150" height="62" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="576" y="44" width="56" height="11" rx="2" fill="#000000"/>
+        <text x="604" y="53" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">ROLE #3</text>
+        <text x="645" y="68" font-family="'Space Grotesk'" font-size="13.5" font-weight="800" fill="#000000" text-anchor="middle">Judge Arbitrator</text>
+        <text x="645" y="84" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">dry-run &amp; trade-offs</text>
+      </g>
+
+      <!-- 05: OUTPUT REPORT -->
+      <g class="diag-node">
+        <rect x="764" y="48" width="146" height="52" rx="4" fill="#000000"/>
+        <rect x="760" y="44" width="146" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <text x="833" y="66" font-family="'Space Grotesk'" font-size="13.5" font-weight="800" fill="#000000" text-anchor="middle">Output Report</text>
+        <text x="833" y="80" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">audit + calibrated fix</text>
+      </g>
+
+      <!-- 06: ITERATION LOOP BADGE -->
+      <g class="diag-node">
+        <rect x="274" y="148" width="220" height="38" rx="4" fill="#000000"/>
+        <rect x="270" y="144" width="220" height="38" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2"/>
+        <text x="380" y="162" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">Iteration Loop (max 3x)</text>
+        <text x="380" y="174" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">if critical vulnerabilities found</text>
       </g>
     </svg>
   </div>
@@ -128,6 +271,27 @@
     <h3>The silent float('nan') infinite loop trap</h3>
     <p>In standard rate limiter or validation code, guards like <code>if tokens &lt;= 0: raise ValueError</code> look airtight. But in Python and IEEE 754, comparisons against <code>float('nan')</code> always return <code>False</code>.</p>
     <p>If an input payload passes <code>NaN</code>, it slips right past the validator into the while-loop, where <code>self.tokens &gt;= tokens</code> is permanently <code>False</code>, triggering a <strong>100% CPU infinite spin that hangs the worker thread</strong>.</p>
+
+    <!-- NAN EXPLOIT COMPARISON MATRIX -->
+    <div class="detector-card" style="margin:18px 0 14px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:0.74rem;font-weight:800;letter-spacing:0.06em;color:#555555">// IEEE 754 EXPLOIT AUDIT · SILENT WORKER THREAD HANG</div>
+      <div class="det-grid">
+        <div class="det-box danger">
+          <span class="det-name">Naive Guard: <code>tokens &lt;= 0</code></span>
+          <div class="det-score">100% CPU LOCK <span style="font-size:0.85rem;font-weight:800">THREAD HANG</span></div>
+          <span class="det-verdict">❌ <code>float('nan') &lt;= 0</code> evaluates to False! Bypasses guard into infinite loop.</span>
+        </div>
+        <div class="det-box success">
+          <span class="det-name">Hardened Gate: <code>math.isfinite()</code></span>
+          <div class="det-score">AIRTIGHT <span style="font-size:0.85rem;font-weight:800">EXCEPTION</span></div>
+          <span class="det-verdict">✅ Traps NaN and Inf immediately, raising clean 400 Bad Request before thread acquires lock.</span>
+        </div>
+      </div>
+      <div class="det-takeaway">
+        <b>ARCHITECTURAL RULE:</b> Never rely on inequality operators (&lt;, &gt;, &lt;=, &gt;=) to validate untrusted floats. Always enforce <code>math.isfinite()</code> at the network boundary.
+      </div>
+    </div>
+
     <p class="outcome"><b>FIX</b> The Critic systematically checks numeric boundary conditions and enforces <code>math.isfinite()</code> across all arithmetic entry points.</p>
   </div>
 
@@ -188,5 +352,165 @@
 </footer>
 
 <script src="../assets/site.js"></script>
+<script>
+(function() {
+  const TASKS = {
+    'token-bucket': {
+      initConf: '52%',
+      finalConf: 'SCORE: 96 / 100',
+      persona: '02 · CONCURRENCY & NUMERIC AUDITOR',
+      genCode: `class TokenBucket:
+    def __init__(self, capacity, refill_rate):
+        self.capacity = capacity
+        self.tokens = capacity
+        self.last_refill = time.time()
+        self.rate = refill_rate
+
+    def consume(self, tokens):
+        # Flawed guard
+        if tokens <= 0:
+            raise ValueError("Tokens must be positive")
+        self.refill()
+        if self.tokens >= tokens:
+            self.tokens -= tokens
+            return True
+        return False`,
+      criticTeardown: `⚠️ CRITICAL FLAW 1: IEEE 754 float('nan') comparison bypass. comparisons with NaN always evaluate to False. float('nan') <= 0 is False, so NaN passes into the bucket, corrupting self.tokens to NaN permanently.
+⚠️ CRITICAL FLAW 2: Thread race condition on self.tokens under concurrent execution. No mutex lock.
+⚠️ CRITICAL FLAW 3: time.time() subject to NTP time-jumping / wall-clock skew.`,
+      fixedCode: `import time, math, threading
+
+class TokenBucket:
+    def __init__(self, capacity: float, refill_rate: float):
+        if not (math.isfinite(capacity) and capacity > 0):
+            raise ValueError("Capacity must be finite and positive")
+        self.capacity = float(capacity)
+        self.tokens = float(capacity)
+        self.rate = float(refill_rate)
+        self.last_refill = time.monotonic() # NTP-immune
+        self._lock = threading.Lock()
+
+    def consume(self, tokens: float = 1.0) -> bool:
+        # Enforce boundary check against NaN and Inf
+        if not (math.isfinite(tokens) and tokens > 0):
+            raise ValueError("Tokens must be finite and > 0")
+        with self._lock: # Thread-safe critical section
+            now = time.monotonic()
+            elapsed = max(0.0, now - self.last_refill)
+            self.tokens = min(self.capacity, self.tokens + elapsed * self.rate)
+            self.last_refill = now
+            if self.tokens >= tokens:
+                self.tokens -= tokens
+                return True
+            return False`,
+      tradeoff: "Verrouillage avec <code>threading.Lock()</code> : introduit une légère contention mémoire sous haute concurrence multi-threads, mais élimine 100% des corruptions d'état et protège contre les exploits IEEE 754 de type DoS."
+    },
+    'hmac-auth': {
+      initConf: '48%',
+      finalConf: 'SCORE: 98 / 100',
+      persona: '02 · SECOPS CRYPTOGRAPHIC AUDITOR',
+      genCode: `def verify_signature(secret_key, payload, received_sig):
+    import hashlib, hmac
+    expected = hmac.new(
+        secret_key.encode(), 
+        payload.encode(), 
+        hashlib.sha256
+    ).hexdigest()
+    
+    # Flawed naive comparison:
+    if expected == received_sig:
+        return True
+    return False`,
+      criticTeardown: `🚨 VULNERABILITY CVE-LEVEL: Timing attack side-channel leak. The Python standard '==' operator compares strings byte-by-byte and terminates early on the first mismatched character.
+An attacker measuring nanosecond latency differences over the network can systematically reconstruct the valid HMAC byte-by-byte.`,
+      fixedCode: `import hmac, hashlib
+
+def verify_signature(secret_key: bytes, payload: bytes, received_sig: str) -> bool:
+    if not isinstance(secret_key, (bytes, bytearray)):
+        secret_key = str(secret_key).encode('utf-8')
+    if not isinstance(payload, (bytes, bytearray)):
+        payload = str(payload).encode('utf-8')
+
+    expected_sig = hmac.new(
+        secret_key, 
+        payload, 
+        hashlib.sha256
+    ).hexdigest()
+
+    # Enforce constant-time comparison to prevent side-channel timing attacks
+    return hmac.compare_digest(expected_sig, str(received_sig))`,
+      tradeoff: "Utilisation stricte de <code>hmac.compare_digest()</code> à temps constant : temps d'exécution constant garanti indépendamment du nombre d'octets valides, prévenant toute fuite d'informations cryptographiques."
+    },
+    'ledger-math': {
+      initConf: '60%',
+      finalConf: 'SCORE: 95 / 100',
+      persona: '02 · FINANCIAL SYSTEMS & DBA AUDITOR',
+      genCode: `def process_transfer(account_a, account_b, amount):
+    # Flawed floating-point arithmetic
+    if account_a['balance'] >= amount:
+        account_a['balance'] -= amount
+        account_b['balance'] += amount
+        return {"status": "success", "new_balance": account_a['balance']}`,
+      criticTeardown: `⚠️ CRITICAL DRIFT: In IEEE 754 binary floating-point arithmetic, 0.1 + 0.2 equals 0.30000000000000004.
+Accumulating float debits over thousands of financial transactions causes ledger drift and discrepancy during fiscal balancing.
+Missing idempotency key: duplicate network retries debit the account twice.`,
+      fixedCode: `from decimal import Decimal, ROUND_HALF_EVEN
+
+def process_transfer(account_a: dict, account_b: dict, amount_str: str, idempotency_key: str, seen_keys: set) -> dict:
+    if idempotency_key in seen_keys:
+        return {"status": "duplicate_ignored", "idempotency_key": idempotency_key}
+
+    # Strict decimal precision arithmetic
+    amount = Decimal(str(amount_str)).quantize(Decimal('0.01'), rounding=ROUND_HALF_EVEN)
+    if amount <= Decimal('0.00'):
+        raise ValueError("Transfer amount must be strictly positive")
+
+    bal_a = Decimal(str(account_a['balance']))
+    if bal_a < amount:
+        raise ValueError("Insufficient funds")
+
+    account_a['balance'] = str(bal_a - amount)
+    account_b['balance'] = str(Decimal(str(account_b['balance'])) + amount)
+    seen_keys.add(idempotency_key)
+
+    return {"status": "settled", "debited": str(amount), "remaining": account_a['balance']}`,
+      tradeoff: "Remplacement par <code>Decimal('0.01')</code> et vérification d'idempotence : surcoût CPU minime par rapport aux floats natifs, mais élimination intégrale des erreurs de centimes résiduels et double débit."
+    }
+  };
+
+  let activeTask = 'token-bucket';
+  const initConfEl = document.getElementById('cr-init-conf');
+  const calibConfEl = document.getElementById('cr-calibrated-conf');
+  const personaEl = document.getElementById('cr-critic-persona');
+  const genCodeEl = document.getElementById('cr-gen-code');
+  const teardownEl = document.getElementById('cr-critic-teardown');
+  const fixedCodeEl = document.getElementById('cr-fixed-code');
+  const tradeoffEl = document.getElementById('cr-tradeoff');
+
+  function renderCritic() {
+    const t = TASKS[activeTask];
+    if (!t) return;
+
+    if (initConfEl) initConfEl.textContent = t.initConf;
+    if (calibConfEl) calibConfEl.textContent = t.finalConf;
+    if (personaEl) personaEl.textContent = t.persona;
+    if (genCodeEl) genCodeEl.textContent = t.genCode;
+    if (teardownEl) teardownEl.innerHTML = t.criticTeardown.split('\n').map(l => `<div>${l}</div>`).join('');
+    if (fixedCodeEl) fixedCodeEl.textContent = t.fixedCode;
+    if (tradeoffEl) tradeoffEl.innerHTML = t.tradeoff;
+  }
+
+  document.querySelectorAll('#critic-sim .preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#critic-sim .preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeTask = btn.dataset.task;
+      renderCritic();
+    });
+  });
+
+  renderCritic();
+})();
+</script>
 </body>
 </html>

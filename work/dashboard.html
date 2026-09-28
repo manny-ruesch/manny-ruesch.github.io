@@ -71,44 +71,216 @@
     <li>Twelve months of history, rebuilt retroactively from CRM date fields.</li>
     <li>A read-only director's view, so management sees the numbers without an account.</li>
   </ul>
+
+  <!-- DASHBOARD UI VISUAL SHOWCASE -->
+  <div class="visual-showcase">
+    <div class="visual-head">
+      <div class="v-dots"><span></span><span></span><span></span></div>
+      <div class="v-title">// EXECUTIVE DECISION DASHBOARD · 5 DATA SOURCES &amp; GEMINI AI ANALYST</div>
+      <div class="v-tag">LIVE UI</div>
+    </div>
+    <div class="visual-body">
+      <img src="../assets/dashboard.png" alt="Real-time Marketing and CRM Executive Decision Dashboard UI" loading="lazy">
+    </div>
+    <div class="visual-foot">
+      <span><b>SYSTEM INTEGRATION:</b> GA4 + Search Console + PageSpeed + onOffice CRM normalized via 11 n8n workflows with Gemini executive synthesis.</span>
+      <span class="v-live">● PRODUCTION SYSTEM</span>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE EXECUTIVE DECISION SIMULATOR -->
+  <div class="dash-sim-container" id="dash-sim">
+    <div class="sim-header">
+      <div class="sim-badge"><span class="dot-live"></span> INTERACTIVE EXECUTIVE DECISION SIMULATOR</div>
+      <div class="sim-title">Test the Live Data → AI Analyst Verdict Engine</div>
+      <p class="sim-intro">Switch business scenarios below to see how the dashboard combines marketing analytics with CRM sales velocity to produce an actionable diagnosis—and how the honest health score handles missing data.</p>
+    </div>
+
+    <!-- SCENARIOS -->
+    <div class="sim-controls">
+      <span class="ctrl-label">SELECT REAL-TIME SCENARIO:</span>
+      <div class="sim-presets">
+        <button type="button" class="preset-btn active" data-scenario="traffic-drop">1. Organic Traffic Drop (-28%)</button>
+        <button type="button" class="preset-btn" data-scenario="lead-spike">2. Lead Spike (+42%) &amp; CRM Lag</button>
+        <button type="button" class="preset-btn" data-scenario="data-outage">3. API Timeout (Honest Partial 2/4)</button>
+      </div>
+    </div>
+
+    <!-- LIVE METRICS BAR -->
+    <div style="padding:18px 24px 0;background:#FFFFFF">
+      <div class="dash-metrics-grid" id="dash-metrics">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+
+    <!-- AI ANALYST VERDICT BANNER -->
+    <div style="padding:0 24px 20px;background:#FFFFFF">
+      <div class="verdict-box status-amber" id="verdict-card">
+        <div class="verdict-head">
+          <div class="verdict-tag amber" id="v-tag">● ATTENTION REQUIRED</div>
+          <div class="verdict-score" id="v-score">SYSTEM HEALTH: 71 / 100</div>
+        </div>
+        <div class="verdict-prose" id="v-prose">
+          L'analyse des 90 derniers jours révèle une tendance négative sur le trafic organique (-28%), mais les conversions qualifiées résistent grâce aux pages de vente. Priorité : auditer les 3 pages piliers récemment déclassées.
+        </div>
+        <div class="verdict-actions">
+          <div class="va-title">✦ PRIORITIZED AI ACTION PLAN (NEXT 48H):</div>
+          <ul id="v-actions">
+            <li>Inspect Search Console URL Inspection tool for /kaufen/ listings dropped from index.</li>
+            <li>Re-verify Core Web Vitals LCP regression on mobile listing templates.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SPEC FOOTER -->
+    <div class="sim-specs">
+      <div><b>UPDATE FREQUENCY</b> <span>Real-time / Per request</span></div>
+      <div><b>CACHE LAYER</b> <span>Static past months / Dynamic current</span></div>
+      <div><b>SECURITY</b> <span>n8n HMAC Secret / Zero Keys in Client</span></div>
+      <div><b>AI MODEL</b> <span class="cost-tag">Gemini 2.5 Flash (~1.1s)</span></div>
+    </div>
+  </div>
+
 </div></section>
 
 <section class="sec rv"><div class="wrap">
   <h2>How it works</h2>
   <div class="diag">
-    <svg viewBox="0 0 920 256" role="img" aria-label="Google APIs are called from the browser by a single-page dashboard. An AI analyst reads the assembled data and returns a written verdict shown in a banner. Below the dashboard, an n8n proxy holds the API keys and eleven n8n workflows query the onOffice CRM. A dashed box shows a read-only director view.">
-      <defs><marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
-        <path d="M0 0 L6 3 L0 6 z" fill="rgba(255,255,255,.34)"/></marker></defs>
+    <svg viewBox="0 0 920 260" role="img" aria-label="Google APIs are called from the browser by a single-page dashboard. An AI analyst reads the assembled data and returns a written verdict shown in a banner. Below the dashboard, an n8n proxy holds the API keys and eleven n8n workflows query the onOffice CRM. A dashed box shows a read-only director view.">
+      <defs>
+        <marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#000000"/>
+        </marker>
+        <marker id="ah-red" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#FF385C"/>
+        </marker>
+        <filter id="diag-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+
+      <!-- BASE CONDUITS -->
       <g class="edge" marker-end="url(#ah)">
-        <path d="M166 66 H198"/><path d="M366 66 H398"/><path d="M586 66 H618"/>
-        <path d="M300 92 C300 140 331 140 331 174"/><path d="M340 92 C340 150 541 150 541 174"/>
-        <path d="M636 208 H682" stroke-dasharray="4 5"/>
+        <path d="M 166 66 L 206 66"/>
+        <path d="M 366 66 L 406 66"/>
+        <path d="M 586 66 L 626 66"/>
+        <path d="M 300 92 C 300 140 331 140 331 180"/>
+        <path d="M 340 92 C 340 150 541 150 541 180"/>
+        <path d="M 636 208 L 682 208" stroke-dasharray="5 5"/>
       </g>
-      <g class="flow">
-        <path d="M166 66 H198"/><path d="M366 66 H398"/><path d="M586 66 H618"/>
-        <path d="M300 92 C300 140 331 140 331 174"/><path d="M340 92 C340 150 541 150 541 174"/>
+
+      <!-- LASER FLOW PULSES -->
+      <g class="flow" marker-end="url(#ah-red)">
+        <path d="M 166 66 L 206 66"/>
+        <path d="M 366 66 L 406 66"/>
+        <path d="M 586 66 L 626 66"/>
+        <path d="M 300 92 C 300 140 331 140 331 180"/>
+        <path d="M 340 92 C 340 150 541 150 541 180"/>
       </g>
-      <g class="bx">
-        <rect x="16" y="40" width="150" height="52" rx="10"/>
-        <text x="91" y="62">Google APIs</text><text class="s" x="91" y="78">GA4 · GSC · PageSpeed</text>
-        <rect x="206" y="40" width="160" height="52" rx="10"/>
-        <text x="286" y="62">Dashboard</text><text class="s" x="286" y="78">one HTML page</text>
-        <rect x="618" y="40" width="150" height="52" rx="10"/>
-        <text x="693" y="62">Verdict banner</text><text class="s" x="693" y="78">traffic light + prose</text>
-        <rect x="246" y="180" width="170" height="56" rx="10"/>
-        <text x="331" y="204">n8n proxy</text><text class="s" x="331" y="220">holds the API keys</text>
-        <rect x="446" y="180" width="190" height="56" rx="10"/>
-        <text x="541" y="204">11 CRM workflows</text><text class="s" x="541" y="220">leads · funnel · history</text>
+
+      <!-- ANIMATED DATA PHOTONS -->
+      <g class="diag-photons">
+        <!-- P1: Google APIs to Dashboard -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 166 66 L 206 66" dur="1.2s" repeatCount="indefinite" begin="0s"/>
+        </circle>
+        <!-- P2: Dashboard to AI Analyst -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 366 66 L 406 66" dur="1.2s" repeatCount="indefinite" begin="0.4s"/>
+        </circle>
+        <!-- P3: AI Analyst to Verdict Banner -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 586 66 L 626 66" dur="1.2s" repeatCount="indefinite" begin="0.8s"/>
+        </circle>
+        <!-- P4: Dashboard down to n8n Proxy -->
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 300 92 C 300 140 331 140 331 180" dur="1.5s" repeatCount="indefinite" begin="0.5s"/>
+        </circle>
+        <!-- P5: Dashboard down to 11 CRM Workflows -->
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 340 92 C 340 150 541 150 541 180" dur="1.6s" repeatCount="indefinite" begin="0.6s"/>
+        </circle>
+        <!-- P6: Workflows to Director View -->
+        <circle r="3.5" fill="#000000">
+          <animateMotion path="M 636 208 L 682 208" dur="1.4s" repeatCount="indefinite" begin="1.1s"/>
+        </circle>
       </g>
-      <g class="acc-b">
-        <rect x="398" y="32" width="188" height="68" rx="12"/>
-        <text x="492" y="60">AI analyst</text>
-        <text class="s" x="492" y="78">Gemini</text>
-        <text class="s" x="492" y="92">verdict + synthesis</text>
+
+      <!-- NEO-BRUTALIST CARDS -->
+
+      <!-- 01: GOOGLE APIS -->
+      <g class="diag-node">
+        <rect x="20" y="44" width="150" height="52" rx="4" fill="#000000"/>
+        <rect x="16" y="40" width="150" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="22" y="46" width="60" height="11" rx="2" fill="#000000"/>
+        <text x="52" y="55" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">CLIENT APIS</text>
+        <text x="91" y="70" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Google APIs</text>
+        <text x="91" y="83" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">GA4 · GSC · PageSpeed</text>
       </g>
-      <g class="dash-b">
-        <rect x="682" y="182" width="222" height="52" rx="10"/>
-        <text x="793" y="204">Director view</text><text class="s" x="793" y="220">read-only, no login</text>
+
+      <!-- 02: DASHBOARD -->
+      <g class="diag-node">
+        <rect x="210" y="44" width="160" height="52" rx="4" fill="#000000"/>
+        <rect x="206" y="40" width="160" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="212" y="46" width="52" height="11" rx="2" fill="#000000"/>
+        <text x="238" y="55" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">ONE VIEW</text>
+        <text x="286" y="70" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Dashboard</text>
+        <text x="286" y="83" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">zero-build SPA</text>
+      </g>
+
+      <!-- 03: AI ANALYST (GEMINI) -->
+      <g class="diag-node">
+        <rect x="410" y="32" width="180" height="70" rx="4" fill="#000000"/>
+        <rect x="406" y="28" width="180" height="70" rx="4" fill="#FFF2F4" stroke="#FF385C" stroke-width="3"/>
+        <circle cx="422" cy="42" r="3.5" fill="#FF385C"/>
+        <circle cx="422" cy="42" r="3.5" stroke="#FF385C" fill="none" class="diag-ping"/>
+        <text x="434" y="45" fill="#FF385C" font-family="'JetBrains Mono'" font-size="8" font-weight="800">✦ AI ENGINE · ~1.1s</text>
+        <text x="496" y="66" font-family="'Space Grotesk'" font-size="15" font-weight="800" fill="#FF385C" text-anchor="middle">AI analyst</text>
+        <text x="496" y="81" font-family="'JetBrains Mono'" font-size="9.5" font-weight="700" fill="#000000" text-anchor="middle">Gemini 2.5 Flash</text>
+        <text x="496" y="93" font-family="'JetBrains Mono'" font-size="9" font-weight="700" fill="#E02447" text-anchor="middle">synthesis + diagnosis</text>
+      </g>
+
+      <!-- 04: VERDICT BANNER -->
+      <g class="diag-node">
+        <rect x="630" y="44" width="150" height="52" rx="4" fill="#000000"/>
+        <rect x="626" y="40" width="150" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="632" y="46" width="56" height="11" rx="2" fill="#000000"/>
+        <text x="660" y="55" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">EXECUTIVE</text>
+        <text x="701" y="70" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Verdict banner</text>
+        <text x="701" y="83" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">traffic light + prose</text>
+      </g>
+
+      <!-- 05: N8N PROXY -->
+      <g class="diag-node">
+        <rect x="250" y="184" width="170" height="56" rx="4" fill="#000000"/>
+        <rect x="246" y="180" width="170" height="56" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="252" y="186" width="60" height="11" rx="2" fill="#000000"/>
+        <text x="282" y="195" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">SECURITY 🔒</text>
+        <text x="331" y="210" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">n8n key proxy</text>
+        <text x="331" y="225" font-family="'JetBrains Mono'" font-size="10" font-weight="600" fill="#555555" text-anchor="middle">zero keys in browser</text>
+      </g>
+
+      <!-- 06: 11 CRM WORKFLOWS -->
+      <g class="diag-node">
+        <rect x="450" y="184" width="190" height="56" rx="4" fill="#000000"/>
+        <rect x="446" y="180" width="190" height="56" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="452" y="186" width="70" height="11" rx="2" fill="#000000"/>
+        <text x="487" y="195" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">ORCHESTRATION</text>
+        <text x="541" y="210" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">11 CRM workflows</text>
+        <text x="541" y="225" font-family="'JetBrains Mono'" font-size="10" font-weight="600" fill="#555555" text-anchor="middle">leads · funnel · history</text>
+      </g>
+
+      <!-- 07: DIRECTOR VIEW -->
+      <g class="diag-node">
+        <rect x="686" y="184" width="222" height="56" rx="4" fill="#000000"/>
+        <rect x="682" y="180" width="222" height="56" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2" stroke-dasharray="5 4"/>
+        <text x="793" y="208" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Director view</text>
+        <text x="793" y="224" font-family="'JetBrains Mono'" font-size="10" font-weight="600" fill="#555555" text-anchor="middle">read-only · passwordless</text>
       </g>
     </svg>
   </div>
@@ -131,6 +303,27 @@
     <h3>A health score that admits ignorance</h3>
     <p>The score aggregates four pillars. When a data source fails to load, an average over the remaining three looks reassuringly normal. And meaningless.</p>
     <p>Now the header reads <strong>“partial score (2/4 pillars)”</strong>, and the AI analyst is explicitly told, in its prompt, not to conclude that everything is fine when pillars are missing.</p>
+
+    <!-- HONEST SCORE COMPARISON MATRIX -->
+    <div class="detector-card">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:0.74rem;font-weight:800;letter-spacing:0.06em;color:#555555">// FAULT TOLERANCE BEHAVIOR · WHEN SEARCH CONSOLE API FAILS</div>
+      <div class="det-grid">
+        <div class="det-box danger">
+          <span class="det-name">Standard Naive Dashboard</span>
+          <div class="det-score">78 / 100 <span style="font-size:0.85rem;font-weight:800">ALL GREEN</span></div>
+          <span class="det-verdict">❌ Averages 3 pillars, silently ignores GSC dropout</span>
+        </div>
+        <div class="det-box success">
+          <span class="det-name">Our Production Engine</span>
+          <div class="det-score">PARTIAL <span style="font-size:0.85rem;font-weight:800">(2/4 PILLARS)</span></div>
+          <span class="det-verdict">✅ Refuses false confidence, warns director immediately</span>
+        </div>
+      </div>
+      <div class="det-takeaway">
+        <b>ARCHITECTURAL RULE:</b> A dashboard that silently hides what it doesn't know is worse than no dashboard. Missing telemetry triggers explicit degraded-state banners.
+      </div>
+    </div>
+
     <p class="outcome"><b>TRADE-OFF</b> A dashboard that hides what it doesn't know is worse than no dashboard.</p>
   </div>
 
@@ -190,5 +383,112 @@
 </footer>
 
 <script src="../assets/site.js"></script>
+<script>
+(function() {
+  const SCENARIOS = {
+    'traffic-drop': {
+      statusClass: 'status-amber',
+      tagClass: 'amber',
+      tagText: '● ATTENTION REQUIRED',
+      scoreText: 'SYSTEM HEALTH: 71 / 100',
+      prose: "L'analyse des 90 derniers jours révèle une <mark>tendance négative sur le trafic organique (-28%)</mark> suite aux dernières fluctuations d'indexation. Cependant, le volume de conversions qualifiées se maintient grâce à la surperformance des pages d'atterrissage directes. Le taux de rebond mobile reste stable à 41%.",
+      actions: [
+        "Lancer une inspection d'URL Search Console sur les 4 pages d'annonces récemment déclassées.",
+        "Auditer la régression de temps de chargement LCP détectée sur le modèle d'annonce mobile.",
+        "Renforcer les liens internes depuis les articles de blog les plus forts vers les fiches biens."
+      ],
+      metrics: [
+        { label: 'SESSIONS ORGANIQUES', val: '14,280', change: '-28.4%', dir: 'down' },
+        { label: 'LEADS QUALIFIÉS', val: '184', change: '+3.2%', dir: 'up' },
+        { label: 'RENDEZ-VOUS NOTAIRE', val: '19', change: '+11.8%', dir: 'up' },
+        { label: 'PAGESPEED MOBILE', val: '64 / 100', change: '-8 pts', dir: 'down' }
+      ]
+    },
+    'lead-spike': {
+      statusClass: 'status-green',
+      tagClass: 'green',
+      tagText: '● SURPERFORMANCE AVEC ALERTE SUIVI',
+      scoreText: 'SYSTEM HEALTH: 88 / 100',
+      prose: "Le volume de leads entrants a <mark>augmenté de +42%</mark> ce mois-ci, tiré par les campagnes ciblées. Néanmoins, l'hygiène commerciale CRM signale un goulot d'étranglement : <mark>46% des nouveaux contacts</mark> n'ont aucun rappel planifié à plus de 48h, risquant une déperdition de mandat.",
+      actions: [
+        "Alerter les conseillers sur les 38 leads vendeurs en attente de premier contact téléphonique.",
+        "Activer la relance automatique WhatsApp n8n sur les demandes d'estimation non rappelées.",
+        "Réallouer la capacité des agents vers les mandats exclusifs à fort potentiel de clôture."
+      ],
+      metrics: [
+        { label: 'SESSIONS ORGANIQUES', val: '22,450', change: '+18.1%', dir: 'up' },
+        { label: 'LEADS QUALIFIÉS', val: '262', change: '+42.4%', dir: 'up' },
+        { label: 'DÉLAI DE 1ER CONTACT', val: '4.8h', change: '+2.1h', dir: 'down' },
+        { label: 'VISITES EFFECTUÉES', val: '47', change: '+27.0%', dir: 'up' }
+      ]
+    },
+    'data-outage': {
+      statusClass: 'status-red',
+      tagClass: 'red',
+      tagText: '⚠️ TÉLÉMÉTRIE PARTIELLE (2/4 PILIERS)',
+      scoreText: 'SCORE DÉGRADÉ (DONNÉES MANQUANTES)',
+      prose: "L'API Search Console et le crawler PageSpeed ont <mark>échoué à répondre (timeout réseau / quota)</mark>. Conformément aux règles d'intégrité, le système refuse de calculer une moyenne artificielle optimiste. Le diagnostic s'appuie uniquement sur les données confirmées GA4 et CRM.",
+      actions: [
+        "Vérifier le renouvellement du token d'accès Google Cloud Console dans n8n Credentials.",
+        "Ne pas interpréter la stabilité apparente comme une absence d'anomalie de référencement.",
+        "Relancer manuellement le workflow n8n de réconciliation des données nocturnes."
+      ],
+      metrics: [
+        { label: 'SESSIONS GA4', val: '16,100', change: '+1.5%', dir: 'up' },
+        { label: 'CRM LEADS VÉRIFIÉS', val: '198', change: '+4.0%', dir: 'up' },
+        { label: 'SEARCH CONSOLE', val: 'INDISPONIBLE', change: 'TIMEOUT', dir: 'down' },
+        { label: 'PAGESPEED INSIGHTS', val: 'NON CALCULÉ', change: 'OFFLINE', dir: 'down' }
+      ]
+    }
+  };
+
+  let activeScenario = 'traffic-drop';
+  const vCard = document.getElementById('verdict-card');
+  const vTag = document.getElementById('v-tag');
+  const vScore = document.getElementById('v-score');
+  const vProse = document.getElementById('v-prose');
+  const vActions = document.getElementById('v-actions');
+  const dMetrics = document.getElementById('dash-metrics');
+
+  function renderScenario() {
+    const s = SCENARIOS[activeScenario];
+    if (!s) return;
+
+    if (vCard) {
+      vCard.className = `verdict-box ${s.statusClass}`;
+    }
+    if (vTag) {
+      vTag.className = `verdict-tag ${s.tagClass}`;
+      vTag.textContent = s.tagText;
+    }
+    if (vScore) vScore.textContent = s.scoreText;
+    if (vProse) vProse.innerHTML = s.prose;
+
+    if (vActions) {
+      vActions.innerHTML = s.actions.map(act => `<li>${act}</li>`).join('');
+    }
+
+    if (dMetrics) {
+      dMetrics.innerHTML = s.metrics.map(m => `
+        <div class="dm-card">
+          <div class="dm-val">${m.val}<span class="change ${m.dir}">${m.change}</span></div>
+          <div class="dm-lbl">${m.label}</div>
+        </div>
+      `).join('');
+    }
+  }
+
+  document.querySelectorAll('#dash-sim .preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#dash-sim .preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeScenario = btn.dataset.scenario;
+      renderScenario();
+    });
+  });
+
+  renderScenario();
+})();
+</script>
 </body>
 </html>

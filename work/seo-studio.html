@@ -70,46 +70,221 @@
     <li>A bring-your-own-keyword mode, for buyers who already know what they want to rank for.</li>
     <li>Full on-page package per article: meta description, JSON-LD schema, internal links from the sitemap, and ready-to-paste HTML.</li>
   </ul>
+
+  <!-- INTERACTIVE SEO STUDIO CONFIG & SCHEMA SIMULATOR -->
+  <div class="sim-container" id="seostudio-sim" style="margin:32px 0 28px;background:#FFFFFF;border:var(--bw) solid #000000;box-shadow:var(--hard-shadow-lg);border-radius:6px;overflow:hidden">
+    <div class="sim-header">
+      <div class="sim-badge"><span class="dot-live"></span> LIVE PRODUCT CONFIG &amp; SCHEMA ADAPTATION SIMULATOR</div>
+      <div class="sim-title">Test White-Label Brand Voice, 3 Personas &amp; JSON-LD Generation</div>
+      <p class="sim-intro">Select an industry profile below to see how a single config block shapes the Gemini editorial tone, persona focus angles, and automated Schema.org markup generation.</p>
+    </div>
+
+    <!-- PRESET CONTROLS -->
+    <div class="sim-controls">
+      <span class="ctrl-label">SELECT BUYER INDUSTRY VERTICAL:</span>
+      <div class="sim-presets">
+        <button type="button" class="preset-btn active" data-ind="real-estate">1. 🏢 Real Estate Agency (Advisory &amp; Legal)</button>
+        <button type="button" class="preset-btn" data-ind="saas-b2b">2. ⚡️ B2B SaaS Startup (Opinionated &amp; Technical)</button>
+        <button type="button" class="preset-btn" data-ind="fintech">3. 📈 Wealth &amp; Fintech (Analytical &amp; Institutional)</button>
+      </div>
+    </div>
+
+    <!-- 2-COL LAYOUT: CONFIG JSON + ON-PAGE ARTIFACT -->
+    <div class="critic-layout">
+      <!-- LEFT: CONFIG JSON -->
+      <div class="critic-left-col">
+        <div style="color:#38BDF8;font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:800;margin-bottom:4px">
+          // TOP-LEVEL EDITORIAL CONFIG NODE
+        </div>
+        <pre id="seo-cfg-json" style="margin:0;color:#94A3B8;font-family:'JetBrains Mono',monospace;font-size:0.71rem;line-height:1.45;white-space:pre-wrap"></pre>
+      </div>
+
+      <!-- RIGHT: LIVE ARTIFACT PREVIEW -->
+      <div class="critic-right-col">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-family:'Space Grotesk',sans-serif;font-size:0.88rem;font-weight:800;color:#000000">GENERATED ARTIFACT &amp; SCHEMA</span>
+          <span id="seo-cost-pill" class="auth-pill pass">GEMINI COST: ~0.28 €</span>
+        </div>
+
+        <div style="background:#FAFAFA;border:2px solid #000000;border-radius:4px;padding:14px">
+          <div style="font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:0.92rem;margin-bottom:4px" id="seo-art-title">
+            <!-- Title -->
+          </div>
+          <p style="font-size:0.78rem;color:#475569;margin-bottom:10px;line-height:1.4" id="seo-art-excerpt">
+            <!-- Excerpt -->
+          </p>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px" id="seo-art-tags">
+            <!-- Tags -->
+          </div>
+
+          <div style="background:#0F172A;border:1.5px solid #000000;border-radius:4px;padding:10px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:#38BDF8;font-weight:800;margin-bottom:4px">
+              // GENERATED JSON-LD SCHEMA.ORG
+            </div>
+            <pre id="seo-schema-code" style="margin:0;color:#34D399;font-family:'JetBrains Mono',monospace;font-size:0.68rem;line-height:1.4;white-space:pre-wrap"></pre>
+          </div>
+        </div>
+
+        <div style="font-size:0.82rem;color:#333333;line-height:1.45" id="seo-summary">
+          <!-- Summary -->
+        </div>
+      </div>
+    </div>
+
+    <!-- SPECS STRIP -->
+    <div class="sim-specs">
+      <div><b>KEYWORD RESEARCH</b> <span>Google Autocomplete (€0 / Unlimited)</span></div>
+      <div><b>OUTPUT ASSETS</b> <span>Markdown, Clean HTML, JSON-LD Schema</span></div>
+      <div><b>LANGUAGES</b> <span>Native DE / EN / FR (3 Personas)</span></div>
+      <div><b>REVIEW GATE</b> <span class="cost-tag">Mandatory human editor sign-off</span></div>
+    </div>
+  </div>
+
 </div></section>
 
 <section class="sec rv"><div class="wrap">
   <h2>How it works</h2>
   <div class="diag">
-    <svg viewBox="0 0 920 256" role="img" aria-label="A buyer submits a topic. Google Autocomplete expands it for free. A config block holding the brand voice and personas drives the Gemini engine, which writes a master article and adapts it into English and French. An on-page package of meta, schema and internal links is attached, and documents come out. A dashed box marks mandatory human review before publishing.">
-      <defs><marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
-        <path d="M0 0 L6 3 L0 6 z" fill="rgba(255,255,255,.34)"/></marker></defs>
+    <svg viewBox="0 0 920 280" role="img" aria-label="A buyer submits a topic. Google Autocomplete expands it for free. A config block holding the brand voice and personas drives the Gemini engine, which writes a master article and adapts it into English and French. An on-page package of meta, schema and internal links is attached, and documents come out. A dashed box marks mandatory human review before publishing.">
+      <defs>
+        <marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#000000"/>
+        </marker>
+        <marker id="ah-red" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#FF385C"/>
+        </marker>
+        <filter id="diag-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+
+      <!-- BASE CONDUITS -->
       <g class="edge" marker-end="url(#ah)">
-        <path d="M156 66 H188"/><path d="M366 66 H398"/><path d="M576 66 H608"/><path d="M756 66 H778"/>
-        <path d="M450 100 C450 142 391 142 391 174"/><path d="M540 100 C540 142 591 142 591 174"/>
-        <path d="M845 92 C845 132 805 132 805 174" stroke-dasharray="4 5"/>
+        <path d="M 156 66 L 196 66"/>
+        <path d="M 366 66 L 406 66"/>
+        <path d="M 576 66 L 616 66"/>
+        <path d="M 756 66 L 786 66"/>
+        <path d="M 450 100 C 450 142 391 142 391 180"/>
+        <path d="M 540 100 C 540 142 591 142 591 180"/>
+        <path d="M 845 92 C 845 134 805 134 805 180" stroke-dasharray="5 5"/>
       </g>
-      <g class="flow">
-        <path d="M156 66 H188"/><path d="M366 66 H398"/><path d="M576 66 H608"/><path d="M756 66 H778"/>
-        <path d="M450 100 C450 142 391 142 391 174"/><path d="M540 100 C540 142 591 142 591 174"/>
+
+      <!-- LASER FLOW PULSES -->
+      <g class="flow" marker-end="url(#ah-red)">
+        <path d="M 156 66 L 196 66"/>
+        <path d="M 366 66 L 406 66"/>
+        <path d="M 576 66 L 616 66"/>
+        <path d="M 756 66 L 786 66"/>
+        <path d="M 450 100 C 450 142 391 142 391 180"/>
+        <path d="M 540 100 C 540 142 591 142 591 180"/>
       </g>
-      <g class="bx">
-        <rect x="16" y="40" width="140" height="52" rx="10"/>
-        <text x="86" y="62">Buyer</text><text class="s" x="86" y="78">topic · language</text>
-        <rect x="196" y="40" width="170" height="52" rx="10"/>
-        <text x="281" y="62">Autocomplete</text><text class="s" x="281" y="78">free · no key</text>
-        <rect x="616" y="40" width="140" height="52" rx="10"/>
-        <text x="686" y="62">Adapt EN · FR</text><text class="s" x="686" y="78">per persona</text>
-        <rect x="786" y="40" width="118" height="52" rx="10"/>
-        <text x="845" y="62">Docs</text><text class="s" x="845" y="78">+ HTML</text>
-        <rect x="306" y="180" width="170" height="56" rx="10"/>
-        <text x="391" y="204">CONFIG block</text><text class="s" x="391" y="220">brand voice · personas</text>
-        <rect x="506" y="180" width="170" height="56" rx="10"/>
-        <text x="591" y="204">On-page package</text><text class="s" x="591" y="220">meta · schema · links</text>
+
+      <!-- FLYING DATA PHOTONS -->
+      <g class="diag-photons">
+        <!-- Buyer to Autocomplete -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 156 66 L 196 66" dur="1.2s" repeatCount="indefinite" begin="0s"/>
+        </circle>
+        <!-- Autocomplete to Master Article -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 366 66 L 406 66" dur="1.2s" repeatCount="indefinite" begin="0.35s"/>
+        </circle>
+        <!-- Master Article to Adapt EN/FR -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 576 66 L 616 66" dur="1.2s" repeatCount="indefinite" begin="0.75s"/>
+        </circle>
+        <!-- Adapt to Docs -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 756 66 L 786 66" dur="1.2s" repeatCount="indefinite" begin="1.1s"/>
+        </circle>
+        <!-- Master to Config -->
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 450 100 C 450 142 391 142 391 180" dur="1.5s" repeatCount="indefinite" begin="0.6s"/>
+        </circle>
+        <!-- Master to On-page Package -->
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 540 100 C 540 142 591 142 591 180" dur="1.5s" repeatCount="indefinite" begin="0.6s"/>
+        </circle>
+        <!-- Docs to Human Review -->
+        <circle r="3.5" fill="#000000">
+          <animateMotion path="M 845 92 C 845 134 805 134 805 180" dur="1.8s" repeatCount="indefinite" begin="1.3s"/>
+        </circle>
       </g>
-      <g class="acc-b">
-        <rect x="406" y="32" width="170" height="68" rx="12"/>
-        <text x="491" y="60">Master article</text>
-        <text class="s" x="491" y="78">Gemini</text>
-        <text class="s" x="491" y="92">voice from CONFIG</text>
+
+      <!-- NEO-BRUTALIST CARDS -->
+
+      <!-- 01: BUYER -->
+      <g class="diag-node">
+        <rect x="20" y="44" width="140" height="52" rx="4" fill="#000000"/>
+        <rect x="16" y="40" width="140" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <text x="86" y="62" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Operator</text>
+        <text x="86" y="78" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">topic · language</text>
       </g>
-      <g class="dash-b">
-        <rect x="706" y="182" width="198" height="52" rx="10"/>
-        <text x="805" y="204">Human review</text><text class="s" x="805" y="220">no auto-publish</text>
+
+      <!-- 02: AUTOCOMPLETE -->
+      <g class="diag-node">
+        <rect x="200" y="44" width="170" height="52" rx="4" fill="#000000"/>
+        <rect x="196" y="40" width="170" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="202" y="46" width="60" height="11" rx="2" fill="#000000"/>
+        <text x="232" y="55" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">KEYWORD API</text>
+        <text x="281" y="70" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Autocomplete</text>
+        <text x="281" y="83" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">free · zero key</text>
+      </g>
+
+      <!-- 03: MASTER ARTICLE (GEMINI) -->
+      <g class="diag-node">
+        <rect x="410" y="32" width="170" height="70" rx="4" fill="#000000"/>
+        <rect x="406" y="28" width="170" height="70" rx="4" fill="#FFF2F4" stroke="#FF385C" stroke-width="3"/>
+        <circle cx="422" cy="42" r="3.5" fill="#FF385C"/>
+        <circle cx="422" cy="42" r="3.5" stroke="#FF385C" fill="none" class="diag-ping"/>
+        <text x="434" y="45" fill="#FF385C" font-family="'JetBrains Mono'" font-size="8" font-weight="800">✦ AI ENGINE (GEMINI)</text>
+        <text x="491" y="66" font-family="'Space Grotesk'" font-size="15" font-weight="800" fill="#FF385C" text-anchor="middle">Master article</text>
+        <text x="491" y="80" font-family="'JetBrains Mono'" font-size="9.5" font-weight="700" fill="#000000" text-anchor="middle">Gemini 2.5 Pro</text>
+        <text x="491" y="92" font-family="'JetBrains Mono'" font-size="9" font-weight="700" fill="#E02447" text-anchor="middle">voice from CONFIG</text>
+      </g>
+
+      <!-- 04: ADAPT EN/FR -->
+      <g class="diag-node">
+        <rect x="620" y="44" width="140" height="52" rx="4" fill="#000000"/>
+        <rect x="616" y="40" width="140" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <text x="686" y="62" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Adapt EN · FR</text>
+        <text x="686" y="78" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">3 reader personas</text>
+      </g>
+
+      <!-- 05: DOCS -->
+      <g class="diag-node">
+        <rect x="790" y="44" width="118" height="52" rx="4" fill="#000000"/>
+        <rect x="786" y="40" width="118" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <text x="845" y="62" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Docs &amp; HTML</text>
+        <text x="845" y="78" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">ready-to-paste</text>
+      </g>
+
+      <!-- 06: CONFIG BLOCK -->
+      <g class="diag-node">
+        <rect x="310" y="184" width="170" height="56" rx="4" fill="#000000"/>
+        <rect x="306" y="180" width="170" height="56" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <text x="391" y="204" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">CONFIG block</text>
+        <text x="391" y="220" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">brand voice · personas</text>
+      </g>
+
+      <!-- 07: ON-PAGE PACKAGE -->
+      <g class="diag-node">
+        <rect x="510" y="184" width="170" height="56" rx="4" fill="#000000"/>
+        <rect x="506" y="180" width="170" height="56" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <text x="591" y="204" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">On-page package</text>
+        <text x="591" y="220" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">meta · schema · links</text>
+      </g>
+
+      <!-- 08: HUMAN REVIEW -->
+      <g class="diag-node">
+        <rect x="710" y="184" width="198" height="56" rx="4" fill="#000000"/>
+        <rect x="706" y="180" width="198" height="56" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2" stroke-dasharray="5 4"/>
+        <text x="805" y="208" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Human review gate</text>
+        <text x="805" y="224" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">no blind auto-publishing</text>
       </g>
     </svg>
   </div>
@@ -137,6 +312,27 @@
     <span class="badge">DECISION</span>
     <h3>Not promising to beat AI detectors</h3>
     <p>Every competitor in this space promises “100% human, undetectable”. I had already proven, on the internal version, that the detectors contradict each other, the same text scored 82% AI on one and 27% on another. So the product ships a strong, configurable brand voice and human review, and refuses to sell a number I know is noise.</p>
+
+    <!-- DETECTOR DISCORDANCE MATRIX -->
+    <div class="detector-card" style="margin:18px 0 14px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:0.74rem;font-weight:800;letter-spacing:0.06em;color:#555555">// EMPIRICAL BENCHMARK · THE AI-DETECTOR CONTRACTION</div>
+      <div class="det-grid">
+        <div class="det-box danger">
+          <span class="det-name">Detector A (Copyleaks)</span>
+          <div class="det-score">82% <span style="font-size:0.85rem;font-weight:800">AI PROBABILITY</span></div>
+          <span class="det-verdict">⚠️ Classifies technical terminology as statistical AI text</span>
+        </div>
+        <div class="det-box success">
+          <span class="det-name">Detector B (ZeroGPT / Writer)</span>
+          <div class="det-score">27% <span style="font-size:0.85rem;font-weight:800">HUMAN SCORE</span></div>
+          <span class="det-verdict">✅ Same article, same paragraphs: flagged as authentically human</span>
+        </div>
+      </div>
+      <div class="det-takeaway">
+        <b>COMMERCIAL RULE:</b> Promising '100% undetectable AI' is deceptive engineering. Our product optimizes for search intent, factual density, and Schema.org rankability instead.
+      </div>
+    </div>
+
     <p class="outcome"><b>TRADE-OFF</b> A less flashy sales line. But a claim that falls apart the first time a buyer tests it is worse than no claim.</p>
   </div>
 
@@ -188,5 +384,123 @@
 </footer>
 
 <script src="../assets/site.js"></script>
+<script>
+(function() {
+  const INDUSTRIES = {
+    'real-estate': {
+      cfgJson: `{
+  "industry": "Real Estate Brokerage",
+  "brand_voice": "Authoritative, empathetic, legal rigor, local expertise",
+  "domain": "https://berlin-realestate.de",
+  "personas": {
+    "de": "Eigentümer & Erbengemeinschaften (Focus: GEG & Steuern)",
+    "en": "International Expat Buyers (Focus: Financing & Bureaucracy)",
+    "fr": "Investisseurs Patrimoniaux (Focus: Rendement & Fiscalité)"
+  },
+  "schema_type": "RealEstateArticle",
+  "target_word_count": 1800
+}`,
+      title: "Altbau Sanierungspflichten 2026: Was Eigentümer wissen müssen",
+      excerpt: "Ein detaillierter Leitfaden über das Gebäudeenergiegesetz (GEG), Denkmalschutzauflagen und wirtschaftliche Förderprogramme der KfW für Berliner Mehrfamilienhäuser.",
+      tags: ["RealEstateArticle", "1,840 Words", "GEG 2026", "KfW Förderung", "Internal Links: 4"],
+      schemaCode: `{
+  "@context": "https://schema.org",
+  "@type": "RealEstateArticle",
+  "headline": "Altbau Sanierungspflichten 2026",
+  "inLanguage": "de-DE",
+  "author": { "@type": "Organization", "name": "Berlin Real Estate" },
+  "about": { "@type": "Thing", "name": "Gebäudeenergiegesetz" }
+}`,
+      summary: "La voix de marque impose une rigueur légale sur le GEG et la fiscalité allemande. Le schéma JSON-LD injecté est spécifiquement typé <code>RealEstateArticle</code> pour optimiser la visibilité sur les requêtes à forte intention transactionnelle."
+    },
+    'saas-b2b': {
+      cfgJson: `{
+  "industry": "B2B Developer Infrastructure",
+  "brand_voice": "Direct, highly technical, opinionated, zero fluff",
+  "domain": "https://devinfra.io",
+  "personas": {
+    "de": "Staff DevOps & Site Reliability Engineers",
+    "en": "VP of Engineering & Cloud Architects",
+    "fr": "Directeurs Techniques & Lead Developers"
+  },
+  "schema_type": "TechArticle",
+  "target_word_count": 2200
+}`,
+      title: "Zero-Downtime Database Migrations: Lessons from 10M RPM",
+      excerpt: "Why naive schema alterations trigger table-level locks, and how we implement backward-compatible dual-writing pipelines with automated rollback gates.",
+      tags: ["TechArticle", "2,210 Words", "PostgreSQL", "Zero-Downtime", "Code Snippets: 3"],
+      schemaCode: `{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Zero-Downtime Database Migrations",
+  "dependencies": "PostgreSQL 16, pg_repack",
+  "proficiencyLevel": "Expert"
+}`,
+      summary: "Le prompt bascule sur un ton d'ingénierie pointu (zéro jargon commercial creux). Le schéma généré devient un <code>TechArticle</code> enrichi avec dépendances techniques et extraits de code syntaxiquement vérifiés."
+    },
+    'fintech': {
+      cfgJson: `{
+  "industry": "WealthTech & Private Banking",
+  "brand_voice": "Analytical, institutional, sober, macroeconomic focus",
+  "domain": "https://aurora-wealth.ch",
+  "personas": {
+    "de": "Family Offices & Privatanleger (Schweiz / DACH)",
+    "en": "Cross-Border High-Net-Worth Individuals",
+    "fr": "Gestionnaires de Fortune & Cadres Dirigeants"
+  },
+  "schema_type": "FinancialProductArticle",
+  "target_word_count": 1950
+}`,
+      title: "Strukturierte Vermögensallokation bei Zinswenden",
+      excerpt: "Makroökonomische Implikationen der SNB- und EZB-Entscheidungen auf festverzinsliche Anleihen, private debt und reale Sachwerte im Portfoliokontext.",
+      tags: ["FinancialProductArticle", "1,920 Words", "SNB / EZB", "DACH Region", "Regulatory compliant"],
+      schemaCode: `{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Strukturierte Vermögensallokation",
+  "publisher": { "@type": "FinancialService", "name": "Aurora Wealth" },
+  "disclaimer": "Keine Anlageberatung im Sinne des FinSA."
+}`,
+      summary: "Ton posé et institutionnel avec clause de non-responsabilité financière obligatoire (FinSA). L'article articule des perspectives macroéconomiques adaptées à chaque marché linguistique."
+    }
+  };
+
+  let activeInd = 'real-estate';
+  const cfgJsonEl = document.getElementById('seo-cfg-json');
+  const titleEl = document.getElementById('seo-art-title');
+  const excerptEl = document.getElementById('seo-art-excerpt');
+  const tagsEl = document.getElementById('seo-art-tags');
+  const schemaEl = document.getElementById('seo-schema-code');
+  const sumEl = document.getElementById('seo-summary');
+
+  function renderInd() {
+    const data = INDUSTRIES[activeInd];
+    if (!data) return;
+
+    if (cfgJsonEl) cfgJsonEl.textContent = data.cfgJson;
+    if (titleEl) titleEl.textContent = data.title;
+    if (excerptEl) excerptEl.textContent = data.excerpt;
+    if (schemaEl) schemaEl.textContent = data.schemaCode;
+    if (sumEl) sumEl.innerHTML = data.summary;
+
+    if (tagsEl) {
+      tagsEl.innerHTML = data.tags.map((t, idx) => `
+        <span class="auth-pill ${idx === 0 ? 'pass' : ''}" style="${idx === 0 ? 'background:#000000;color:#FFFFFF' : 'background:#FFFFFF;color:#000000'}">${t}</span>
+      `).join('');
+    }
+  }
+
+  document.querySelectorAll('#seostudio-sim .preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#seostudio-sim .preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeInd = btn.dataset.ind;
+      renderInd();
+    });
+  });
+
+  renderInd();
+})();
+</script>
 </body>
 </html>

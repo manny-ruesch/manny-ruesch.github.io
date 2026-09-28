@@ -70,46 +70,229 @@
     <li>A one-click table setup, a usage-and-cost page, and a README credentials card, so the product supports itself instead of me.</li>
     <li>Access code, editable daily quota and a honeypot, so a public form cannot quietly burn through the buyer's API budget.</li>
   </ul>
+
+  <!-- INTERACTIVE REBRAND & CONFIG RESKIN SIMULATOR -->
+  <div class="sim-container" id="studio-sim" style="margin:32px 0 28px;background:#FFFFFF;border:var(--bw) solid #000000;box-shadow:var(--hard-shadow-lg);border-radius:6px;overflow:hidden">
+    <div class="sim-header">
+      <div class="sim-badge"><span class="dot-live"></span> LIVE ONE-BLOCK RESKIN &amp; WHITELABEL SIMULATOR</div>
+      <div class="sim-title">Test Dynamic Rebranding Driven by a Single n8n Config Node</div>
+      <p class="sim-intro">Select an agency preset below to observe how updating 1 single JSON config node instantly adapts the public form styling, language dictionary, styling catalogue, and quota limits.</p>
+    </div>
+
+    <!-- PRESET CONTROLS -->
+    <div class="sim-controls">
+      <span class="ctrl-label">SELECT AGENCY BRAND PRESET:</span>
+      <div class="sim-presets">
+        <button type="button" class="preset-btn active" data-brand="berlin-loft">1. 🇩🇪 Berlin Loft Real Estate (Minimalist Red)</button>
+        <button type="button" class="preset-btn" data-brand="cotedazur">2. 🇫🇷 Riviera Prestige Immobilier (Navy Blue)</button>
+        <button type="button" class="preset-btn" data-brand="scandi">3. 🇬🇧 Nordic Living Realty (Forest Green)</button>
+      </div>
+    </div>
+
+    <!-- 2-COL LAYOUT: CONFIG JSON + FORM PREVIEW -->
+    <div class="critic-layout">
+      <!-- LEFT: CONFIG JSON -->
+      <div class="critic-left-col">
+        <div style="color:#38BDF8;font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:800;margin-bottom:4px">
+          // TOP-LEVEL n8n CONFIG NODE (JSON SCHEMA)
+        </div>
+        <pre id="st-config-json" style="margin:0;color:#94A3B8;font-family:'JetBrains Mono',monospace;font-size:0.71rem;line-height:1.45;white-space:pre-wrap"></pre>
+      </div>
+
+      <!-- RIGHT: LIVE FORM PREVIEW -->
+      <div class="critic-right-col">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-family:'Space Grotesk',sans-serif;font-size:0.88rem;font-weight:800;color:#000000">CLIENT-FACING FORM PREVIEW</span>
+          <span id="st-lang-badge" class="auth-pill pass">LANG: DE</span>
+        </div>
+
+        <!-- FORM MOCKUP -->
+        <div id="st-form-mock" style="border:2px solid #000000;border-radius:4px;padding:16px;background:#FAFAFA">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1.5px solid #E2E8F0">
+            <div id="st-logo-badge" style="width:34px;height:34px;background:#FF385C;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-weight:900;border-radius:4px">BL</div>
+            <div>
+              <div id="st-agency-title" style="font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:0.92rem">Berlin Loft Estates</div>
+              <div id="st-agency-sub" style="font-size:0.72rem;color:#666666">KI-gestütztes virtuelles Home Staging</div>
+            </div>
+          </div>
+
+          <div style="margin-bottom:10px">
+            <label style="display:block;font-size:0.74rem;font-weight:700;margin-bottom:4px" id="st-lbl-style">Wohnstil wählen:</label>
+            <div id="st-styles-list" style="display:flex;gap:6px;flex-wrap:wrap">
+              <!-- Injected dynamically -->
+            </div>
+          </div>
+
+          <div style="background:#FFFFFF;border:1.5px dashed #CBD5E1;border-radius:4px;padding:12px;text-align:center;font-size:0.74rem;color:#64748B" id="st-drop-text">
+            📷 Foto hierher ziehen oder durchsuchen
+          </div>
+
+          <div style="display:flex;justify-content:space-between;margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:#64748B">
+            <span>DAILY QUOTA: <strong id="st-quota-val">50 images</strong></span>
+            <span>STORAGE: <strong>Client Google Drive</strong></span>
+          </div>
+        </div>
+
+        <div style="font-size:0.82rem;color:#333333;line-height:1.45" id="st-expl">
+          <!-- Injected dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- SPECS STRIP -->
+    <div class="sim-specs">
+      <div><b>HOSTING</b> <span>Self-hosted on buyer's n8n (Docker)</span></div>
+      <div><b>DATA PRIVACY</b> <span>100% On-Premise · GDPR Compliant</span></div>
+      <div><b>SETUP TIME</b> <span>&lt; 15 minutes (One-click tables)</span></div>
+      <div><b>SECURITY</b> <span class="cost-tag">Access code + Quota + Honeypot</span></div>
+    </div>
+  </div>
+
 </div></section>
 
 <section class="sec rv"><div class="wrap">
   <h2>How it works</h2>
   <div class="diag">
-    <svg viewBox="0 0 920 256" role="img" aria-label="A buyer uploads a photo through a rebrandable form. The form is driven by a single config block that sets the logo, colours, styles and language. The image model is called with the buyer's own API key, and the render is stored on the buyer's own Drive and shown on a result page. An access-and-quota gate protects the buyer's API budget, and a usage-and-cost page reports spend.">
-      <defs><marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
-        <path d="M0 0 L6 3 L0 6 z" fill="rgba(255,255,255,.34)"/></marker></defs>
+    <svg viewBox="0 0 920 280" role="img" aria-label="A buyer uploads a photo through a rebrandable form. The form is driven by a single config block that sets the logo, colours, styles and language. The image model is called with the buyer's own API key, and the render is stored on the buyer's own Drive and shown on a result page. An access-and-quota gate protects the buyer's API budget, and a usage-and-cost page reports spend.">
+      <defs>
+        <marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#000000"/>
+        </marker>
+        <marker id="ah-red" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#FF385C"/>
+        </marker>
+        <filter id="diag-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+
+      <!-- BASE CONDUITS -->
       <g class="edge" marker-end="url(#ah)">
-        <path d="M134 66 H166"/><path d="M314 66 H346"/><path d="M534 66 H566"/><path d="M706 66 H738"/>
-        <path d="M410 100 C410 142 384 142 384 174"/><path d="M478 100 C478 142 564 142 564 174"/>
-        <path d="M642 208 H690" stroke-dasharray="4 5"/>
+        <path d="M 134 66 L 174 66"/>
+        <path d="M 314 66 L 354 66"/>
+        <path d="M 534 66 L 574 66"/>
+        <path d="M 706 66 L 746 66"/>
+        <path d="M 410 100 C 410 142 384 142 384 180"/>
+        <path d="M 478 100 C 478 142 564 142 564 180"/>
+        <path d="M 642 208 L 690 208" stroke-dasharray="5 5"/>
       </g>
-      <g class="flow">
-        <path d="M134 66 H166"/><path d="M314 66 H346"/><path d="M534 66 H566"/><path d="M706 66 H738"/>
-        <path d="M410 100 C410 142 384 142 384 174"/><path d="M478 100 C478 142 564 142 564 174"/>
+
+      <!-- LASER FLOW PULSES -->
+      <g class="flow" marker-end="url(#ah-red)">
+        <path d="M 134 66 L 174 66"/>
+        <path d="M 314 66 L 354 66"/>
+        <path d="M 534 66 L 574 66"/>
+        <path d="M 706 66 L 746 66"/>
+        <path d="M 410 100 C 410 142 384 142 384 180"/>
+        <path d="M 478 100 C 478 142 564 142 564 180"/>
       </g>
-      <g class="bx">
-        <rect x="16" y="40" width="118" height="52" rx="10"/>
-        <text x="75" y="62">Buyer</text><text class="s" x="75" y="78">uploads a photo</text>
-        <rect x="174" y="40" width="140" height="52" rx="10"/>
-        <text x="244" y="62">Rebrandable form</text><text class="s" x="244" y="78">their logo · language</text>
-        <rect x="574" y="40" width="132" height="52" rx="10"/>
-        <text x="640" y="62">Their Drive</text><text class="s" x="640" y="78">renders stay with them</text>
-        <rect x="746" y="40" width="158" height="52" rx="10"/>
-        <text x="825" y="62">Result page</text><text class="s" x="825" y="78">before / after</text>
-        <rect x="306" y="180" width="156" height="56" rx="10"/>
-        <text x="384" y="204">CONFIG block</text><text class="s" x="384" y="220">logo · colours · styles</text>
-        <rect x="486" y="180" width="156" height="56" rx="10"/>
-        <text x="564" y="204">Access + quota</text><text class="s" x="564" y="220">protects their budget</text>
+
+      <!-- FLYING DATA PHOTONS -->
+      <g class="diag-photons">
+        <!-- User to Form -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 134 66 L 174 66" dur="1.2s" repeatCount="indefinite" begin="0s"/>
+        </circle>
+        <!-- Form to Image Model -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 314 66 L 354 66" dur="1.2s" repeatCount="indefinite" begin="0.35s"/>
+        </circle>
+        <!-- Model to Drive -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 534 66 L 574 66" dur="1.2s" repeatCount="indefinite" begin="0.75s"/>
+        </circle>
+        <!-- Drive to Result -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 706 66 L 746 66" dur="1.2s" repeatCount="indefinite" begin="1.1s"/>
+        </circle>
+        <!-- Form to Config -->
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 410 100 C 410 142 384 142 384 180" dur="1.5s" repeatCount="indefinite" begin="0.6s"/>
+        </circle>
+        <!-- Form to Quota -->
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 478 100 C 478 142 564 142 564 180" dur="1.5s" repeatCount="indefinite" begin="0.6s"/>
+        </circle>
+        <!-- Quota to Usage Dashboard -->
+        <circle r="3.5" fill="#000000">
+          <animateMotion path="M 642 208 L 690 208" dur="1.4s" repeatCount="indefinite" begin="1.2s"/>
+        </circle>
       </g>
-      <g class="acc-b">
-        <rect x="354" y="32" width="180" height="68" rx="12"/>
-        <text x="444" y="60">Image model</text>
-        <text class="s" x="444" y="78">the buyer's own key</text>
-        <text class="s" x="444" y="92">pay per image</text>
+
+      <!-- NEO-BRUTALIST CARDS -->
+
+      <!-- 01: BUYER -->
+      <g class="diag-node">
+        <rect x="20" y="44" width="118" height="52" rx="4" fill="#000000"/>
+        <rect x="16" y="40" width="118" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <text x="75" y="62" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Buyer Agent</text>
+        <text x="75" y="78" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">uploads photo</text>
       </g>
-      <g class="dash-b">
-        <rect x="690" y="182" width="214" height="52" rx="10"/>
-        <text x="797" y="204">Usage &amp; cost</text><text class="s" x="797" y="220">cents per image</text>
+
+      <!-- 02: REBRANDABLE FORM -->
+      <g class="diag-node">
+        <rect x="178" y="44" width="140" height="52" rx="4" fill="#000000"/>
+        <rect x="174" y="40" width="140" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="180" y="46" width="60" height="11" rx="2" fill="#000000"/>
+        <text x="210" y="55" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">WHITELABEL</text>
+        <text x="244" y="70" font-family="'Space Grotesk'" font-size="13.5" font-weight="800" fill="#000000" text-anchor="middle">Rebrandable form</text>
+        <text x="244" y="83" font-family="'JetBrains Mono'" font-size="9" font-weight="600" fill="#555555" text-anchor="middle">their logo · language</text>
+      </g>
+
+      <!-- 03: IMAGE MODEL -->
+      <g class="diag-node">
+        <rect x="358" y="32" width="180" height="70" rx="4" fill="#000000"/>
+        <rect x="354" y="28" width="180" height="70" rx="4" fill="#FFF2F4" stroke="#FF385C" stroke-width="3"/>
+        <circle cx="370" cy="42" r="3.5" fill="#FF385C"/>
+        <circle cx="370" cy="42" r="3.5" stroke="#FF385C" fill="none" class="diag-ping"/>
+        <text x="382" y="45" fill="#FF385C" font-family="'JetBrains Mono'" font-size="8" font-weight="800">✦ AI ENGINE (FLUX / SD)</text>
+        <text x="444" y="66" font-family="'Space Grotesk'" font-size="15" font-weight="800" fill="#FF385C" text-anchor="middle">Image model</text>
+        <text x="444" y="80" font-family="'JetBrains Mono'" font-size="9.5" font-weight="700" fill="#000000" text-anchor="middle">the buyer's own key</text>
+        <text x="444" y="92" font-family="'JetBrains Mono'" font-size="9" font-weight="700" fill="#E02447" text-anchor="middle">pay per generation</text>
+      </g>
+
+      <!-- 04: BUYER DRIVE -->
+      <g class="diag-node">
+        <rect x="578" y="44" width="132" height="52" rx="4" fill="#000000"/>
+        <rect x="574" y="40" width="132" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <text x="640" y="62" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Their Drive</text>
+        <text x="640" y="78" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">renders stay with them</text>
+      </g>
+
+      <!-- 05: RESULT PAGE -->
+      <g class="diag-node">
+        <rect x="750" y="44" width="158" height="52" rx="4" fill="#000000"/>
+        <rect x="746" y="40" width="158" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <text x="825" y="62" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Result page</text>
+        <text x="825" y="78" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">before / after</text>
+      </g>
+
+      <!-- 06: CONFIG BLOCK -->
+      <g class="diag-node">
+        <rect x="310" y="184" width="156" height="56" rx="4" fill="#000000"/>
+        <rect x="306" y="180" width="156" height="56" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <text x="384" y="204" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">CONFIG block</text>
+        <text x="384" y="220" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">logo · colours · styles</text>
+      </g>
+
+      <!-- 07: ACCESS & QUOTA -->
+      <g class="diag-node">
+        <rect x="490" y="184" width="156" height="56" rx="4" fill="#000000"/>
+        <rect x="486" y="180" width="156" height="56" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <text x="564" y="204" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Access + quota</text>
+        <text x="564" y="220" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">protects their budget</text>
+      </g>
+
+      <!-- 08: USAGE & COST -->
+      <g class="diag-node">
+        <rect x="694" y="184" width="214" height="56" rx="4" fill="#000000"/>
+        <rect x="690" y="180" width="214" height="56" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2" stroke-dasharray="5 4"/>
+        <text x="797" y="208" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Usage &amp; cost page</text>
+        <text x="797" y="224" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">cents per image telemetry</text>
       </g>
     </svg>
   </div>
@@ -137,6 +320,27 @@
     <span class="badge">DECISION</span>
     <h3>A public form must not be able to drain a wallet</h3>
     <p>The moment the form is public, anyone who finds the URL is spending the buyer's API budget. So the product ships an access code, a daily quota the buyer edits from a dashboard, and a honeypot field checked server-side.</p>
+
+    <!-- DENIAL OF WALLET SECURITY MATRIX -->
+    <div class="detector-card" style="margin:18px 0 14px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:0.74rem;font-weight:800;letter-spacing:0.06em;color:#555555">// THREAT MODEL · DENIAL-OF-WALLET MITIGATION</div>
+      <div class="det-grid">
+        <div class="det-box danger">
+          <span class="det-name">Open Public Webhook Form</span>
+          <div class="det-score">UNRESTRICTED <span style="font-size:0.85rem;font-weight:800">DRAIN RISK</span></div>
+          <span class="det-verdict">❌ Bots can spam image submissions, generating thousands of costly GPU inference API calls.</span>
+        </div>
+        <div class="det-box success">
+          <span class="det-name">Studio Triple-Lock Defense</span>
+          <div class="det-score">CAPPED BUDGET <span style="font-size:0.85rem;font-weight:800">SAFE</span></div>
+          <span class="det-verdict">✅ Daily quota table halts runs when budget reached + hidden bot honeypot + agent access token.</span>
+        </div>
+      </div>
+      <div class="det-takeaway">
+        <b>COMMERCIAL DIRECTIVE:</b> Any white-label tool calling paid AI APIs on a client's credit card MUST implement hard daily spend limits at the orchestration layer.
+      </div>
+    </div>
+
     <p class="outcome"><b>TRADE-OFF</b> A little friction for the buyer's own staff. The alternative is a stranger turning their AI bill into a denial-of-wallet attack overnight.</p>
   </div>
 
@@ -188,5 +392,121 @@
 </footer>
 
 <script src="../assets/site.js"></script>
+<script>
+(function() {
+  const BRANDS = {
+    'berlin-loft': {
+      lang: 'LANG: DE',
+      configJson: `{
+  "agency_name": "Berlin Loft Estates",
+  "brand_color": "#FF385C",
+  "logo_initials": "BL",
+  "locale": "de-DE",
+  "daily_quota": 50,
+  "default_styles": ["Altbau Minimalist", "Industrial Loft", "Bauhaus Modern"],
+  "storage_destination": "google_drive://agency_staging/"
+}`,
+      logoInitials: 'BL',
+      logoColor: '#FF385C',
+      title: 'Berlin Loft Estates',
+      sub: 'KI-gestütztes virtuelles Home Staging',
+      lblStyle: 'Wohnstil wählen:',
+      dropText: '📷 Foto hierher ziehen oder durchsuchen',
+      quota: '50 images / day',
+      styles: ['Altbau Minimalist', 'Industrial Loft', 'Bauhaus Modern'],
+      expl: "En modifiant la clé <code>locale: 'de-DE'</code> et les couleurs, le formulaire public bascule immédiatement en allemand, applique le thème graphique de l'agence et verrouille le stockage sur son propre dossier Google Drive privé."
+    },
+    'cotedazur': {
+      lang: 'LANG: FR',
+      configJson: `{
+  "agency_name": "Riviera Prestige Immobilier",
+  "brand_color": "#1E3A8A",
+  "logo_initials": "RP",
+  "locale": "fr-FR",
+  "daily_quota": 100,
+  "default_styles": ["Contemporain Méditerranéen", "Riviera Chic", "Design Minimaliste"],
+  "storage_destination": "google_drive://riviera_drive/"
+}`,
+      logoInitials: 'RP',
+      logoColor: '#1E3A8A',
+      title: 'Riviera Prestige Immobilier',
+      sub: 'Home Staging Virtuel par Intelligence Artificielle',
+      lblStyle: 'Sélectionner le style d\'aménagement :',
+      dropText: '📷 Déposer la photo de la pièce ici ou parcourir',
+      quota: '100 images / jour',
+      styles: ['Méditerranéen', 'Riviera Chic', 'Design Minimaliste'],
+      expl: "La charte passe au bleu marine 'Riviera', l'interface s'adapte en français et le catalogue d'aménagement privilégie les villas méditerranéennes lumineuses."
+    },
+    'scandi': {
+      lang: 'LANG: EN',
+      configJson: `{
+  "agency_name": "Nordic Living Realty",
+  "brand_color": "#059669",
+  "logo_initials": "NL",
+  "locale": "en-GB",
+  "daily_quota": 75,
+  "default_styles": ["Scandinavian Light Wood", "Warm Japandi", "Nordic Minimal"],
+  "storage_destination": "google_drive://nordic_staging/"
+}`,
+      logoInitials: 'NL',
+      logoColor: '#059669',
+      title: 'Nordic Living Realty',
+      sub: 'AI Virtual Interior Staging Studio',
+      lblStyle: 'Select interior aesthetic:',
+      dropText: '📷 Drag and drop room photo or browse',
+      quota: '75 images / day',
+      styles: ['Scandi Wood', 'Warm Japandi', 'Nordic Minimal'],
+      expl: "Rebranding complet en vert nordique avec styles d'ameublement 'Japandi & Bois Clair'. Aucune donnée photo ne transite par un serveur tiers."
+    }
+  };
+
+  let activeBrand = 'berlin-loft';
+  const jsonEl = document.getElementById('st-config-json');
+  const langBadge = document.getElementById('st-lang-badge');
+  const logoBadge = document.getElementById('st-logo-badge');
+  const titleEl = document.getElementById('st-agency-title');
+  const subEl = document.getElementById('st-agency-sub');
+  const lblStyle = document.getElementById('st-lbl-style');
+  const dropText = document.getElementById('st-drop-text');
+  const quotaVal = document.getElementById('st-quota-val');
+  const stylesList = document.getElementById('st-styles-list');
+  const explEl = document.getElementById('st-expl');
+
+  function renderBrand() {
+    const b = BRANDS[activeBrand];
+    if (!b) return;
+
+    if (jsonEl) jsonEl.textContent = b.configJson;
+    if (langBadge) langBadge.textContent = b.lang;
+    if (logoBadge) {
+      logoBadge.textContent = b.logoInitials;
+      logoBadge.style.background = b.logoColor;
+    }
+    if (titleEl) titleEl.textContent = b.title;
+    if (subEl) subEl.textContent = b.sub;
+    if (lblStyle) lblStyle.textContent = b.lblStyle;
+    if (dropText) dropText.textContent = b.dropText;
+    if (quotaVal) quotaVal.textContent = b.quota;
+    if (explEl) explEl.textContent = b.expl;
+
+    if (stylesList) {
+      stylesList.innerHTML = b.styles.map((s, idx) => `
+        <span class="auth-pill ${idx === 0 ? 'pass' : ''}" style="${idx === 0 ? `background:${b.logoColor};color:#FFFFFF;border-color:#000000` : 'background:#FFFFFF;color:#000000'}">${s}</span>
+      `).join('');
+    }
+  }
+
+  document.querySelectorAll('#studio-sim .preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#studio-sim .preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeBrand = btn.dataset.brand;
+      renderBrand();
+    });
+  });
+
+  renderBrand();
+})();
+</script>
 </body>
 </html>

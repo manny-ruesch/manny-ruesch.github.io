@@ -71,52 +71,201 @@
     <li>An automated instance-wide security audit, run and acted upon rather than filed.</li>
     <li>A handover runbook, because the internship ends and the workflows do not.</li>
   </ul>
+
+  <!-- INTERACTIVE 32-WORKFLOW HEALTH & FAILOVER SIMULATOR -->
+  <div class="sim-container" id="backbone-sim" style="margin:32px 0 28px;background:#FFFFFF;border:var(--bw) solid #000000;box-shadow:var(--hard-shadow-lg);border-radius:6px;overflow:hidden">
+    <div class="sim-header">
+      <div class="sim-badge"><span class="dot-live"></span> LIVE 32-WORKFLOW TOPOLOGY &amp; FAILOVER SIMULATOR</div>
+      <div class="sim-title">Test Global Failover, Central Error Trapping &amp; Eval Replay</div>
+      <p class="sim-intro">Select a production event below to test how the 32-workflow fleet responds: see failing upstream webhooks captured by the central dead-letter handler, and prompt regressions blocked by the eval harness.</p>
+    </div>
+
+    <!-- PRESET CONTROLS -->
+    <div class="sim-controls">
+      <span class="ctrl-label">TRIGGER SYSTEM EVENT:</span>
+      <div class="sim-presets">
+        <button type="button" class="preset-btn active" data-event="nominal">1. 🟢 Nominal State (32/32 Healthy · 720 ops/mo)</button>
+        <button type="button" class="preset-btn" data-event="crm-timeout">2. 🔴 CRM 504 Timeout (Central Error Trap)</button>
+        <button type="button" class="preset-btn" data-event="eval-regression">3. 🟡 Prompt Regression Blocked by Eval</button>
+      </div>
+    </div>
+
+    <!-- 2-COL LAYOUT: MATRIX + INCIDENT TRACE -->
+    <div class="backbone-layout">
+      <!-- 32-NODE GRID -->
+      <div class="bb-matrix-col">
+        <div style="display:flex;justify-content:space-between;align-items:center;color:#38BDF8;font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:800">
+          <span>// N8N VPS PRODUCTION FLEET (32 WORKFLOWS)</span>
+          <span id="bb-fleet-status" style="color:#10B981">32 / 32 ACTIVE</span>
+        </div>
+        <div class="bb-grid-32" id="bb-dots">
+          <!-- 32 dots dynamically rendered -->
+        </div>
+        <div style="display:flex;gap:12px;font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:#94A3B8;margin-top:2px">
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;background:#10B981;border-radius:2px"></span> Nominal</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;background:#F59E0B;border-radius:2px"></span> Trapped / Retrying</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;background:#EF4444;border-radius:2px"></span> Error Intercepted</span>
+        </div>
+      </div>
+
+      <!-- INCIDENT RESPONSE TERMINAL -->
+      <div class="bb-incident-col">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-family:'Space Grotesk',sans-serif;font-size:0.88rem;font-weight:800;color:#000000">DISPATCHER &amp; TRACE LOG</span>
+          <span id="bb-badge" class="auth-pill pass">ALL SYSTEMS NORMAL</span>
+        </div>
+        <div class="trace-terminal" id="bb-trace">
+          <!-- Injected dynamically -->
+        </div>
+        <div style="font-size:0.82rem;color:#333333;line-height:1.45" id="bb-desc">
+          <!-- Injected dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- SPECS STRIP -->
+    <div class="sim-specs">
+      <div><b>HOSTING</b> <span>Docker on isolated Hetzner VPS</span></div>
+      <div><b>RECOVERY PATTERN</b> <span>Global Error Workflow (Zero lost leads)</span></div>
+      <div><b>REGRESSION GATE</b> <span>Pre-deploy synthetic conversation runner</span></div>
+      <div><b>GDPR STATUS</b> <span class="cost-tag">Zero PII in execution logs</span></div>
+    </div>
+  </div>
+
 </div></section>
 
 <section class="sec rv"><div class="wrap">
   <h2>How it works</h2>
   <div class="diag">
-    <svg viewBox="0 0 920 288" role="img" aria-label="Lead capture, CRM sync and monitoring all run on a single self-hosted n8n instance holding 32 active workflows. Below it sit a central error workflow that catches every major failure and an evaluation harness that replays test cases. A dashed box to the right represents the automated security audit, covering secrets management and endpoint exposure.">
-      <defs><marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
-        <path d="M0 0 L6 3 L0 6 z" fill="rgba(255,255,255,.34)"/></marker></defs>
+    <svg viewBox="0 0 920 310" role="img" aria-label="Lead capture, CRM sync and monitoring all run on a single self-hosted n8n instance holding 32 active workflows. Below it sit a central error workflow that catches every major failure and an evaluation harness that replays test cases. A dashed box to the right represents the automated security audit, covering secrets management and endpoint exposure.">
+      <defs>
+        <marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#000000"/>
+        </marker>
+        <marker id="ah-red" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#FF385C"/>
+        </marker>
+        <filter id="diag-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+
+      <!-- BASE CONDUITS -->
       <g class="edge" marker-end="url(#ah)">
-        <path d="M186 48 C230 48 230 120 272 120"/>
-        <path d="M186 120 H272"/>
-        <path d="M186 192 C230 192 230 120 272 120"/>
-        <path d="M365 172 V206"/>
-        <path d="M470 172 C470 196 620 190 620 206"/>
-        <path d="M530 120 H592" stroke-dasharray="4 5"/>
+        <path d="M 186 48 C 230 48 230 120 272 120"/>
+        <path d="M 186 120 L 272 120"/>
+        <path d="M 186 192 C 230 192 230 120 272 120"/>
+        <path d="M 365 174 L 365 212"/>
+        <path d="M 470 174 C 470 196 620 190 620 212"/>
+        <path d="M 530 120 L 594 120" stroke-dasharray="5 5"/>
       </g>
-      <g class="flow">
-        <path d="M186 48 C230 48 230 120 272 120"/>
-        <path d="M186 120 H272"/>
-        <path d="M186 192 C230 192 230 120 272 120"/>
-        <path d="M365 172 V206"/>
-        <path d="M470 172 C470 196 620 190 620 206"/>
+
+      <!-- LASER FLOW PULSES -->
+      <g class="flow" marker-end="url(#ah-red)">
+        <path d="M 186 48 C 230 48 230 120 272 120"/>
+        <path d="M 186 120 L 272 120"/>
+        <path d="M 186 192 C 230 192 230 120 272 120"/>
+        <path d="M 365 174 L 365 212"/>
+        <path d="M 470 174 C 470 196 620 190 620 212"/>
       </g>
-      <g class="bx">
-        <rect x="16" y="24" width="170" height="48" rx="10"/>
-        <text x="101" y="44">Lead capture</text><text class="s" x="101" y="60">4 sources</text>
-        <rect x="16" y="96" width="170" height="48" rx="10"/>
-        <text x="101" y="116">CRM sync</text><text class="s" x="101" y="132">listings · contacts</text>
-        <rect x="16" y="168" width="170" height="48" rx="10"/>
-        <text x="101" y="188">Monitoring</text><text class="s" x="101" y="204">+ scheduled reports</text>
-        <rect x="250" y="212" width="230" height="56" rx="10"/>
-        <text x="365" y="236">Central error workflow</text><text class="s" x="365" y="252">catches every major failure</text>
-        <rect x="520" y="212" width="200" height="56" rx="10"/>
-        <text x="620" y="236">Eval harness</text><text class="s" x="620" y="252">replays test cases</text>
+
+      <!-- FLYING DATA PHOTONS -->
+      <g class="diag-photons">
+        <!-- Lead capture to n8n -->
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 186 48 C 230 48 230 120 272 120" dur="1.3s" repeatCount="indefinite" begin="0s"/>
+        </circle>
+        <!-- CRM sync to n8n -->
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 186 120 L 272 120" dur="1s" repeatCount="indefinite" begin="0.3s"/>
+        </circle>
+        <!-- Monitoring to n8n -->
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 186 192 C 230 192 230 120 272 120" dur="1.3s" repeatCount="indefinite" begin="0.6s"/>
+        </circle>
+        <!-- n8n down to Error Workflow -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 365 174 L 365 212" dur="1s" repeatCount="indefinite" begin="0.8s"/>
+        </circle>
+        <!-- n8n down to Eval Harness -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 470 174 C 470 196 620 190 620 212" dur="1.4s" repeatCount="indefinite" begin="1s"/>
+        </circle>
+        <!-- n8n to Security Audit -->
+        <circle r="3.5" fill="#000000">
+          <animateMotion path="M 530 120 L 594 120" dur="1.8s" repeatCount="indefinite" begin="1.2s"/>
+        </circle>
       </g>
-      <g class="acc-b">
-        <rect x="272" y="68" width="258" height="104" rx="12"/>
-        <text x="401" y="106">n8n</text>
-        <text class="s" x="401" y="126">self-hosted · Docker · VPS</text>
-        <text class="s" x="401" y="144">32 active workflows</text>
+
+      <!-- NEO-BRUTALIST CARDS -->
+
+      <!-- 01: LEAD CAPTURE -->
+      <g class="diag-node">
+        <rect x="20" y="28" width="170" height="48" rx="4" fill="#000000"/>
+        <rect x="16" y="24" width="170" height="48" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <text x="101" y="44" font-family="'Space Grotesk'" font-size="13.5" font-weight="800" fill="#000000" text-anchor="middle">Lead capture</text>
+        <text x="101" y="58" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">4 portal sources</text>
       </g>
-      <g class="dash-b">
-        <rect x="600" y="76" width="290" height="88" rx="10"/>
-        <text x="745" y="106">Security audit</text>
-        <text class="s" x="745" y="126">secrets management</text>
-        <text class="s" x="745" y="144">endpoint exposure</text>
+
+      <!-- 02: CRM SYNC -->
+      <g class="diag-node">
+        <rect x="20" y="100" width="170" height="48" rx="4" fill="#000000"/>
+        <rect x="16" y="96" width="170" height="48" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <text x="101" y="116" font-family="'Space Grotesk'" font-size="13.5" font-weight="800" fill="#000000" text-anchor="middle">CRM sync</text>
+        <text x="101" y="130" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">listings · contacts</text>
+      </g>
+
+      <!-- 03: MONITORING -->
+      <g class="diag-node">
+        <rect x="20" y="172" width="170" height="48" rx="4" fill="#000000"/>
+        <rect x="16" y="168" width="170" height="48" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <text x="101" y="188" font-family="'Space Grotesk'" font-size="13.5" font-weight="800" fill="#000000" text-anchor="middle">Monitoring</text>
+        <text x="101" y="202" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">+ scheduled reports</text>
+      </g>
+
+      <!-- 04: N8N CENTRAL ENGINE -->
+      <g class="diag-node">
+        <rect x="276" y="72" width="258" height="104" rx="4" fill="#000000"/>
+        <rect x="272" y="68" width="258" height="104" rx="4" fill="#FFF2F4" stroke="#FF385C" stroke-width="3"/>
+        <circle cx="288" cy="84" r="3.5" fill="#FF385C"/>
+        <circle cx="288" cy="84" r="3.5" stroke="#FF385C" fill="none" class="diag-ping"/>
+        <text x="300" y="87" fill="#FF385C" font-family="'JetBrains Mono'" font-size="8" font-weight="800">✦ CENTRAL DOCKER VPS</text>
+        <text x="401" y="112" font-family="'Space Grotesk'" font-size="18" font-weight="900" fill="#FF385C" text-anchor="middle">n8n Engine</text>
+        <text x="401" y="132" font-family="'JetBrains Mono'" font-size="10" font-weight="700" fill="#000000" text-anchor="middle">self-hosted · Docker · VPS</text>
+        <text x="401" y="150" font-family="'JetBrains Mono'" font-size="10" font-weight="800" fill="#E02447" text-anchor="middle">32 active production workflows</text>
+      </g>
+
+      <!-- 05: CENTRAL ERROR WORKFLOW -->
+      <g class="diag-node">
+        <rect x="254" y="216" width="230" height="56" rx="4" fill="#000000"/>
+        <rect x="250" y="212" width="230" height="56" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="256" y="218" width="60" height="11" rx="2" fill="#000000"/>
+        <text x="286" y="227" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">TRAP GATE</text>
+        <text x="365" y="242" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Central error workflow</text>
+        <text x="365" y="257" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">catches every major failure</text>
+      </g>
+
+      <!-- 06: EVAL HARNESS -->
+      <g class="diag-node">
+        <rect x="524" y="216" width="200" height="56" rx="4" fill="#000000"/>
+        <rect x="520" y="212" width="200" height="56" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="526" y="218" width="68" height="11" rx="2" fill="#000000"/>
+        <text x="560" y="227" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">CI / TEST GATE</text>
+        <text x="620" y="242" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Eval harness</text>
+        <text x="620" y="257" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">replays synthetic test cases</text>
+      </g>
+
+      <!-- 07: SECURITY AUDIT -->
+      <g class="diag-node">
+        <rect x="604" y="80" width="290" height="88" rx="4" fill="#000000"/>
+        <rect x="600" y="76" width="290" height="88" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2" stroke-dasharray="5 4"/>
+        <text x="745" y="106" font-family="'Space Grotesk'" font-size="15" font-weight="800" fill="#000000" text-anchor="middle">Security &amp; Secret Audit</text>
+        <text x="745" y="126" font-family="'JetBrains Mono'" font-size="10" font-weight="600" fill="#555555" text-anchor="middle">credential token masking</text>
+        <text x="745" y="144" font-family="'JetBrains Mono'" font-size="10" font-weight="600" fill="#555555" text-anchor="middle">zero-retention PII enforcement</text>
       </g>
     </svg>
   </div>
@@ -145,6 +294,27 @@
     <span class="badge">PITFALL</span>
     <h3>Credentials are global, and deleting one breaks everything</h3>
     <p>A colleague reconnected a Google account by deleting the credential and creating it again. The new credential got a new internal ID. <strong>Seven workflows</strong> pointed at the old one and stopped, silently, at once.</p>
+
+    <!-- CREDENTIAL RECONNECT COMPARISON MATRIX -->
+    <div class="detector-card" style="margin:18px 0 14px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:0.74rem;font-weight:800;letter-spacing:0.06em;color:#555555">// INCIDENT POST-MORTEM · N8N GLOBAL CREDENTIAL BINDINGS</div>
+      <div class="det-grid">
+        <div class="det-box danger">
+          <span class="det-name">Naive Delete &amp; Re-create</span>
+          <div class="det-score">7 CASCADING <span style="font-size:0.85rem;font-weight:800">FAILURES</span></div>
+          <span class="det-verdict">❌ Deleting credential generates a new UUID. 7 workflows referencing old UUID break instantly.</span>
+        </div>
+        <div class="det-box success">
+          <span class="det-name">In-Place OAuth Reconnect</span>
+          <div class="det-score">ZERO DOWNTIME <span style="font-size:0.85rem;font-weight:800">PRESERVED</span></div>
+          <span class="det-verdict">✅ Reconnect updates the auth token while preserving identical internal ID. All 7 workflows keep running.</span>
+        </div>
+      </div>
+      <div class="det-takeaway">
+        <b>RUNBOOK DIRECTIVE:</b> Never delete an active credential object in production. Always click 'Reconnect' to preserve UUID references across dependent DAG topologies.
+      </div>
+    </div>
+
     <p class="outcome"><b>FIX</b> Always “Reconnect” in place, never delete-and-recreate. Written into the runbook in bold, because this is the kind of thing you learn once and only once.</p>
   </div>
 
@@ -196,5 +366,101 @@
 </footer>
 
 <script src="../assets/site.js"></script>
+<script>
+(function() {
+  const EVENTS = {
+    'nominal': {
+      fleetStatus: '32 / 32 ACTIVE · 100% HEALTHY',
+      fleetColor: '#10B981',
+      badge: { text: 'ALL SYSTEMS NORMAL', class: 'pass' },
+      badNodes: [],
+      warnNodes: [],
+      trace: `[00:14:02] CRON: Nightly DMARC XML ingest completed (18 reports, 0 errors)
+[04:00:00] HEALTHCHECK: Watchdog pinged 4 mailboxes · status 200 OK
+[08:30:15] WEBHOOK: Immobilienscout24 lead received → parsed → CRM sync [OK]
+[09:12:44] EVAL: Synthetic test harness ran 4/4 suites → 100% pass
+[11:05:19] OPS: 32/32 production DAGs executing within normal memory bounds`,
+      desc: "L'ensemble des 32 automatisations tourne sur le VPS Hetzner sans interruption. Les 4 flux de capture de leads, les tâches de synchronisation CRM et les rapports programmés s'exécutent en moins de 850 ms par webhook."
+    },
+    'crm-timeout': {
+      fleetStatus: '31 ACTIVE · 1 TRAPPED (ERROR WORKFLOW)',
+      fleetColor: '#EF4444',
+      badge: { text: 'FAILOVER TRAPPED ⚠️', class: 'fail' },
+      badNodes: [14],
+      warnNodes: [6, 12],
+      trace: `[14:22:01] WEBHOOK: Inbound portal lead (Immowelt ID: #98214)
+[14:22:03] NODE [onOffice REST API]: HTTP POST /api/v1/address → 504 Gateway Timeout
+[14:22:03] TRIGGER: Global Error Workflow intercepted failure on DAG #14
+[14:22:04] TRAP: Payload saved to dead-letter SQL queue (0 lead loss)
+[14:22:05] ALERT: Incident email dispatched to engineering with full stack trace & payload
+[14:22:06] RETRY: Scheduled backoff retry in 300s`,
+      desc: "Une panne transitoire de l'API CRM a renvoyé une erreur 504. Au lieu d'échouer silencieusement et de perdre le prospect, le workflow central d'erreur intercepte l'exécution, sauvegarde les données brutes dans la table de secours et alerte l'équipe instantanément."
+    },
+    'eval-regression': {
+      fleetStatus: '32 ACTIVE · PROMPT DEPLOY BLOCKED',
+      fleetColor: '#F59E0B',
+      badge: { text: 'REGRESSION BLOCKED 🛑', class: 'warn' },
+      badNodes: [],
+      warnNodes: [3, 4],
+      trace: `[16:45:10] CI/CD: Pre-deploy check for WhatsApp Assistant prompt v2.4
+[16:45:11] RUNNER: Replaying 4 golden test cases against Gemini Flash
+[16:45:12] TEST 1 (German Buyer, Balcony): PASS [1.2s]
+[16:45:13] TEST 2 (French Seller, Valuation): PASS [1.4s]
+[16:45:14] TEST 3 (Expat Budget Constraint): FAIL ❌ (Bot forgot max warm rent limit)
+[16:45:14] GATE: Deployment automatically aborted. Production prompt preserved.`,
+      desc: "L'harnais d'évaluation a rejoué les conversations synthétiques avant la mise en production d'un nouveau prompt. Le test n°3 a détecté une régression silencieuse : le déploiement a été stoppé net sans impacter les utilisateurs réels."
+    }
+  };
+
+  let activeEvt = 'nominal';
+  const dotsContainer = document.getElementById('bb-dots');
+  const fleetStatusEl = document.getElementById('bb-fleet-status');
+  const badgeEl = document.getElementById('bb-badge');
+  const traceEl = document.getElementById('bb-trace');
+  const descEl = document.getElementById('bb-desc');
+
+  function renderGrid() {
+    const data = EVENTS[activeEvt];
+    if (!data) return;
+
+    if (fleetStatusEl) {
+      fleetStatusEl.textContent = data.fleetStatus;
+      fleetStatusEl.style.color = data.fleetColor;
+    }
+    if (badgeEl) {
+      badgeEl.textContent = data.badge.text;
+      badgeEl.className = `auth-pill ${data.badge.class}`;
+    }
+    if (traceEl) traceEl.textContent = data.trace;
+    if (descEl) descEl.textContent = data.desc;
+
+    if (dotsContainer) {
+      dotsContainer.innerHTML = '';
+      for (let i = 0; i < 32; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'bb-wf-dot';
+        if (data.badNodes.includes(i)) {
+          dot.className += ' err';
+        } else if (data.warnNodes.includes(i)) {
+          dot.className += ' warn';
+        }
+        dot.title = `Workflow #${i+1}`;
+        dotsContainer.appendChild(dot);
+      }
+    }
+  }
+
+  document.querySelectorAll('#backbone-sim .preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#backbone-sim .preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeEvt = btn.dataset.event;
+      renderGrid();
+    });
+  });
+
+  renderGrid();
+})();
+</script>
 </body>
 </html>
