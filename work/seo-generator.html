@@ -66,51 +66,266 @@
   <p>A form takes a topic. Forty-nine nodes later, six Google Docs exist: a proofreading copy and a ready-to-paste HTML copy, in German, English and French, each with meta description, structured data, tags and internal links.</p>
   <ul>
     <li>Keyword expansion from Google's own autocomplete: free, no API key, real search data.</li>
-    <li>One master article, then two <em>persona adaptations</em>: Berlin locals, international expats, French-speaking investors.</li>
+    <li>One master article, then two <em>persona adaptations</em>: German locals, international expats, French-speaking investors.</li>
     <li>Internal links chosen from the live sitemap, bucketed per language.</li>
     <li>A third mode that takes an article somebody else wrote and translates and formats it through the same chain.</li>
     <li>Every run emails a summary, with a warning banner in the subject line if any stage degraded.</li>
   </ul>
+
+  <!-- 3D WORKFLOW TOPOLOGY SHOWCASE -->
+  <div class="visual-showcase">
+    <div class="visual-head">
+      <div class="v-dots"><span></span><span></span><span></span></div>
+      <div class="v-title">// 49-NODE N8N WORKFLOW TOPOLOGY · MULTILINGUAL ORCHESTRATION</div>
+      <div class="v-tag">OCTANE RENDER</div>
+    </div>
+    <div class="visual-body">
+      <img src="../assets/gumroad/multilingual-seo-article-generator-n8n.png" alt="3D isometric visualization of the 49-node n8n multilingual article generator workflow" loading="lazy">
+    </div>
+    <div class="visual-foot">
+      <span><b>PIPELINE ARCHITECTURE:</b> Seed topic → Google Autocomplete extraction → Gemini 2.5 Pro master draft → 3 Persona branch rewrites → HTML / JSON-LD / Sitemap internal linking</span>
+      <span class="v-live">● PRODUCTION SYSTEM</span>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 3-PERSONA ENGINE SIMULATION -->
+  <div class="seo-sim-container" id="engine-sim">
+    <div class="sim-header">
+      <div class="sim-badge"><span class="dot-live"></span> INTERACTIVE ENGINE SIMULATION</div>
+      <div class="sim-title">Test the Keyword → 3-Persona Adaptation Pipeline</div>
+      <p class="sim-intro">Select a real-world topic to watch how the 49-node pipeline expands user search intent via Google Autocomplete and crafts 3 distinct strategic angles—never a literal translation.</p>
+    </div>
+
+    <!-- PRESET CONTROLS -->
+    <div class="sim-controls">
+      <span class="ctrl-label">SELECT SEED TOPIC:</span>
+      <div class="sim-presets">
+        <button type="button" class="preset-btn active" data-preset="renovation">1. "Altbau Sanierung Pflichten"</button>
+        <button type="button" class="preset-btn" data-preset="expat">2. "Buying Property as Expat"</button>
+        <button type="button" class="preset-btn" data-preset="yield">3. "Rendement Locatif &amp; Fiscalité"</button>
+      </div>
+    </div>
+
+    <!-- GOOGLE AUTOCOMPLETE INTENT EXPANSION -->
+    <div class="sim-autocomplete">
+      <div class="ac-label">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <span>GOOGLE AUTOCOMPLETE INTENT EXPANSION (FREE API · ZERO KEY · REAL USER QUERIES):</span>
+      </div>
+      <div class="ac-tags" id="ac-tags"></div>
+    </div>
+
+    <!-- 3-PERSONA TABS -->
+    <div class="persona-tabs">
+      <button type="button" class="p-tab active" data-lang="de">
+        <span class="p-tab-title">🇩🇪 German Local Persona</span>
+        <span class="p-tab-badge">Regulatory / Legal Details</span>
+      </button>
+      <button type="button" class="p-tab" data-lang="en">
+        <span class="p-tab-title">🇬🇧 Expat Buyer Persona</span>
+        <span class="p-tab-badge">Bureaucracy / Financing</span>
+      </button>
+      <button type="button" class="p-tab" data-lang="fr">
+        <span class="p-tab-title">🇫🇷 French Investor Persona</span>
+        <span class="p-tab-badge">Yield / Tax Optimization</span>
+      </button>
+    </div>
+
+    <!-- PERSONA DISPLAY -->
+    <div class="persona-display" id="persona-display">
+      <div class="p-meta-grid">
+        <div class="p-meta-item">
+          <span class="lbl">Target Audience &amp; Strategic Angle</span>
+          <span class="val highlight" id="p-angle">Strict regulatory compliance, GEG energy deadlines &amp; municipal bylaws</span>
+        </div>
+        <div class="p-meta-item">
+          <span class="lbl">Targeted Primary Focus Keyword</span>
+          <span class="val" id="p-keyword">Altbau Sanierung Pflichten &amp; Milieuschutz</span>
+        </div>
+      </div>
+
+      <div class="p-excerpt-box">
+        <div class="p-article-h1" id="p-title">Altbau sanieren 2026: Gesetzliche Pflichten, GEG-Fristen und Milieuschutz</div>
+        <div class="p-article-body" id="p-excerpt">
+          Wer einen Altbau erwirbt, steht vor strengen Nachrüstpflichten gemäß <mark>Gebäudeenergiegesetz (§§ 71 ff. GEG)</mark>. Besonders in festgesetzten Erhaltungsgebieten (<mark>Milieuschutz</mark>) erfordern selbst energetische Verbesserungen eine gesonderte Genehmigung des Stadtentwicklungsamts...
+        </div>
+        <div class="p-links-row">
+          <span class="lbl">AUTOMATIC SITEMAP INTERNAL LINKS:</span>
+          <div id="p-links" style="display:flex;gap:8px;flex-wrap:wrap">
+            <span class="p-link-chip">/milieuschutz-erhaltungsgebiete/</span>
+            <span class="p-link-chip">/altbau-kaufberatung/</span>
+            <span class="p-link-chip">/geg-sanierungsfristen/</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TECHNICAL SPECS FOOTER -->
+    <div class="sim-specs">
+      <div><b>GENERATED OUTPUT</b> <span>2 Google Docs (Review + HTML)</span></div>
+      <div><b>ON-PAGE MARKUP</b> <span>Article + FAQPage JSON-LD</span></div>
+      <div><b>ARTICLE LENGTH</b> <span id="p-words">1,680 words</span></div>
+      <div><b>PIPELINE COST</b> <span class="cost-tag" id="p-cost">~€0.28 (Gemini 2.5 Pro)</span></div>
+    </div>
+  </div>
 </div></section>
 
 <section class="sec rv"><div class="wrap">
   <h2>How it works</h2>
   <div class="diag">
-    <svg viewBox="0 0 920 256" role="img" aria-label="A form takes a topic. Google Autocomplete expands it into real keywords. A master article is written by Gemini, then adapted into English and French for different personas. Meta descriptions, structured data and internal links are generated and merged in. Six Google Docs and an email summary come out. A dashed box marks mandatory human review before anything is published.">
-      <defs><marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
-        <path d="M0 0 L6 3 L0 6 z" fill="rgba(255,255,255,.34)"/></marker></defs>
+    <svg viewBox="0 0 920 260" role="img" aria-label="A form takes a topic. Google Autocomplete expands it into real keywords. A master article is written by Gemini, then adapted into English and French for different personas. Meta descriptions, structured data and internal links are generated and merged in. Six Google Docs and an email summary come out. A dashed box marks mandatory human review before anything is published.">
+      <defs>
+        <marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#000000"/>
+        </marker>
+        <marker id="ah-red" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#FF385C"/>
+        </marker>
+        <filter id="diag-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+
+      <!-- BASE CONDUIT CABLES -->
       <g class="edge" marker-end="url(#ah)">
-        <path d="M156 66 H188"/><path d="M366 66 H398"/><path d="M576 66 H608"/><path d="M756 66 H778"/>
-        <path d="M450 100 C450 142 391 142 391 174"/><path d="M540 100 C540 142 591 142 591 174"/>
-        <path d="M845 92 C845 132 805 132 805 174" stroke-dasharray="4 5"/>
+        <!-- Horizontal stream -->
+        <path d="M 156 66 L 196 66"/>
+        <path d="M 366 66 L 406 66"/>
+        <path d="M 576 66 L 616 66"/>
+        <path d="M 756 66 L 786 66"/>
+        <!-- Vertical branch lines -->
+        <path d="M 450 98 C 450 142 391 142 391 180"/>
+        <path d="M 540 98 C 540 142 591 142 591 180"/>
+        <path d="M 845 92 C 845 136 805 136 805 180" stroke-dasharray="5 5"/>
       </g>
-      <g class="flow">
-        <path d="M156 66 H188"/><path d="M366 66 H398"/><path d="M576 66 H608"/><path d="M756 66 H778"/>
-        <path d="M450 100 C450 142 391 142 391 174"/><path d="M540 100 C540 142 591 142 591 174"/>
+
+      <!-- LASER FLOW PULSES -->
+      <g class="flow" marker-end="url(#ah-red)">
+        <path d="M 156 66 L 196 66"/>
+        <path d="M 366 66 L 406 66"/>
+        <path d="M 576 66 L 616 66"/>
+        <path d="M 756 66 L 786 66"/>
+        <path d="M 450 98 C 450 142 391 142 391 180"/>
+        <path d="M 540 98 C 540 142 591 142 591 180"/>
       </g>
-      <g class="bx">
-        <rect x="16" y="40" width="140" height="52" rx="10"/>
-        <text x="86" y="62">Form</text><text class="s" x="86" y="78">topic · mode</text>
-        <rect x="196" y="40" width="170" height="52" rx="10"/>
-        <text x="281" y="62">Autocomplete</text><text class="s" x="281" y="78">free keyword data</text>
-        <rect x="616" y="40" width="140" height="52" rx="10"/>
-        <text x="686" y="62">Adapt EN · FR</text><text class="s" x="686" y="78">persona rewrites</text>
-        <rect x="786" y="40" width="118" height="52" rx="10"/>
-        <text x="845" y="62">6 Docs</text><text class="s" x="845" y="78">+ email</text>
-        <rect x="306" y="180" width="170" height="56" rx="10"/>
-        <text x="391" y="204">Meta · JSON-LD</text><text class="s" x="391" y="220">per language</text>
-        <rect x="506" y="180" width="170" height="56" rx="10"/>
-        <text x="591" y="204">Internal links</text><text class="s" x="591" y="220">from the sitemap</text>
+
+      <!-- ANIMATED FLYING DATA PHOTONS -->
+      <g class="diag-photons">
+        <!-- P1: Form to Autocomplete -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 156 66 L 196 66" dur="1.2s" repeatCount="indefinite" begin="0s"/>
+        </circle>
+        <!-- P2: Autocomplete to Gemini Master -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 366 66 L 406 66" dur="1.2s" repeatCount="indefinite" begin="0.35s"/>
+        </circle>
+        <!-- P3: Gemini Master down to Meta/JSON-LD -->
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 450 98 C 450 142 391 142 391 180" dur="1.6s" repeatCount="indefinite" begin="0.6s"/>
+        </circle>
+        <!-- P4: Gemini Master down to Sitemap Internal Links -->
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 540 98 C 540 142 591 142 591 180" dur="1.6s" repeatCount="indefinite" begin="0.6s"/>
+        </circle>
+        <!-- P5: Gemini Master to 3 Persona Branch -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 576 66 L 616 66" dur="1.2s" repeatCount="indefinite" begin="0.85s"/>
+        </circle>
+        <!-- P6: Persona to 6 Google Docs -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 756 66 L 786 66" dur="1.2s" repeatCount="indefinite" begin="1.2s"/>
+        </circle>
+        <!-- P7: Docs to Mandatory Review Gate -->
+        <circle r="3.5" fill="#000000">
+          <animateMotion path="M 845 92 C 845 136 805 136 805 180" dur="1.5s" repeatCount="indefinite" begin="1.4s"/>
+        </circle>
       </g>
-      <g class="acc-b">
-        <rect x="406" y="32" width="170" height="68" rx="12"/>
-        <text x="491" y="60">Master article</text>
-        <text class="s" x="491" y="78">Gemini 2.5 Pro</text>
-        <text class="s" x="491" y="92">one language</text>
+
+      <!-- NEO-BRUTALIST CARDS -->
+
+      <!-- 01: FORM -->
+      <g class="diag-node">
+        <rect x="20" y="44" width="140" height="52" rx="4" fill="#000000"/>
+        <rect x="16" y="40" width="140" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="22" y="46" width="38" height="11" rx="2" fill="#000000"/>
+        <text x="41" y="55" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">INPUT</text>
+        <text x="86" y="70" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Form</text>
+        <text x="86" y="83" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">topic · mode</text>
       </g>
-      <g class="dash-b">
-        <rect x="706" y="182" width="198" height="52" rx="10"/>
-        <text x="805" y="204">Human review</text><text class="s" x="805" y="220">no auto-publish</text>
+
+      <!-- 02: AUTOCOMPLETE -->
+      <g class="diag-node">
+        <rect x="200" y="44" width="170" height="52" rx="4" fill="#000000"/>
+        <rect x="196" y="40" width="170" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="202" y="46" width="60" height="11" rx="2" fill="#000000"/>
+        <text x="232" y="55" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">SEARCH DATA</text>
+        <text x="281" y="70" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Autocomplete</text>
+        <text x="281" y="83" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">free keyword intent</text>
+      </g>
+
+      <!-- 03: MASTER ARTICLE (AI ENGINE) -->
+      <g class="diag-node">
+        <rect x="410" y="32" width="170" height="70" rx="4" fill="#000000"/>
+        <rect x="406" y="28" width="170" height="70" rx="4" fill="#FFF2F4" stroke="#FF385C" stroke-width="3"/>
+        <!-- Radar beacon -->
+        <circle cx="422" cy="42" r="3.5" fill="#FF385C"/>
+        <circle cx="422" cy="42" r="3.5" stroke="#FF385C" fill="none" class="diag-ping"/>
+        <text x="434" y="45" fill="#FF385C" font-family="'JetBrains Mono'" font-size="8" font-weight="800">✦ AI ENGINE · ~14s</text>
+        <text x="491" y="66" font-family="'Space Grotesk'" font-size="15" font-weight="800" fill="#FF385C" text-anchor="middle">Master article</text>
+        <text x="491" y="81" font-family="'JetBrains Mono'" font-size="9.5" font-weight="700" fill="#000000" text-anchor="middle">Gemini 2.5 Pro</text>
+        <text x="491" y="93" font-family="'JetBrains Mono'" font-size="9" font-weight="700" fill="#E02447" text-anchor="middle">depth &amp; authority</text>
+      </g>
+
+      <!-- 04: ADAPT EN · FR -->
+      <g class="diag-node">
+        <rect x="620" y="44" width="140" height="52" rx="4" fill="#000000"/>
+        <rect x="616" y="40" width="140" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="622" y="46" width="62" height="11" rx="2" fill="#000000"/>
+        <text x="653" y="55" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">3 PERSONAS</text>
+        <text x="686" y="70" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Adapt EN · FR</text>
+        <text x="686" y="83" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">persona rewrites</text>
+      </g>
+
+      <!-- 05: 6 DOCS + EMAIL -->
+      <g class="diag-node">
+        <rect x="790" y="44" width="118" height="52" rx="4" fill="#000000"/>
+        <rect x="786" y="40" width="118" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="792" y="46" width="42" height="11" rx="2" fill="#000000"/>
+        <text x="813" y="55" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">OUTPUT</text>
+        <text x="845" y="70" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">6 Docs</text>
+        <text x="845" y="83" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">+ email alert</text>
+      </g>
+
+      <!-- 06: META & JSON-LD -->
+      <g class="diag-node">
+        <rect x="310" y="184" width="170" height="56" rx="4" fill="#000000"/>
+        <rect x="306" y="180" width="170" height="56" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="312" y="186" width="68" height="11" rx="2" fill="#000000"/>
+        <text x="346" y="195" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">SCHEMA.ORG</text>
+        <text x="391" y="210" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Meta · JSON-LD</text>
+        <text x="391" y="225" font-family="'JetBrains Mono'" font-size="10" font-weight="600" fill="#555555" text-anchor="middle">per language</text>
+      </g>
+
+      <!-- 07: INTERNAL LINKS -->
+      <g class="diag-node">
+        <rect x="510" y="184" width="170" height="56" rx="4" fill="#000000"/>
+        <rect x="506" y="180" width="170" height="56" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="512" y="186" width="60" height="11" rx="2" fill="#000000"/>
+        <text x="542" y="195" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">SITEMAP</text>
+        <text x="591" y="210" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Internal links</text>
+        <text x="591" y="225" font-family="'JetBrains Mono'" font-size="10" font-weight="600" fill="#555555" text-anchor="middle">from live sitemap</text>
+      </g>
+
+      <!-- 08: HUMAN REVIEW -->
+      <g class="diag-node">
+        <rect x="710" y="184" width="198" height="56" rx="4" fill="#000000"/>
+        <rect x="706" y="180" width="198" height="56" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2" stroke-dasharray="5 4"/>
+        <text x="805" y="208" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Human review 🔒</text>
+        <text x="805" y="224" font-family="'JetBrains Mono'" font-size="10" font-weight="600" fill="#555555" text-anchor="middle">mandatory · no auto-publish</text>
       </g>
     </svg>
   </div>
@@ -132,6 +347,27 @@
     <h3>AI detectors disagree with each other</h3>
     <p>An article scored <strong>82% “AI”</strong> on one detector. I rewrote the voice, tested five strategies, and got it to a modest improvement. Then I ran the <em>same text</em> through a second detector: <strong>27% AI, “strongly convinced this was written by a human”</strong>.</p>
     <p>Worse, the optimisation was making the prose <em>worse</em>: forcing burstiness produced a mechanical rhythm of its own, which is just a new tell.</p>
+    
+    <!-- EMPIRICAL BENCHMARK CARD -->
+    <div class="detector-card">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:0.74rem;font-weight:800;letter-spacing:0.06em;color:#555555">// EMPIRICAL BENCHMARK · SAME TEXT TESTED SIMULTANEOUSLY</div>
+      <div class="det-grid">
+        <div class="det-box danger">
+          <span class="det-name">Detector A (Copyleaks)</span>
+          <div class="det-score">82% <span style="font-size:0.85rem;font-weight:800">AI PROBABILITY</span></div>
+          <span class="det-verdict">⚠️ "Likely generated by AI"</span>
+        </div>
+        <div class="det-box success">
+          <span class="det-name">Detector B (Writer / ZeroGPT)</span>
+          <div class="det-score">27% <span style="font-size:0.85rem;font-weight:800">AI PROBABILITY</span></div>
+          <span class="det-verdict">✅ "Strongly convinced written by human"</span>
+        </div>
+      </div>
+      <div class="det-takeaway">
+        <b>TAKEAWAY:</b> Heuristic detector metrics are unscientific noise. Rewriting to force artificial "burstiness" degrades readability and harms search rankings. The only metric that counts in production is editorial clarity and direct user satisfaction.
+      </div>
+    </div>
+
     <p class="outcome"><b>DECISION</b> Stop. Search engines do not penalise AI writing, they penalise bad writing. The only lever that survives scrutiny is a human editor.</p>
   </div>
 
@@ -190,5 +426,179 @@
 </footer>
 
 <script src="../assets/site.js"></script>
+<script>
+(function() {
+  const SIM_DATA = {
+    renovation: {
+      autocomplete: [
+        "altbau sanierung pflichten 2026",
+        "geg heizungstausch fristen altbau",
+        "milieuschutz antrag genehmigung",
+        "altbau energetisch sanieren kosten rechner",
+        "denkmalschutz auflagen fenster kastenfenster"
+      ],
+      de: {
+        angle: "Strict regulatory compliance, GEG energy deadlines & municipal Milieuschutz bylaws",
+        keyword: "Altbau Sanierung Pflichten & Milieuschutz 2026",
+        title: "Altbau sanieren 2026: Gesetzliche Pflichten, GEG-Fristen und Milieuschutz",
+        excerpt: "Wer einen Altbau erwirbt, steht vor strengen Nachrüstpflichten gemäß <mark>Gebäudeenergiegesetz (§§ 71 ff. GEG)</mark>. Besonders in festgesetzten Erhaltungsgebieten (<mark>Milieuschutz</mark>) erfordern selbst energetische Verbesserungen wie neue Fenster oder Balkone eine gesonderte Genehmigung des Stadtentwicklungsamts...",
+        links: ["/milieuschutz-erhaltungsgebiete/", "/altbau-kaufberatung/", "/geg-sanierungsfristen/"],
+        words: "1,680 words",
+        cost: "~€0.28 (Gemini 2.5 Pro)"
+      },
+      en: {
+        angle: "Demystifying German bureaucracy, homeowner association (WEG) bylaws & English permits",
+        keyword: "Buying & Renovating an Altbau in Germany: Expat Guide",
+        title: "The Expat Guide to Renovating a Historic German Apartment: WEG Rules & Hidden Costs",
+        excerpt: "Buying a classic high-ceiling <mark>Altbau apartment</mark> is a dream for many international residents, but navigating German renovation laws can be daunting. Before stripping any stucco or replacing windows, here is what you need to know about <mark>WEG homeowner permissions</mark> and mandatory energy upgrades...",
+        links: ["/expat-buying-guide-germany/", "/historic-apartments-restoration/", "/notary-process/"],
+        words: "1,740 words",
+        cost: "~€0.29 (Gemini 2.5 Pro)"
+      },
+      fr: {
+        angle: "Tax optimization, renovation expense deductibility (Erhaltungsaufwand) & rental yield",
+        keyword: "Investissement Locatif Ancien Allemagne : Fiscalité & Travaux",
+        title: "Rénover un appartement ancien en Allemagne : Optimisation fiscale et création de valeur",
+        excerpt: "Pour un investisseur non-résident, l'acquisition d'un bien ancien à rénover en Allemagne offre un puissant levier d'optimisation fiscale grâce à la <mark>déduction des charges d'entretien (Erhaltungsaufwand)</mark> amortissables sur 2 à 5 ans, tout en optimisant le <mark>rendement locatif net</mark>...",
+        links: ["/fiscalite-immobiliere-allemagne/", "/guide-investisseur-francophone/", "/rendement-locatif/"],
+        words: "1,620 words",
+        cost: "~€0.27 (Gemini 2.5 Pro)"
+      }
+    },
+    expat: {
+      autocomplete: [
+        "buying property in germany as foreigner",
+        "german mortgage requirements for expats",
+        "notary signing process real estate germany",
+        "property transfer tax grunderwerbsteuer rates",
+        "blue card mortgage approval rate 2026"
+      ],
+      de: {
+        angle: "Finanzierungsauflagen für internationale Fachkräfte & Notarabwicklung",
+        keyword: "Immobilienkauf durch internationale Fachkräfte",
+        title: "Immobilienkauf in Deutschland: Finanzierungsregeln für internationale Käufer",
+        excerpt: "Internationale Fachkräfte und Expats stehen beim Immobilienkauf vor spezifischen Hürden: Während der <mark>Grunderwerbsteuer-Satz</mark> je nach Bundesland zwischen 3,5% und 6,5% liegt, verlangen Banken bei befristeten Aufenthaltstiteln oft höheres Eigenkapital...",
+        links: ["/finanzierungsberatung-expats/", "/kaufnebenkosten-rechner/"],
+        words: "1,550 words",
+        cost: "~€0.26 (Gemini 2.5 Pro)"
+      },
+      en: {
+        angle: "Step-by-step practical navigation from offer to notary signing and keys in hand",
+        keyword: "How to Buy Property in Germany as a Foreigner: Step-by-Step",
+        title: "Buying Property in Germany as a Foreigner: The Complete Step-by-Step Playbook",
+        excerpt: "There are no legal restrictions preventing foreign citizens from buying German property. However, the mortgage journey and <mark>German notary system (Beurkundung)</mark> follow strict statutory protocols. Here is your definitive checklist to avoid costly delays...",
+        links: ["/foreigner-property-guide/", "/notary-protocol-checklist/", "/mortgage-pre-approval/"],
+        words: "1,820 words",
+        cost: "~€0.31 (Gemini 2.5 Pro)"
+      },
+      fr: {
+        angle: "Comparatif acquisition France vs Allemagne, frais de notaire réduits & banques",
+        keyword: "Acheter un bien immobilier en Allemagne : Guide pour les Français",
+        title: "Acheter en Allemagne : Pourquoi le processus notarié protège mieux l'acquéreur",
+        excerpt: "Contrairement à la France, la signature devant le notaire en Allemagne scelle immédiatement la vente sans délai de rétractation de 10 jours. Comprendre le rôle du <mark>compte séquestre notarié (Notaranderkonto)</mark> et l'inscription au <mark>registre foncier (Grundbuch)</mark> est capital...",
+        links: ["/comparatif-france-allemagne/", "/demarche-notariale-allemande/"],
+        words: "1,690 words",
+        cost: "~€0.29 (Gemini 2.5 Pro)"
+      }
+    },
+    yield: {
+      autocomplete: [
+        "rendement locatif net calcul allemagne",
+        "german real estate tax non resident",
+        "doppelbesteuerungsabkommen frankreich deutschland immobilien",
+        "mietpreisbremse ausnahmen neubau",
+        "property management fee germany hausverwaltung"
+      ],
+      de: {
+        angle: "Mietpreisbremse-Ausnahmen, Indexmiete & Renditeoptimierung für Vermieter",
+        keyword: "Mietrendite berechnen & Mietpreisbremse optimieren",
+        title: "Mietrendite maximieren: Rechtssichere Mietverträge und Indexmiete in Ballungsräumen",
+        excerpt: "In angespannten Wohnungsmärkten begrenzt die <mark>Mietpreisbremse</mark> Neuvermietungen auf maximal 10% über der ortsüblichen Vergleichsmiete. Ausnahmen gelten jedoch für umfassend modernisierte Wohnungen sowie <mark>Indexmietverträge</mark>...",
+        links: ["/mietpreisbremse-leitfaden/", "/rendite-kalkulation/"],
+        words: "1,710 words",
+        cost: "~€0.29 (Gemini 2.5 Pro)"
+      },
+      en: {
+        angle: "Gross vs net cash flow yield, currency risk & turnkey property management for overseas investors",
+        keyword: "German Buy-to-Let Yield: Net Return Analysis for Overseas Buyers",
+        title: "German Buy-to-Let Investment: True Net Yields, Maintenance Reserves & Tax",
+        excerpt: "While headline gross yields in major hubs hover around 3.5%–4.5%, international investors must factor in non-recoverable management fees (<mark>Hausverwaltung</mark>) and the mandatory maintenance reserve (<mark>Instandhaltungsrücklage</mark>) to forecast real cash flow...",
+        links: ["/buy-to-let-yield-calculator/", "/property-management-germany/"],
+        words: "1,780 words",
+        cost: "~€0.30 (Gemini 2.5 Pro)"
+      },
+      fr: {
+        angle: "Convention fiscale franco-allemande, absence d'IFI et amortissement linéaire",
+        keyword: "Fiscalité Immobilière Allemagne Investisseur Français",
+        title: "Investir en Allemagne : La convention fiscale franco-allemande passée au crible",
+        excerpt: "Les revenus locatifs de source allemande perçus par un résident fiscal français sont <mark>imposables en Allemagne</mark> avec un taux effectif très avantageux, tout en étant exonérés en France avec maintien du taux effectif. De plus, l'<mark>amortissement linéaire de 2% à 3%</mark> efface une large part de la base taxable...",
+        links: ["/convention-fiscale-franco-allemande/", "/simulateur-rendement-locatif/", "/gestion-locative-distance/"],
+        words: "1,850 words",
+        cost: "~€0.31 (Gemini 2.5 Pro)"
+      }
+    }
+  };
+
+  let activePreset = 'renovation';
+  let activeLang = 'de';
+
+  const acTagsEl = document.getElementById('ac-tags');
+  const angleEl = document.getElementById('p-angle');
+  const keywordEl = document.getElementById('p-keyword');
+  const titleEl = document.getElementById('p-title');
+  const excerptEl = document.getElementById('p-excerpt');
+  const linksEl = document.getElementById('p-links');
+  const wordsEl = document.getElementById('p-words');
+  const costEl = document.getElementById('p-cost');
+
+  function renderSim() {
+    const data = SIM_DATA[activePreset];
+    if (!data) return;
+
+    // Render autocomplete tags
+    if (acTagsEl) {
+      acTagsEl.innerHTML = data.autocomplete.map(tag => `<span class="ac-tag">${tag}</span>`).join('');
+    }
+
+    // Render persona details
+    const persona = data[activeLang];
+    if (!persona) return;
+
+    if (angleEl) angleEl.textContent = persona.angle;
+    if (keywordEl) keywordEl.textContent = persona.keyword;
+    if (titleEl) titleEl.textContent = persona.title;
+    if (excerptEl) excerptEl.innerHTML = persona.excerpt;
+    if (wordsEl) wordsEl.textContent = persona.words;
+    if (costEl) costEl.textContent = persona.cost;
+
+    if (linksEl) {
+      linksEl.innerHTML = persona.links.map(l => `<span class="p-link-chip">${l}</span>`).join('');
+    }
+  }
+
+  // Preset buttons
+  document.querySelectorAll('.preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activePreset = btn.dataset.preset;
+      renderSim();
+    });
+  });
+
+  // Language tabs
+  document.querySelectorAll('.p-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.p-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      activeLang = tab.dataset.lang;
+      renderSim();
+    });
+  });
+
+  // Initial render
+  renderSim();
+})();
+</script>
 </body>
 </html>
