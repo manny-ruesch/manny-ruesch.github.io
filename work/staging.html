@@ -12,13 +12,13 @@
 <meta property="og:url" content="https://manny-ruesch.github.io/work/staging.html">
 <meta property="og:image" content="https://manny-ruesch.github.io/assets/og/staging.png">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="../favicon.svg" type="image/svg+xml">
-<link rel="icon" href="../favicon-32.png" sizes="32x32" type="image/png">
-<link rel="apple-touch-icon" href="../apple-touch-icon.png">
-<meta name="theme-color" content="#0A0D12">
+<link rel="icon" href="../favicon.svg?v=2" type="image/svg+xml">
+<link rel="icon" href="../favicon-32.png?v=2" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png?v=2">
+<meta name="theme-color" content="#F0F0F0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css">
 <link rel="stylesheet" href="../assets/case.css">
 </head>
@@ -40,7 +40,7 @@
 <header class="case-head">
   <div class="wrap">
     <a href="../index.html#work" class="backlink">← Work</a>
-    <div class="kicker">// automation &amp; AI system · for a real-estate agency in Berlin</div>
+    <div class="kicker">// automation &amp; AI system · for real-estate</div>
     <h1>An empty room, furnished in ~33 seconds</h1>
     <p class="lede">Raw listing photos go in, fully-staged interiors come out. It replaces a €150–400, multi-day photo shoot with a pipeline that runs while the agent is still on the phone.</p>
     <div class="metrics3">
@@ -89,41 +89,156 @@
 <section class="sec rv"><div class="wrap">
   <h2>How it works</h2>
   <div class="diag">
-    <svg viewBox="0 0 920 256" role="img" aria-label="An agent uploads a photo through a web form. A prompt builder assembles the instructions, with hard constraints placed last, and a job ledger reserves the quota before generation. The image model returns a staged render, which is stored on a shared Drive and shown on a result page with a before-and-after slider. The ledger also feeds a usage and cost page.">
-      <defs><marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
-        <path d="M0 0 L6 3 L0 6 z" fill="rgba(255,255,255,.34)"/></marker></defs>
+    <svg viewBox="0 0 920 260" role="img" aria-label="Pipeline architecture: an agent uploads a photo through a web form, which triggers prompt constraints and reserves quota in the job ledger, then calls the AI image model to produce a render stored on Shared Drive and previewed on a result page with before/after slider.">
+      <defs>
+        <marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#000000"/>
+        </marker>
+        <marker id="ah-red" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#FF385C"/>
+        </marker>
+        <filter id="diag-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+
+      <!-- BASE CONDUIT CABLES -->
       <g class="edge" marker-end="url(#ah)">
-        <path d="M134 66 H166"/><path d="M314 66 H346"/><path d="M534 66 H566"/><path d="M706 66 H738"/>
-        <path d="M410 100 C410 142 384 142 384 174"/><path d="M478 100 C478 142 564 142 564 174"/>
-        <path d="M642 208 H690" stroke-dasharray="4 5"/>
+        <path d="M 134 66 L 174 66" />
+        <path d="M 314 66 L 354 66" />
+        <path d="M 534 66 L 574 66" />
+        <path d="M 706 66 L 746 66" />
+        <path d="M 410 100 C 410 142 384 142 384 180" />
+        <path d="M 478 100 C 478 142 564 142 564 180" />
+        <path d="M 642 208 L 690 208" stroke-dasharray="5 5" />
       </g>
-      <g class="flow">
-        <path d="M134 66 H166"/><path d="M314 66 H346"/><path d="M534 66 H566"/><path d="M706 66 H738"/>
-        <path d="M410 100 C410 142 384 142 384 174"/><path d="M478 100 C478 142 564 142 564 174"/>
+
+      <!-- LASER FLOW PULSES -->
+      <g class="flow" marker-end="url(#ah-red)">
+        <path d="M 134 66 L 174 66" />
+        <path d="M 314 66 L 354 66" />
+        <path d="M 534 66 L 574 66" />
+        <path d="M 706 66 L 746 66" />
+        <path d="M 410 100 C 410 142 384 142 384 180" />
+        <path d="M 478 100 C 478 142 564 142 564 180" />
       </g>
-      <g class="bx">
-        <rect x="16" y="40" width="118" height="52" rx="10"/>
-        <text x="75" y="62">Agent</text><text class="s" x="75" y="78">uploads a photo</text>
-        <rect x="174" y="40" width="140" height="52" rx="10"/>
-        <text x="244" y="62">Web form</text><text class="s" x="244" y="78">room + style</text>
-        <rect x="574" y="40" width="132" height="52" rx="10"/>
-        <text x="640" y="62">Shared Drive</text><text class="s" x="640" y="78">stores the render</text>
-        <rect x="746" y="40" width="158" height="52" rx="10"/>
-        <text x="825" y="62">Result page</text><text class="s" x="825" y="78">before / after slider</text>
-        <rect x="306" y="180" width="156" height="56" rx="10"/>
-        <text x="384" y="204">Prompt builder</text><text class="s" x="384" y="220">constraints last</text>
-        <rect x="486" y="180" width="156" height="56" rx="10"/>
-        <text x="564" y="204">Job ledger</text><text class="s" x="564" y="220">reserved up front</text>
+
+      <!-- FLYING DATA PHOTONS / ACTIVE SIGNALS -->
+      <g class="diag-photons">
+        <!-- Signal 1: Agent -> Form -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 134 66 L 174 66" dur="1.2s" repeatCount="indefinite" begin="0s" />
+        </circle>
+        <!-- Signal 2: Form -> AI Model -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 314 66 L 354 66" dur="1.2s" repeatCount="indefinite" begin="0.35s" />
+        </circle>
+        <!-- Signal 3: Model -> Prompt Builder -->
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 410 100 C 410 142 384 142 384 180" dur="1.6s" repeatCount="indefinite" begin="0.6s" />
+        </circle>
+        <!-- Signal 4: Model -> Job Ledger -->
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 478 100 C 478 142 564 142 564 180" dur="1.6s" repeatCount="indefinite" begin="0.6s" />
+        </circle>
+        <!-- Signal 5: Ledger -> Usage -->
+        <circle r="3.5" fill="#000000">
+          <animateMotion path="M 642 208 L 690 208" dur="1.4s" repeatCount="indefinite" begin="1.2s" />
+        </circle>
+        <!-- Signal 6: Model -> Shared Drive -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 534 66 L 574 66" dur="1.2s" repeatCount="indefinite" begin="0.85s" />
+        </circle>
+        <!-- Signal 7: Shared Drive -> Result Page -->
+        <circle r="4.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 706 66 L 746 66" dur="1.2s" repeatCount="indefinite" begin="1.2s" />
+        </circle>
       </g>
-      <g class="acc-b">
-        <rect x="354" y="32" width="180" height="68" rx="12"/>
-        <text x="444" y="60">Image model</text>
-        <text class="s" x="444" y="78">furnish · declutter · empty</text>
-        <text class="s" x="444" y="92">+ camera lock</text>
+
+      <!-- NEO-BRUTALIST BOXES WITH SOLID OFFSET DROP SHADOWS -->
+
+      <!-- 01: AGENT -->
+      <g class="diag-node">
+        <rect x="20" y="44" width="118" height="52" rx="4" fill="#000000"/>
+        <rect x="16" y="40" width="118" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="22" y="46" width="38" height="11" rx="2" fill="#000000"/>
+        <text x="41" y="55" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">INPUT</text>
+        <text x="75" y="70" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Agent</text>
+        <text x="75" y="83" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">uploads photo</text>
       </g>
-      <g class="dash-b">
-        <rect x="690" y="182" width="214" height="52" rx="10"/>
-        <text x="797" y="204">Usage &amp; cost</text><text class="s" x="797" y="220">daily quota, editable</text>
+
+      <!-- 02: WEB FORM -->
+      <g class="diag-node">
+        <rect x="178" y="44" width="136" height="52" rx="4" fill="#000000"/>
+        <rect x="174" y="40" width="136" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="180" y="46" width="48" height="11" rx="2" fill="#000000"/>
+        <text x="204" y="55" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">PAYLOAD</text>
+        <text x="242" y="70" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Web form</text>
+        <text x="242" y="83" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">room + style</text>
+      </g>
+
+      <!-- 03: IMAGE MODEL (HERO AI ENGINE) -->
+      <g class="diag-node">
+        <rect x="358" y="32" width="180" height="70" rx="4" fill="#000000"/>
+        <rect x="354" y="28" width="180" height="70" rx="4" fill="#FFF2F4" stroke="#FF385C" stroke-width="3"/>
+        <circle cx="370" cy="42" r="3.5" fill="#FF385C"/>
+        <circle cx="370" cy="42" r="3.5" stroke="#FF385C" fill="none" class="diag-ping"/>
+        <text x="382" y="45" fill="#FF385C" font-family="'JetBrains Mono'" font-size="8" font-weight="800">✦ AI ENGINE · ~33s</text>
+        <text x="444" y="66" font-family="'Space Grotesk'" font-size="15" font-weight="800" fill="#FF385C" text-anchor="middle">Image model</text>
+        <text x="444" y="81" font-family="'JetBrains Mono'" font-size="9.5" font-weight="700" fill="#000000" text-anchor="middle">furnish · declutter · empty</text>
+        <text x="444" y="93" font-family="'JetBrains Mono'" font-size="9" font-weight="700" fill="#E02447" text-anchor="middle">+ camera lock</text>
+      </g>
+
+      <!-- 04: SHARED DRIVE -->
+      <g class="diag-node">
+        <rect x="578" y="44" width="132" height="52" rx="4" fill="#000000"/>
+        <rect x="574" y="40" width="132" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="580" y="46" width="48" height="11" rx="2" fill="#000000"/>
+        <text x="604" y="55" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">STORAGE</text>
+        <text x="640" y="70" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Shared Drive</text>
+        <text x="640" y="83" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">stores the render</text>
+      </g>
+
+      <!-- 05: RESULT PAGE -->
+      <g class="diag-node">
+        <rect x="750" y="44" width="154" height="52" rx="4" fill="#000000"/>
+        <rect x="746" y="40" width="154" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="752" y="46" width="44" height="11" rx="2" fill="#000000"/>
+        <text x="774" y="55" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">OUTPUT</text>
+        <text x="823" y="70" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Result page</text>
+        <text x="823" y="83" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">before / after slider</text>
+      </g>
+
+      <!-- 06: PROMPT BUILDER -->
+      <g class="diag-node">
+        <rect x="310" y="184" width="156" height="56" rx="4" fill="#000000"/>
+        <rect x="306" y="180" width="156" height="56" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="312" y="186" width="66" height="11" rx="2" fill="#000000"/>
+        <text x="345" y="195" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">CONSTRAINTS</text>
+        <text x="384" y="210" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Prompt builder</text>
+        <text x="384" y="225" font-family="'JetBrains Mono'" font-size="10" font-weight="600" fill="#555555" text-anchor="middle">pinned to the end</text>
+      </g>
+
+      <!-- 07: JOB LEDGER -->
+      <g class="diag-node">
+        <rect x="490" y="184" width="156" height="56" rx="4" fill="#000000"/>
+        <rect x="486" y="180" width="156" height="56" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="492" y="186" width="50" height="11" rx="2" fill="#000000"/>
+        <text x="517" y="195" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">ATOMIC 🔒</text>
+        <text x="564" y="210" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Job ledger</text>
+        <text x="564" y="225" font-family="'JetBrains Mono'" font-size="10" font-weight="600" fill="#555555" text-anchor="middle">reserved up front</text>
+      </g>
+
+      <!-- 08: USAGE & COST -->
+      <g class="diag-node">
+        <rect x="694" y="184" width="210" height="56" rx="4" fill="#000000"/>
+        <rect x="690" y="180" width="210" height="56" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2" stroke-dasharray="5 4"/>
+        <text x="795" y="208" font-family="'Space Grotesk'" font-size="14" font-weight="800" fill="#000000" text-anchor="middle">Usage &amp; cost</text>
+        <text x="795" y="224" font-family="'JetBrains Mono'" font-size="10" font-weight="600" fill="#555555" text-anchor="middle">daily quota · editable</text>
       </g>
     </svg>
   </div>

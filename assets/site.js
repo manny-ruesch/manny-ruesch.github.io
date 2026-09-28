@@ -30,19 +30,19 @@ document.querySelectorAll('.rv').forEach(el=>io.observe(el));
 /* ---- MR monogram: progressive draw + glowing pen tip ---- */
 (function(){
   const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const BASE='<path class="chip" d="M30 14 H66 Q82 14 82 30 V44 M82 56 V70 Q82 86 66 86 H30 Q14 86 14 70 V30 Q14 14 30 14" stroke="#EAEFF6" stroke-opacity="0.30" stroke-width="3"/>'
-    +'<path class="trace" d="M66 50 H94" stroke="#5EEAD4" stroke-width="3"/>'
-    +'<g class="edges" stroke="#EAEFF6" stroke-width="3.6">'
+  const BASE='<path class="chip" d="M30 14 H66 Q82 14 82 30 V44 M82 56 V70 Q82 86 66 86 H30 Q14 86 14 70 V30 Q14 14 30 14" stroke="#000000" stroke-opacity="0.25" stroke-width="3"/>'
+    +'<path class="trace" d="M66 50 H94" stroke="#FF385C" stroke-width="3"/>'
+    +'<g class="edges" stroke="#000000" stroke-width="3.6">'
     +'<line x1="28" y1="66" x2="28" y2="34"/><line x1="28" y1="34" x2="40" y2="54"/>'
     +'<line x1="40" y1="54" x2="52" y2="34"/><line x1="52" y1="34" x2="52" y2="66"/>'
     +'<line x1="52" y1="34" x2="66" y2="37"/><line x1="66" y1="37" x2="66" y2="50"/>'
     +'<line x1="66" y1="50" x2="52" y2="50"/><line x1="52" y1="50" x2="68" y2="66"/></g>'
-    +'<g class="nodes" fill="#0A0D12" stroke="#EAEFF6" stroke-width="2.4">'
+    +'<g class="nodes" fill="#FFFFFF" stroke="#000000" stroke-width="2.4">'
     +'<circle cx="28" cy="66" r="3.2"/><circle cx="28" cy="34" r="3.2"/><circle cx="52" cy="66" r="3.2"/><circle cx="66" cy="37" r="3.2"/><circle cx="68" cy="66" r="3.2"/></g>'
-    +'<g class="active" fill="#5EEAD4"><circle cx="40" cy="54" r="3.7"/><circle cx="52" cy="34" r="3.7"/><circle cx="66" cy="50" r="3.7"/></g>'
-    +'<circle class="pin" cx="94" cy="50" r="3.4" fill="#5EEAD4"/>';
+    +'<g class="active" fill="#FF385C"><circle cx="40" cy="54" r="3.7"/><circle cx="52" cy="34" r="3.7"/><circle cx="66" cy="50" r="3.7"/></g>'
+    +'<circle class="pin" cx="94" cy="50" r="3.4" fill="#FF385C"/>';
   const PEN='<path class="tipPath" d="M28 66 L28 34 L40 54 L52 34 L52 66 L52 34 L66 37 L66 50 L52 50 L68 66 L66 50 L94 50" fill="none" stroke="rgba(0,0,0,0)"/>'
-    +'<circle class="tip" r="3.2" fill="#EAFFFB" style="filter:drop-shadow(0 0 5px #5EEAD4) drop-shadow(0 0 10px #5EEAD4)"/>';
+    +'<circle class="tip" r="3.2" fill="#FF385C" style="filter:drop-shadow(0 0 4px #FF385C) drop-shadow(0 0 8px #FF385C)"/>';
   const SVG='<svg viewBox="0 0 100 100" fill="none" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">'+BASE+PEN+'</svg>';
 
   const marks=[...document.querySelectorAll('.logo .mk')];
@@ -85,6 +85,7 @@ document.querySelectorAll('.rv').forEach(el=>io.observe(el));
 (function(){
   document.querySelectorAll('.ba-slider').forEach(slider=>{
     let dragging=false,pos=50;
+    slider.style.setProperty('--pos','50%');
     function setP(clientX){
       const r=slider.getBoundingClientRect();
       const x=Math.max(0,Math.min(clientX-r.left,r.width));
