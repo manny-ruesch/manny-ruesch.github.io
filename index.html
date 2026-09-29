@@ -143,6 +143,28 @@ a.card:focus-visible{outline:3px solid #000000;outline-offset:3px}
   a.card::after{opacity:1;transform:none;transition:none}
   .status .dot,.scrollcue .bar{animation:none}
 }
+
+/* ---- PRODUCTION TOOLS SHOWROOM ---- */
+.tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(20px,2.5vw,28px);margin-top:20px}
+.tool-card{display:flex;flex-direction:column;background:#FFFFFF;border:var(--bw) solid #000000;box-shadow:var(--hard-shadow);border-radius:4px;overflow:hidden;transition:transform .15s var(--ease),box-shadow .15s var(--ease)}
+.tool-card:hover{transform:translate(-3px,-3px);box-shadow:var(--hard-shadow-lg)}
+.tool-media{position:relative;width:100%;aspect-ratio:16/9;background:#0d1118;border-bottom:var(--bw) solid #000000;overflow:hidden}
+.tool-media img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s ease}
+.tool-card:hover .tool-media img{transform:scale(1.03)}
+.tool-price-tag{position:absolute;top:12px;right:12px;background:#000000;color:#FFFFFF;border:2px solid #000000;padding:4px 10px;font-family:'JetBrains Mono',monospace;font-size:.82rem;font-weight:800;border-radius:3px;box-shadow:2px 2px 0px rgba(0,0,0,0.3)}
+.tool-content{padding:22px;display:flex;flex-direction:column;flex:1}
+.tool-content h4{font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:1.15rem;line-height:1.25;letter-spacing:-.01em;color:#000000;margin-bottom:10px}
+.tool-content p{color:#444444;font-size:.9rem;line-height:1.5;margin-bottom:16px;flex:1}
+.tool-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
+.tool-tag{font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:700;color:#000000;background:#F0F0F0;border:1.5px solid #000000;border-radius:2px;padding:2px 8px}
+.tool-actions{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding-top:16px;border-top:1.5px solid #E5E5E5}
+.btn-gumroad{display:inline-flex;align-items:center;justify-content:center;background:var(--acc);color:#FFFFFF;border:2px solid #000000;padding:10px 14px;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:.85rem;letter-spacing:.02em;text-transform:uppercase;border-radius:3px;box-shadow:var(--hard-shadow-sm);transition:all .15s}
+.btn-gumroad:hover{background:#E02447;transform:translate(-1px,-1px);box-shadow:var(--hard-shadow);color:#FFFFFF}
+.btn-whop{display:inline-flex;align-items:center;justify-content:center;background:#000000;color:#FFFFFF;border:2px solid #000000;padding:10px 14px;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:.85rem;letter-spacing:.02em;text-transform:uppercase;border-radius:3px;box-shadow:var(--hard-shadow-sm);transition:all .15s}
+.btn-whop:hover{background:#222222;transform:translate(-1px,-1px);box-shadow:var(--hard-shadow);color:#FFFFFF}
+@media(max-width:960px){.tools-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.tools-grid{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -154,6 +176,7 @@ a.card:focus-visible{outline:3px solid #000000;outline-offset:3px}
     <a href="#top" class="logo"><span class="mk">MR</span><span>Manny Ruesch</span></a>
     <div class="navlinks">
       <a href="#work" class="hide-sm">Work</a>
+      <a href="#tools" class="hide-sm">Tools</a>
       <a href="#stack" class="hide-sm">Stack</a>
       <a href="#contact" class="hide-sm">Contact</a>
       <a href="assets/cv-manny-ruesch.pdf" target="_blank" rel="noopener" class="hide-sm">CV ↗</a>
@@ -361,9 +384,118 @@ a.card:focus-visible{outline:3px solid #000000;outline-offset:3px}
   </div>
 </section>
 
+<!-- BEGIN STORE TOOLS SECTION -->
+<section id="tools">
+  <div class="wrap">
+    <div class="eyebrow rv">03 / Production Tools</div>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:12px;margin-bottom:12px">
+      <h2 class="sec-h rv">Ready-to-Deploy Engines &amp; Workflows.</h2>
+      <span class="mono rv" style="font-size:.85rem;font-weight:700;color:var(--acc);background:#FFFFFF;border:2px solid #000000;padding:4px 10px;box-shadow:var(--hard-shadow-sm);border-radius:3px">ZERO RECURRING SUBSCRIPTIONS · INSTANT ZIP</span>
+    </div>
+    <p class="rv" style="color:#444444;font-size:1.05rem;max-width:64ch;margin-bottom:34px">
+      Self-hosted automation systems, autonomous AI agents, and programmatic content engines built for high-throughput production. Download once, own the code forever.
+    </p>
+
+    <div class="tools-grid">
+
+      <div class="tool-card rv">
+        <div class="tool-media">
+          <img src="assets/gumroad/ai-agent-memory-rag-sync-notion-airtable-n8n-20260929.png" alt="Autonomous AI Memory & RAG Sync (Notion + Airtable)" loading="lazy">
+          <span class="tool-price-tag">19 €</span>
+        </div>
+        <div class="tool-content">
+          <h4>Autonomous AI Memory & RAG Sync (Notion + Airtable)</h4>
+          <p>Zero-maintenance RAG sync engine between Notion, Airtable CRM, and Gemini embeddings. Continuous context for autonomous agents.</p>
+          <div class="tool-tags"><span class="tool-tag">n8n</span><span class="tool-tag">RAG Sync</span><span class="tool-tag">Notion API</span><span class="tool-tag">Airtable</span><span class="tool-tag">Gemini</span></div>
+          <div class="tool-actions">
+            <a href="https://mannyverse767.gumroad.com/l/ai-agent-memory-rag-sync-notion-airtable-n8n-20260929" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
+            <a href="https://whop.com/mr-studio-7faa/autonomous-ai-memory-rag-sync-for-notion-airtable-n8n-engine" target="_blank" rel="noopener" class="btn-whop">Whop ↗</a>
+          </div>
+        </div>
+      </div>
+      <div class="tool-card rv">
+        <div class="tool-media">
+          <img src="assets/gumroad/programmatic-seo-markdown-generator-python-20260929.png" alt="Programmatic SEO Markdown Engine with Quality Gates" loading="lazy">
+          <span class="tool-price-tag">14 €</span>
+        </div>
+        <div class="tool-content">
+          <h4>Programmatic SEO Markdown Engine with Quality Gates</h4>
+          <p>High-velocity programmatic content generator in pure Python. Enforces strict automated quality filters, heading hierarchy, and zero fluff.</p>
+          <div class="tool-tags"><span class="tool-tag">Python</span><span class="tool-tag">CLI</span><span class="tool-tag">Programmatic SEO</span><span class="tool-tag">Markdown</span><span class="tool-tag">Quality Gates</span></div>
+          <div class="tool-actions">
+            <a href="https://mannyverse767.gumroad.com/l/programmatic-seo-markdown-generator-python-20260929" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
+            <a href="https://whop.com/mr-studio-7faa/programmatic-seo-engine-with-automated-quality-gates-python-markdown" target="_blank" rel="noopener" class="btn-whop">Whop ↗</a>
+          </div>
+        </div>
+      </div>
+      <div class="tool-card rv">
+        <div class="tool-media">
+          <img src="assets/gumroad/programmatic-seo-engine-python-qc-20260928.png" alt="Programmatic SEO Engine: Automated QC Pipeline" loading="lazy">
+          <span class="tool-price-tag">19 €</span>
+        </div>
+        <div class="tool-content">
+          <h4>Programmatic SEO Engine: Automated QC Pipeline</h4>
+          <p>Industrial-scale keyword clustering and article generator with real-time heuristic scoring, automated schema markup, and internal link routing.</p>
+          <div class="tool-tags"><span class="tool-tag">Python</span><span class="tool-tag">Automated QC</span><span class="tool-tag">SEO Pipeline</span><span class="tool-tag">Data Pipeline</span></div>
+          <div class="tool-actions">
+            <a href="https://mannyverse767.gumroad.com/l/programmatic-seo-engine-python-qc-20260928" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
+            <a href="https://whop.com/mr-studio-7faa/programmatic-seo-engine-python-pipeline-with-automated-quality-control" target="_blank" rel="noopener" class="btn-whop">Whop ↗</a>
+          </div>
+        </div>
+      </div>
+      <div class="tool-card rv">
+        <div class="tool-media">
+          <img src="assets/gumroad/multilingual-seo-article-generator-n8n.png" alt="Multilingual SEO Article Generator & Internal Linking" loading="lazy">
+          <span class="tool-price-tag">19 €</span>
+        </div>
+        <div class="tool-content">
+          <h4>Multilingual SEO Article Generator & Internal Linking</h4>
+          <p>Plug-and-play n8n workflow leveraging Google Autocomplete scraping and Gemini Flash to produce structured, multilingual articles on demand.</p>
+          <div class="tool-tags"><span class="tool-tag">n8n</span><span class="tool-tag">Gemini Flash</span><span class="tool-tag">Google Autocomplete</span><span class="tool-tag">Markdown</span></div>
+          <div class="tool-actions">
+            <a href="https://mannyverse767.gumroad.com/l/multilingual-seo-article-generator-n8n" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
+            <a href="https://whop.com/mr-studio-7faa/multilingual-seo-article-generator-automated-internal-linking-n8n-gemini-w" target="_blank" rel="noopener" class="btn-whop">Whop ↗</a>
+          </div>
+        </div>
+      </div>
+      <div class="tool-card rv">
+        <div class="tool-media">
+          <img src="assets/gumroad/autonomous-b2b-lead-enrichment-scoring-n8n-20260927.png" alt="Autonomous B2B Lead Enrichment & Scoring Agent" loading="lazy">
+          <span class="tool-price-tag">19 €</span>
+        </div>
+        <div class="tool-content">
+          <h4>Autonomous B2B Lead Enrichment & Scoring Agent</h4>
+          <p>Automated pipeline that scrapes ICP prospect websites, discovers verified business emails via Hunter, and scores lead warmth with LLMs.</p>
+          <div class="tool-tags"><span class="tool-tag">n8n</span><span class="tool-tag">Lead Scoring</span><span class="tool-tag">Hunter.io</span><span class="tool-tag">Autonomous Agent</span></div>
+          <div class="tool-actions">
+            <a href="https://mannyverse767.gumroad.com/l/autonomous-b2b-lead-enrichment-scoring-n8n-20260927" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
+            <a href="https://whop.com/mr-studio-7faa/autonomous-b2b-lead-enrichment-scoring-agent-n8n-ai-workflow" target="_blank" rel="noopener" class="btn-whop">Whop ↗</a>
+          </div>
+        </div>
+      </div>
+      <div class="tool-card rv">
+        <div class="tool-media">
+          <img src="assets/gumroad/ai-virtual-staging-n8n.png" alt="AI Virtual Home Staging Micro-SaaS & Agency Kit" loading="lazy">
+          <span class="tool-price-tag">39 €</span>
+        </div>
+        <div class="tool-content">
+          <h4>AI Virtual Home Staging Micro-SaaS & Agency Kit</h4>
+          <p>Full production pipeline furnishing empty property photos in under 35 seconds. Complete with webhook API, presets, and architecture guide.</p>
+          <div class="tool-tags"><span class="tool-tag">n8n</span><span class="tool-tag">Nano Banana Pro</span><span class="tool-tag">Micro-SaaS</span><span class="tool-tag">Real Estate</span></div>
+          <div class="tool-actions">
+            <a href="https://mannyverse767.gumroad.com/l/ai-virtual-staging-n8n" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
+            <a href="https://whop.com/mr-studio-7faa/ai-virtual-home-staging-micro-saas-agency-kit-n8n-gemini-workflow" target="_blank" rel="noopener" class="btn-whop">Whop ↗</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- END STORE TOOLS SECTION -->
+
 <section id="stack">
   <div class="wrap">
-    <div class="eyebrow rv">03 / Toolbox</div>
+    <div class="eyebrow rv">04 / Toolbox</div>
     <h2 class="sec-h rv" style="margin-bottom:clamp(34px,5vw,60px)">The stack I build with.</h2>
     <div class="stack">
       <div class="col rv"><h5>Automation</h5><ul><li><i></i>n8n</li><li><i></i>Make</li><li><i></i>Webhooks</li><li><i></i>REST APIs</li></ul></div>
@@ -376,7 +508,7 @@ a.card:focus-visible{outline:3px solid #000000;outline-offset:3px}
 
 <section id="contact" class="contact">
   <div class="wrap">
-    <div class="eyebrow rv" style="justify-content:center">04 / Contact</div>
+    <div class="eyebrow rv" style="justify-content:center">05 / Contact</div>
     <h2 class="big rv">Let's build <span class="g">something</span>.</h2>
     <p class="rv d1">Automation, an AI pipeline, or an internal tool that should just run itself? I'd love to hear about it.</p>
     <div class="actions rv d2" style="justify-content:center;display:flex;gap:14px;flex-wrap:wrap">
