@@ -144,7 +144,10 @@ a.card:focus-visible{outline:3px solid #000000;outline-offset:3px}
   .status .dot,.scrollcue .bar{animation:none}
 }
 
-/* ---- PRODUCTION TOOLS SHOWROOM ---- */
+
+
+
+/* ---- PRODUCTION TOOLS SHOWROOM (FEATURED 3) ---- */
 .tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(20px,2.5vw,28px);margin-top:20px}
 .tool-card{display:flex;flex-direction:column;background:#FFFFFF;border:var(--bw) solid #000000;box-shadow:var(--hard-shadow);border-radius:4px;overflow:hidden;transition:transform .15s var(--ease),box-shadow .15s var(--ease)}
 .tool-card:hover{transform:translate(-3px,-3px);box-shadow:var(--hard-shadow-lg)}
@@ -162,8 +165,15 @@ a.card:focus-visible{outline:3px solid #000000;outline-offset:3px}
 .btn-gumroad:hover{background:#E02447;transform:translate(-1px,-1px);box-shadow:var(--hard-shadow);color:#FFFFFF}
 .btn-whop{display:inline-flex;align-items:center;justify-content:center;background:#000000;color:#FFFFFF;border:2px solid #000000;padding:10px 14px;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:.85rem;letter-spacing:.02em;text-transform:uppercase;border-radius:3px;box-shadow:var(--hard-shadow-sm);transition:all .15s}
 .btn-whop:hover{background:#222222;transform:translate(-1px,-1px);box-shadow:var(--hard-shadow);color:#FFFFFF}
+
+/* Tools CTA Bar */
+.tools-cta-bar{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;background:#FFFFFF;border:var(--bw) solid #000000;box-shadow:var(--hard-shadow);border-radius:4px;padding:22px 28px;margin-top:32px}
+.tools-cta-bar .cta-title{font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:1.25rem;color:#000000;letter-spacing:-.01em}
+.tools-cta-bar .cta-sub{font-size:.9rem;color:#555555;font-weight:500;margin-top:4px}
+.btn-explore-catalog{display:inline-flex;align-items:center;gap:10px;background:#000000;color:#FFFFFF;border:2px solid #000000;padding:12px 24px;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:.95rem;text-transform:uppercase;letter-spacing:.03em;border-radius:4px;box-shadow:var(--hard-shadow-sm);transition:all .15s;white-space:nowrap}
+.btn-explore-catalog:hover{background:var(--acc);border-color:#000000;color:#FFFFFF;transform:translate(-2px,-2px);box-shadow:var(--hard-shadow)}
 @media(max-width:960px){.tools-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:640px){.tools-grid{grid-template-columns:1fr}}
+@media(max-width:640px){.tools-grid{grid-template-columns:1fr}.tools-cta-bar{flex-direction:column;align-items:stretch;text-align:left}.btn-explore-catalog{justify-content:center}}
 
 </style>
 </head>
@@ -176,7 +186,7 @@ a.card:focus-visible{outline:3px solid #000000;outline-offset:3px}
     <a href="#top" class="logo"><span class="mk">MR</span><span>Manny Ruesch</span></a>
     <div class="navlinks">
       <a href="#work" class="hide-sm">Work</a>
-      <a href="#tools" class="hide-sm">Tools</a>
+      <a href="tools.html" class="hide-sm">Tools</a>
       <a href="#stack" class="hide-sm">Stack</a>
       <a href="#contact" class="hide-sm">Contact</a>
       <a href="assets/cv-manny-ruesch.pdf" target="_blank" rel="noopener" class="hide-sm">CV ↗</a>
@@ -389,8 +399,8 @@ a.card:focus-visible{outline:3px solid #000000;outline-offset:3px}
   <div class="wrap">
     <div class="eyebrow rv">03 / Production Tools</div>
     <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:12px;margin-bottom:12px">
-      <h2 class="sec-h rv">Ready-to-Deploy Engines &amp; Workflows.</h2>
-      <span class="mono rv" style="font-size:.85rem;font-weight:700;color:var(--acc);background:#FFFFFF;border:2px solid #000000;padding:4px 10px;box-shadow:var(--hard-shadow-sm);border-radius:3px">ZERO RECURRING SUBSCRIPTIONS · INSTANT ZIP</span>
+      <h2 class="sec-h rv">Featured Engines &amp; Workflows.</h2>
+      <span class="mono rv" style="font-size:.85rem;font-weight:700;color:var(--acc);background:#FFFFFF;border:2px solid #000000;padding:4px 10px;box-shadow:var(--hard-shadow-sm);border-radius:3px">ZERO SUBSCRIPTIONS · INSTANT ZIP</span>
     </div>
     <p class="rv" style="color:#444444;font-size:1.05rem;max-width:64ch;margin-bottom:34px">
       Self-hosted automation systems, autonomous AI agents, and programmatic content engines built for high-throughput production. Download once, own the code forever.
@@ -443,51 +453,14 @@ a.card:focus-visible{outline:3px solid #000000;outline-offset:3px}
           </div>
         </div>
       </div>
-      <div class="tool-card rv">
-        <div class="tool-media">
-          <img src="assets/gumroad/multilingual-seo-article-generator-n8n.png" alt="Multilingual SEO Article Generator & Internal Linking" loading="lazy">
-          <span class="tool-price-tag">19 €</span>
-        </div>
-        <div class="tool-content">
-          <h4>Multilingual SEO Article Generator & Internal Linking</h4>
-          <p>Plug-and-play n8n workflow leveraging Google Autocomplete scraping and Gemini Flash to produce structured, multilingual articles on demand.</p>
-          <div class="tool-tags"><span class="tool-tag">n8n</span><span class="tool-tag">Gemini Flash</span><span class="tool-tag">Google Autocomplete</span><span class="tool-tag">Markdown</span></div>
-          <div class="tool-actions">
-            <a href="https://mannyverse767.gumroad.com/l/multilingual-seo-article-generator-n8n" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
-            <a href="https://whop.com/mr-studio-7faa/multilingual-seo-article-generator-automated-internal-linking-n8n-gemini-w" target="_blank" rel="noopener" class="btn-whop">Whop ↗</a>
-          </div>
-        </div>
+    </div>
+
+    <div class="tools-cta-bar rv">
+      <div>
+        <div class="cta-title">Looking for the full arsenal?</div>
+        <div class="cta-sub">Browse all 6 production-ready automation scripts, n8n workflows &amp; SEO engines.</div>
       </div>
-      <div class="tool-card rv">
-        <div class="tool-media">
-          <img src="assets/gumroad/autonomous-b2b-lead-enrichment-scoring-n8n-20260927.png" alt="Autonomous B2B Lead Enrichment & Scoring Agent" loading="lazy">
-          <span class="tool-price-tag">19 €</span>
-        </div>
-        <div class="tool-content">
-          <h4>Autonomous B2B Lead Enrichment & Scoring Agent</h4>
-          <p>Automated pipeline that scrapes ICP prospect websites, discovers verified business emails via Hunter, and scores lead warmth with LLMs.</p>
-          <div class="tool-tags"><span class="tool-tag">n8n</span><span class="tool-tag">Lead Scoring</span><span class="tool-tag">Hunter.io</span><span class="tool-tag">Autonomous Agent</span></div>
-          <div class="tool-actions">
-            <a href="https://mannyverse767.gumroad.com/l/autonomous-b2b-lead-enrichment-scoring-n8n-20260927" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
-            <a href="https://whop.com/mr-studio-7faa/autonomous-b2b-lead-enrichment-scoring-agent-n8n-ai-workflow" target="_blank" rel="noopener" class="btn-whop">Whop ↗</a>
-          </div>
-        </div>
-      </div>
-      <div class="tool-card rv">
-        <div class="tool-media">
-          <img src="assets/gumroad/ai-virtual-staging-n8n.png" alt="AI Virtual Home Staging Micro-SaaS & Agency Kit" loading="lazy">
-          <span class="tool-price-tag">39 €</span>
-        </div>
-        <div class="tool-content">
-          <h4>AI Virtual Home Staging Micro-SaaS & Agency Kit</h4>
-          <p>Full production pipeline furnishing empty property photos in under 35 seconds. Complete with webhook API, presets, and architecture guide.</p>
-          <div class="tool-tags"><span class="tool-tag">n8n</span><span class="tool-tag">Nano Banana Pro</span><span class="tool-tag">Micro-SaaS</span><span class="tool-tag">Real Estate</span></div>
-          <div class="tool-actions">
-            <a href="https://mannyverse767.gumroad.com/l/ai-virtual-staging-n8n" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
-            <a href="https://whop.com/mr-studio-7faa/ai-virtual-home-staging-micro-saas-agency-kit-n8n-gemini-workflow" target="_blank" rel="noopener" class="btn-whop">Whop ↗</a>
-          </div>
-        </div>
-      </div>
+      <a href="tools.html" class="btn-explore-catalog">Explore Full Catalog (6 Tools) →</a>
     </div>
   </div>
 </section>

@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tools &amp; Automation Engines Catalog · Manny Ruesch</title>
+<meta name="description" content="Production-ready n8n workflows, Python CLI tools, and autonomous AI engines. Zero recurring subscriptions, instant ZIP download.">
+<link rel="canonical" href="https://manny-ruesch.github.io/tools.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Tools &amp; Automation Engines Catalog · Manny Ruesch">
+<meta property="og:description" content="Production-ready n8n workflows, Python CLI tools, and autonomous AI engines.">
+<meta property="og:url" content="https://manny-ruesch.github.io/tools.html">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png?v=2" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
+<meta name="theme-color" content="#F0F0F0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+
+/* ---- PRODUCTION TOOLS SHOWROOM (FEATURED 3) ---- */
+.tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(20px,2.5vw,28px);margin-top:20px}
+.tool-card{display:flex;flex-direction:column;background:#FFFFFF;border:var(--bw) solid #000000;box-shadow:var(--hard-shadow);border-radius:4px;overflow:hidden;transition:transform .15s var(--ease),box-shadow .15s var(--ease)}
+.tool-card:hover{transform:translate(-3px,-3px);box-shadow:var(--hard-shadow-lg)}
+.tool-media{position:relative;width:100%;aspect-ratio:16/9;background:#0d1118;border-bottom:var(--bw) solid #000000;overflow:hidden}
+.tool-media img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s ease}
+.tool-card:hover .tool-media img{transform:scale(1.03)}
+.tool-price-tag{position:absolute;top:12px;right:12px;background:#000000;color:#FFFFFF;border:2px solid #000000;padding:4px 10px;font-family:'JetBrains Mono',monospace;font-size:.82rem;font-weight:800;border-radius:3px;box-shadow:2px 2px 0px rgba(0,0,0,0.3)}
+.tool-content{padding:22px;display:flex;flex-direction:column;flex:1}
+.tool-content h4{font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:1.15rem;line-height:1.25;letter-spacing:-.01em;color:#000000;margin-bottom:10px}
+.tool-content p{color:#444444;font-size:.9rem;line-height:1.5;margin-bottom:16px;flex:1}
+.tool-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
+.tool-tag{font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:700;color:#000000;background:#F0F0F0;border:1.5px solid #000000;border-radius:2px;padding:2px 8px}
+.tool-actions{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding-top:16px;border-top:1.5px solid #E5E5E5}
+.btn-gumroad{display:inline-flex;align-items:center;justify-content:center;background:var(--acc);color:#FFFFFF;border:2px solid #000000;padding:10px 14px;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:.85rem;letter-spacing:.02em;text-transform:uppercase;border-radius:3px;box-shadow:var(--hard-shadow-sm);transition:all .15s}
+.btn-gumroad:hover{background:#E02447;transform:translate(-1px,-1px);box-shadow:var(--hard-shadow);color:#FFFFFF}
+.btn-whop{display:inline-flex;align-items:center;justify-content:center;background:#000000;color:#FFFFFF;border:2px solid #000000;padding:10px 14px;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:.85rem;letter-spacing:.02em;text-transform:uppercase;border-radius:3px;box-shadow:var(--hard-shadow-sm);transition:all .15s}
+.btn-whop:hover{background:#222222;transform:translate(-1px,-1px);box-shadow:var(--hard-shadow);color:#FFFFFF}
+
+/* Tools CTA Bar */
+.tools-cta-bar{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;background:#FFFFFF;border:var(--bw) solid #000000;box-shadow:var(--hard-shadow);border-radius:4px;padding:22px 28px;margin-top:32px}
+.tools-cta-bar .cta-title{font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:1.25rem;color:#000000;letter-spacing:-.01em}
+.tools-cta-bar .cta-sub{font-size:.9rem;color:#555555;font-weight:500;margin-top:4px}
+.btn-explore-catalog{display:inline-flex;align-items:center;gap:10px;background:#000000;color:#FFFFFF;border:2px solid #000000;padding:12px 24px;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:.95rem;text-transform:uppercase;letter-spacing:.03em;border-radius:4px;box-shadow:var(--hard-shadow-sm);transition:all .15s;white-space:nowrap}
+.btn-explore-catalog:hover{background:var(--acc);border-color:#000000;color:#FFFFFF;transform:translate(-2px,-2px);box-shadow:var(--hard-shadow)}
+@media(max-width:960px){.tools-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.tools-grid{grid-template-columns:1fr}.tools-cta-bar{flex-direction:column;align-items:stretch;text-align:left}.btn-explore-catalog{justify-content:center}}
+
+/* Catalog Page Styles */
+.catalog-head{padding-top:clamp(120px,16vh,160px);padding-bottom:40px;border-bottom:var(--bw) solid #000000}
+.catalog-bar{display:flex;gap:16px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin:30px 0 20px}
+.filter-tabs{display:flex;gap:8px;flex-wrap:wrap}
+.filter-tab{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.85rem;background:#FFFFFF;color:#000000;border:2px solid #000000;border-radius:4px;padding:8px 16px;cursor:pointer;box-shadow:var(--hard-shadow-sm);transition:all .15s}
+.filter-tab:hover{background:#F0F0F0;transform:translate(-1px,-1px);box-shadow:var(--hard-shadow)}
+.filter-tab.active{background:#000000;color:#FFFFFF}
+.search-box{position:relative;flex:1;max-width:340px;min-width:240px}
+.search-input{width:100%;font-family:'JetBrains Mono',monospace;font-size:.88rem;padding:10px 14px;background:#FFFFFF;border:2px solid #000000;border-radius:4px;box-shadow:var(--hard-shadow-sm);outline:none}
+.search-input:focus{border-color:var(--acc);box-shadow:var(--hard-shadow)}
+.results-counter{font-family:'JetBrains Mono',monospace;font-size:.82rem;font-weight:700;color:#666666;margin:10px 0 24px}
+.empty-notice{display:none;padding:60px 20px;text-align:center;background:#FFFFFF;border:var(--bw) solid #000000;box-shadow:var(--hard-shadow);border-radius:4px;margin-top:20px}
+.empty-notice h3{font-family:'Space Grotesk',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:8px}
+.empty-notice p{color:#666666;font-size:.95rem}
+</style>
+</head>
+<body id="top">
+<div id="progress"></div><div id="glow"></div>
+
+<nav id="nav">
+  <div class="wrap">
+    <a href="index.html" class="logo"><span class="mk">MR</span><span>Manny Ruesch</span></a>
+    <div class="navlinks">
+      <a href="index.html#work" class="hide-sm">Work</a>
+      <a href="tools.html" class="hide-sm active" style="color:var(--acc);font-weight:800">Tools</a>
+      <a href="index.html#stack" class="hide-sm">Stack</a>
+      <a href="index.html#contact" class="hide-sm">Contact</a>
+      <a href="assets/cv-manny-ruesch.pdf" target="_blank" rel="noopener" class="hide-sm">CV ↗</a>
+      <a href="https://www.linkedin.com/in/manny-ruesch" target="_blank" rel="noopener" class="cta">LinkedIn ↗</a>
+    </div>
+  </div>
+</nav>
+
+<header class="catalog-head">
+  <div class="wrap">
+    <a href="index.html" class="mono" style="font-size:.82rem;font-weight:800;color:var(--acc);display:inline-flex;align-items:center;gap:6px;margin-bottom:18px">← Back to Portfolio</a>
+    <div class="eyebrow" style="margin-bottom:16px">MR Studio · Production Tools</div>
+    <h1 class="sec-h" style="font-size:clamp(2.2rem,4.5vw,3.6rem)">Ready-to-Deploy Engines &amp; Workflows.</h1>
+    <p style="color:#444444;font-size:1.15rem;max-width:64ch;margin-top:14px;line-height:1.5">
+      The complete arsenal of self-hosted automation scripts, autonomous agents, and programmatic content pipelines. Zero subscription fees, instant ZIP download, own the code forever.
+    </p>
+
+    <div class="catalog-bar">
+      <div class="filter-tabs" id="filter-tabs">
+        <button class="filter-tab active" data-filter="all">All Tools (6)</button>
+        <button class="filter-tab" data-filter="n8n">n8n Workflows</button>
+        <button class="filter-tab" data-filter="python">Python Pipelines</button>
+        <button class="filter-tab" data-filter="seo">SEO &amp; Content</button>
+        <button class="filter-tab" data-filter="rag">AI &amp; RAG</button>
+      </div>
+      <div class="search-box">
+        <input type="text" id="search-input" class="search-input" placeholder="Search keywords..." aria-label="Search tools">
+      </div>
+    </div>
+    <div class="results-counter" id="results-counter">Showing 6 of 6 production tools</div>
+  </div>
+</header>
+
+<main style="padding:40px 0 100px">
+  <div class="wrap">
+    <div class="tools-grid" id="tools-container">
+
+      <div class="tool-card rv" data-categories="n8n rag all" data-search="autonomous ai memory & rag sync (notion + airtable) zero-maintenance rag sync engine between notion, airtable crm, and gemini embeddings. continuous context for autonomous agents. n8n rag sync notion api airtable gemini">
+        <div class="tool-media">
+          <img src="assets/gumroad/ai-agent-memory-rag-sync-notion-airtable-n8n-20260929.png" alt="Autonomous AI Memory & RAG Sync (Notion + Airtable)" loading="lazy">
+          <span class="tool-price-tag">19 €</span>
+        </div>
+        <div class="tool-content">
+          <h4>Autonomous AI Memory & RAG Sync (Notion + Airtable)</h4>
+          <p>Zero-maintenance RAG sync engine between Notion, Airtable CRM, and Gemini embeddings. Continuous context for autonomous agents.</p>
+          <div class="tool-tags"><span class="tool-tag">n8n</span><span class="tool-tag">RAG Sync</span><span class="tool-tag">Notion API</span><span class="tool-tag">Airtable</span><span class="tool-tag">Gemini</span></div>
+          <div class="tool-actions">
+            <a href="https://mannyverse767.gumroad.com/l/ai-agent-memory-rag-sync-notion-airtable-n8n-20260929" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
+            <a href="https://whop.com/mr-studio-7faa/autonomous-ai-memory-rag-sync-for-notion-airtable-n8n-engine" target="_blank" rel="noopener" class="btn-whop">Whop ↗</a>
+          </div>
+        </div>
+      </div>
+      <div class="tool-card rv" data-categories="python seo all" data-search="programmatic seo markdown engine with quality gates high-velocity programmatic content generator in pure python. enforces strict automated quality filters, heading hierarchy, and zero fluff. python cli programmatic seo markdown quality gates">
+        <div class="tool-media">
+          <img src="assets/gumroad/programmatic-seo-markdown-generator-python-20260929.png" alt="Programmatic SEO Markdown Engine with Quality Gates" loading="lazy">
+          <span class="tool-price-tag">14 €</span>
+        </div>
+        <div class="tool-content">
+          <h4>Programmatic SEO Markdown Engine with Quality Gates</h4>
+          <p>High-velocity programmatic content generator in pure Python. Enforces strict automated quality filters, heading hierarchy, and zero fluff.</p>
+          <div class="tool-tags"><span class="tool-tag">Python</span><span class="tool-tag">CLI</span><span class="tool-tag">Programmatic SEO</span><span class="tool-tag">Markdown</span><span class="tool-tag">Quality Gates</span></div>
+          <div class="tool-actions">
+            <a href="https://mannyverse767.gumroad.com/l/programmatic-seo-markdown-generator-python-20260929" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
+            <a href="https://whop.com/mr-studio-7faa/programmatic-seo-engine-with-automated-quality-gates-python-markdown" target="_blank" rel="noopener" class="btn-whop">Whop ↗</a>
+          </div>
+        </div>
+      </div>
+      <div class="tool-card rv" data-categories="python seo all" data-search="programmatic seo engine: automated qc pipeline industrial-scale keyword clustering and article generator with real-time heuristic scoring, automated schema markup, and internal link routing. python automated qc seo pipeline data pipeline">
+        <div class="tool-media">
+          <img src="assets/gumroad/programmatic-seo-engine-python-qc-20260928.png" alt="Programmatic SEO Engine: Automated QC Pipeline" loading="lazy">
+          <span class="tool-price-tag">19 €</span>
+        </div>
+        <div class="tool-content">
+          <h4>Programmatic SEO Engine: Automated QC Pipeline</h4>
+          <p>Industrial-scale keyword clustering and article generator with real-time heuristic scoring, automated schema markup, and internal link routing.</p>
+          <div class="tool-tags"><span class="tool-tag">Python</span><span class="tool-tag">Automated QC</span><span class="tool-tag">SEO Pipeline</span><span class="tool-tag">Data Pipeline</span></div>
+          <div class="tool-actions">
+            <a href="https://mannyverse767.gumroad.com/l/programmatic-seo-engine-python-qc-20260928" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
+            <a href="https://whop.com/mr-studio-7faa/programmatic-seo-engine-python-pipeline-with-automated-quality-control" target="_blank" rel="noopener" class="btn-whop">Whop ↗</a>
+          </div>
+        </div>
+      </div>
+      <div class="tool-card rv" data-categories="n8n seo all" data-search="multilingual seo article generator & internal linking plug-and-play n8n workflow leveraging google autocomplete scraping and gemini flash to produce structured, multilingual articles on demand. n8n gemini flash google autocomplete markdown">
+        <div class="tool-media">
+          <img src="assets/gumroad/multilingual-seo-article-generator-n8n.png" alt="Multilingual SEO Article Generator & Internal Linking" loading="lazy">
+          <span class="tool-price-tag">19 €</span>
+        </div>
+        <div class="tool-content">
+          <h4>Multilingual SEO Article Generator & Internal Linking</h4>
+          <p>Plug-and-play n8n workflow leveraging Google Autocomplete scraping and Gemini Flash to produce structured, multilingual articles on demand.</p>
+          <div class="tool-tags"><span class="tool-tag">n8n</span><span class="tool-tag">Gemini Flash</span><span class="tool-tag">Google Autocomplete</span><span class="tool-tag">Markdown</span></div>
+          <div class="tool-actions">
+            <a href="https://mannyverse767.gumroad.com/l/multilingual-seo-article-generator-n8n" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
+            <a href="https://whop.com/mr-studio-7faa/multilingual-seo-article-generator-automated-internal-linking-n8n-gemini-w" target="_blank" rel="noopener" class="btn-whop">Whop ↗</a>
+          </div>
+        </div>
+      </div>
+      <div class="tool-card rv" data-categories="n8n rag all" data-search="autonomous b2b lead enrichment & scoring agent automated pipeline that scrapes icp prospect websites, discovers verified business emails via hunter, and scores lead warmth with llms. n8n lead scoring hunter.io autonomous agent">
+        <div class="tool-media">
+          <img src="assets/gumroad/autonomous-b2b-lead-enrichment-scoring-n8n-20260927.png" alt="Autonomous B2B Lead Enrichment & Scoring Agent" loading="lazy">
+          <span class="tool-price-tag">19 €</span>
+        </div>
+        <div class="tool-content">
+          <h4>Autonomous B2B Lead Enrichment & Scoring Agent</h4>
+          <p>Automated pipeline that scrapes ICP prospect websites, discovers verified business emails via Hunter, and scores lead warmth with LLMs.</p>
+          <div class="tool-tags"><span class="tool-tag">n8n</span><span class="tool-tag">Lead Scoring</span><span class="tool-tag">Hunter.io</span><span class="tool-tag">Autonomous Agent</span></div>
+          <div class="tool-actions">
+            <a href="https://mannyverse767.gumroad.com/l/autonomous-b2b-lead-enrichment-scoring-n8n-20260927" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
+            <a href="https://whop.com/mr-studio-7faa/autonomous-b2b-lead-enrichment-scoring-agent-n8n-ai-workflow" target="_blank" rel="noopener" class="btn-whop">Whop ↗</a>
+          </div>
+        </div>
+      </div>
+      <div class="tool-card rv" data-categories="n8n rag all" data-search="ai virtual home staging micro-saas & agency kit full production pipeline furnishing empty property photos in under 35 seconds. complete with webhook api, presets, and architecture guide. n8n nano banana pro micro-saas real estate">
+        <div class="tool-media">
+          <img src="assets/gumroad/ai-virtual-staging-n8n.png" alt="AI Virtual Home Staging Micro-SaaS & Agency Kit" loading="lazy">
+          <span class="tool-price-tag">39 €</span>
+        </div>
+        <div class="tool-content">
+          <h4>AI Virtual Home Staging Micro-SaaS & Agency Kit</h4>
+          <p>Full production pipeline furnishing empty property photos in under 35 seconds. Complete with webhook API, presets, and architecture guide.</p>
+          <div class="tool-tags"><span class="tool-tag">n8n</span><span class="tool-tag">Nano Banana Pro</span><span class="tool-tag">Micro-SaaS</span><span class="tool-tag">Real Estate</span></div>
+          <div class="tool-actions">
+            <a href="https://mannyverse767.gumroad.com/l/ai-virtual-staging-n8n" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
+            <a href="https://whop.com/mr-studio-7faa/ai-virtual-home-staging-micro-saas-agency-kit-n8n-gemini-workflow" target="_blank" rel="noopener" class="btn-whop">Whop ↗</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-notice" id="empty-notice">
+      <h3>No matching tools found</h3>
+      <p>Try searching with another keyword or reset the category filters.</p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="logo"><span class="mk">MR</span></div>
+    <div class="mono">Designed &amp; built by Manny Ruesch · 2026</div>
+    <div style="display:flex;gap:18px;align-items:center">
+      <a href="index.html#contact">Custom Pipeline Request ↗</a>
+      <a href="#top">Back to top ↑</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Real-time Instant Filter & Search
+(function(){
+  const tabs = document.querySelectorAll('.filter-tab');
+  const searchInput = document.getElementById('search-input');
+  const cards = document.querySelectorAll('#tools-container .tool-card');
+  const counter = document.getElementById('results-counter');
+  const empty = document.getElementById('empty-notice');
+
+  let currentFilter = 'all';
+  let searchQuery = '';
+
+  function applyFilter() {
+    let visible = 0;
+    cards.forEach(card => {
+      const cats = card.getAttribute('data-categories') || '';
+      const text = card.getAttribute('data-search') || '';
+      const matchCat = (currentFilter === 'all') || cats.includes(currentFilter);
+      const matchSearch = (!searchQuery) || text.includes(searchQuery.toLowerCase());
+
+      if (matchCat && matchSearch) {
+        card.style.display = 'flex';
+        visible++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    counter.textContent = `Showing ${visible} of ${cards.length} production tools`;
+    empty.style.display = (visible === 0) ? 'block' : 'none';
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentFilter = tab.getAttribute('data-filter');
+      applyFilter();
+    });
+  });
+
+  searchInput.addEventListener('input', (e) => {
+    searchQuery = e.target.value.trim();
+    applyFilter();
+  });
+})();
+</script>
+</body>
+</html>
