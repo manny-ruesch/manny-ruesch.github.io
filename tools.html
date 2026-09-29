@@ -21,13 +21,14 @@
 <link rel="stylesheet" href="assets/site.css">
 <style>
 
-/* ---- PRODUCTION TOOLS SHOWROOM (FEATURED 3) ---- */
+/* ---- PRODUCTION TOOLS SHOWROOM (FEATURED TOP 3) ---- */
 .tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(20px,2.5vw,28px);margin-top:20px}
-.tool-card{display:flex;flex-direction:column;background:#FFFFFF;border:var(--bw) solid #000000;box-shadow:var(--hard-shadow);border-radius:4px;overflow:hidden;transition:transform .15s var(--ease),box-shadow .15s var(--ease)}
-.tool-card:hover{transform:translate(-3px,-3px);box-shadow:var(--hard-shadow-lg)}
+.tool-card{display:flex;flex-direction:column;background:#FFFFFF;border:var(--bw) solid #000000;box-shadow:var(--hard-shadow);border-radius:4px;overflow:hidden;transition:transform .15s var(--ease),box-shadow .15s var(--ease);opacity:1 !important;transform:none !important}
+.tool-card:hover{transform:translate(-3px,-3px) !important;box-shadow:var(--hard-shadow-lg)}
 .tool-media{position:relative;width:100%;aspect-ratio:16/9;background:#0d1118;border-bottom:var(--bw) solid #000000;overflow:hidden}
 .tool-media img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s ease}
 .tool-card:hover .tool-media img{transform:scale(1.03)}
+.tool-badge-pill{position:absolute;top:12px;left:12px;background:#FFFFFF;color:var(--acc);border:2px solid #000000;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:800;border-radius:2px;box-shadow:var(--hard-shadow-sm);text-transform:uppercase}
 .tool-price-tag{position:absolute;top:12px;right:12px;background:#000000;color:#FFFFFF;border:2px solid #000000;padding:4px 10px;font-family:'JetBrains Mono',monospace;font-size:.82rem;font-weight:800;border-radius:3px;box-shadow:2px 2px 0px rgba(0,0,0,0.3)}
 .tool-content{padding:22px;display:flex;flex-direction:column;flex:1}
 .tool-content h4{font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:1.15rem;line-height:1.25;letter-spacing:-.01em;color:#000000;margin-bottom:10px}
@@ -111,14 +112,31 @@
   <div class="wrap">
     <div class="tools-grid" id="tools-container">
 
-      <div class="tool-card rv" data-categories="n8n rag all" data-search="autonomous ai memory & rag sync (notion + airtable) zero-maintenance rag sync engine between notion, airtable crm, and gemini embeddings. continuous context for autonomous agents. n8n rag sync notion api airtable gemini">
+      <div class="tool-card" data-categories="n8n rag all" data-search="ai virtual home staging micro-saas & agency kit full production pipeline furnishing empty property photos in under 35 seconds. complete with webhook api, custom presets, and architecture guide. n8n nano banana pro micro-saas real estate">
+        <div class="tool-media">
+          <img src="assets/gumroad/ai-virtual-staging-n8n.png" alt="AI Virtual Home Staging Micro-SaaS & Agency Kit" loading="lazy">
+          <span class="tool-badge-pill">FLAGSHIP MICRO-SAAS</span>
+          <span class="tool-price-tag">39 €</span>
+        </div>
+        <div class="tool-content">
+          <h4>AI Virtual Home Staging Micro-SaaS & Agency Kit</h4>
+          <p>Full production pipeline furnishing empty property photos in under 35 seconds. Complete with webhook API, custom presets, and architecture guide.</p>
+          <div class="tool-tags"><span class="tool-tag">n8n</span><span class="tool-tag">Nano Banana Pro</span><span class="tool-tag">Micro-SaaS</span><span class="tool-tag">Real Estate</span></div>
+          <div class="tool-actions">
+            <a href="https://mannyverse767.gumroad.com/l/ai-virtual-staging-n8n" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
+            <a href="https://whop.com/mr-studio-7faa/ai-virtual-home-staging-micro-saas-agency-kit-n8n-gemini-workflow" target="_blank" rel="noopener" class="btn-whop">Whop ↗</a>
+          </div>
+        </div>
+      </div>
+      <div class="tool-card" data-categories="n8n rag all" data-search="autonomous ai memory & rag sync (notion + airtable) zero-maintenance continuous rag sync engine between notion databases, airtable crm, and gemini embeddings for autonomous multi-agent systems. n8n rag sync notion api airtable gemini">
         <div class="tool-media">
           <img src="assets/gumroad/ai-agent-memory-rag-sync-notion-airtable-n8n-20260929.png" alt="Autonomous AI Memory & RAG Sync (Notion + Airtable)" loading="lazy">
+          <span class="tool-badge-pill">AUTONOMOUS RAG</span>
           <span class="tool-price-tag">19 €</span>
         </div>
         <div class="tool-content">
           <h4>Autonomous AI Memory & RAG Sync (Notion + Airtable)</h4>
-          <p>Zero-maintenance RAG sync engine between Notion, Airtable CRM, and Gemini embeddings. Continuous context for autonomous agents.</p>
+          <p>Zero-maintenance continuous RAG sync engine between Notion databases, Airtable CRM, and Gemini embeddings for autonomous multi-agent systems.</p>
           <div class="tool-tags"><span class="tool-tag">n8n</span><span class="tool-tag">RAG Sync</span><span class="tool-tag">Notion API</span><span class="tool-tag">Airtable</span><span class="tool-tag">Gemini</span></div>
           <div class="tool-actions">
             <a href="https://mannyverse767.gumroad.com/l/ai-agent-memory-rag-sync-notion-airtable-n8n-20260929" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
@@ -126,24 +144,26 @@
           </div>
         </div>
       </div>
-      <div class="tool-card rv" data-categories="python seo all" data-search="programmatic seo markdown engine with quality gates high-velocity programmatic content generator in pure python. enforces strict automated quality filters, heading hierarchy, and zero fluff. python cli programmatic seo markdown quality gates">
+      <div class="tool-card" data-categories="n8n rag all" data-search="autonomous b2b lead enrichment & scoring agent high-throughput pipeline that scrapes icp prospect domains, discovers verified professional emails via hunter api, and scores lead intent with llms. n8n lead scoring hunter.io autonomous agent">
         <div class="tool-media">
-          <img src="assets/gumroad/programmatic-seo-markdown-generator-python-20260929.png" alt="Programmatic SEO Markdown Engine with Quality Gates" loading="lazy">
-          <span class="tool-price-tag">14 €</span>
+          <img src="assets/gumroad/autonomous-b2b-lead-enrichment-scoring-n8n-20260927.png" alt="Autonomous B2B Lead Enrichment & Scoring Agent" loading="lazy">
+          <span class="tool-badge-pill">B2B AGENT</span>
+          <span class="tool-price-tag">19 €</span>
         </div>
         <div class="tool-content">
-          <h4>Programmatic SEO Markdown Engine with Quality Gates</h4>
-          <p>High-velocity programmatic content generator in pure Python. Enforces strict automated quality filters, heading hierarchy, and zero fluff.</p>
-          <div class="tool-tags"><span class="tool-tag">Python</span><span class="tool-tag">CLI</span><span class="tool-tag">Programmatic SEO</span><span class="tool-tag">Markdown</span><span class="tool-tag">Quality Gates</span></div>
+          <h4>Autonomous B2B Lead Enrichment & Scoring Agent</h4>
+          <p>High-throughput pipeline that scrapes ICP prospect domains, discovers verified professional emails via Hunter API, and scores lead intent with LLMs.</p>
+          <div class="tool-tags"><span class="tool-tag">n8n</span><span class="tool-tag">Lead Scoring</span><span class="tool-tag">Hunter.io</span><span class="tool-tag">Autonomous Agent</span></div>
           <div class="tool-actions">
-            <a href="https://mannyverse767.gumroad.com/l/programmatic-seo-markdown-generator-python-20260929" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
-            <a href="https://whop.com/mr-studio-7faa/programmatic-seo-engine-with-automated-quality-gates-python-markdown" target="_blank" rel="noopener" class="btn-whop">Whop ↗</a>
+            <a href="https://mannyverse767.gumroad.com/l/autonomous-b2b-lead-enrichment-scoring-n8n-20260927" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
+            <a href="https://whop.com/mr-studio-7faa/autonomous-b2b-lead-enrichment-scoring-agent-n8n-ai-workflow" target="_blank" rel="noopener" class="btn-whop">Whop ↗</a>
           </div>
         </div>
       </div>
-      <div class="tool-card rv" data-categories="python seo all" data-search="programmatic seo engine: automated qc pipeline industrial-scale keyword clustering and article generator with real-time heuristic scoring, automated schema markup, and internal link routing. python automated qc seo pipeline data pipeline">
+      <div class="tool-card" data-categories="python seo all" data-search="programmatic seo engine: automated qc pipeline industrial-scale keyword clustering and article generator with real-time heuristic scoring, automated schema markup, and internal link routing. python automated qc seo pipeline data pipeline">
         <div class="tool-media">
           <img src="assets/gumroad/programmatic-seo-engine-python-qc-20260928.png" alt="Programmatic SEO Engine: Automated QC Pipeline" loading="lazy">
+          
           <span class="tool-price-tag">19 €</span>
         </div>
         <div class="tool-content">
@@ -156,9 +176,10 @@
           </div>
         </div>
       </div>
-      <div class="tool-card rv" data-categories="n8n seo all" data-search="multilingual seo article generator & internal linking plug-and-play n8n workflow leveraging google autocomplete scraping and gemini flash to produce structured, multilingual articles on demand. n8n gemini flash google autocomplete markdown">
+      <div class="tool-card" data-categories="n8n seo all" data-search="multilingual seo article generator & internal linking plug-and-play n8n workflow leveraging google autocomplete scraping and gemini flash to produce structured, multilingual articles on demand. n8n gemini flash google autocomplete markdown">
         <div class="tool-media">
           <img src="assets/gumroad/multilingual-seo-article-generator-n8n.png" alt="Multilingual SEO Article Generator & Internal Linking" loading="lazy">
+          
           <span class="tool-price-tag">19 €</span>
         </div>
         <div class="tool-content">
@@ -171,33 +192,19 @@
           </div>
         </div>
       </div>
-      <div class="tool-card rv" data-categories="n8n rag all" data-search="autonomous b2b lead enrichment & scoring agent automated pipeline that scrapes icp prospect websites, discovers verified business emails via hunter, and scores lead warmth with llms. n8n lead scoring hunter.io autonomous agent">
+      <div class="tool-card" data-categories="python seo all" data-search="programmatic seo markdown engine with quality gates high-velocity programmatic content generator in pure python. enforces strict automated quality filters, heading hierarchy, and zero fluff. python cli programmatic seo markdown quality gates">
         <div class="tool-media">
-          <img src="assets/gumroad/autonomous-b2b-lead-enrichment-scoring-n8n-20260927.png" alt="Autonomous B2B Lead Enrichment & Scoring Agent" loading="lazy">
-          <span class="tool-price-tag">19 €</span>
+          <img src="assets/gumroad/programmatic-seo-markdown-generator-python-20260929.png" alt="Programmatic SEO Markdown Engine with Quality Gates" loading="lazy">
+          
+          <span class="tool-price-tag">14 €</span>
         </div>
         <div class="tool-content">
-          <h4>Autonomous B2B Lead Enrichment & Scoring Agent</h4>
-          <p>Automated pipeline that scrapes ICP prospect websites, discovers verified business emails via Hunter, and scores lead warmth with LLMs.</p>
-          <div class="tool-tags"><span class="tool-tag">n8n</span><span class="tool-tag">Lead Scoring</span><span class="tool-tag">Hunter.io</span><span class="tool-tag">Autonomous Agent</span></div>
+          <h4>Programmatic SEO Markdown Engine with Quality Gates</h4>
+          <p>High-velocity programmatic content generator in pure Python. Enforces strict automated quality filters, heading hierarchy, and zero fluff.</p>
+          <div class="tool-tags"><span class="tool-tag">Python</span><span class="tool-tag">CLI</span><span class="tool-tag">Programmatic SEO</span><span class="tool-tag">Markdown</span><span class="tool-tag">Quality Gates</span></div>
           <div class="tool-actions">
-            <a href="https://mannyverse767.gumroad.com/l/autonomous-b2b-lead-enrichment-scoring-n8n-20260927" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
-            <a href="https://whop.com/mr-studio-7faa/autonomous-b2b-lead-enrichment-scoring-agent-n8n-ai-workflow" target="_blank" rel="noopener" class="btn-whop">Whop ↗</a>
-          </div>
-        </div>
-      </div>
-      <div class="tool-card rv" data-categories="n8n rag all" data-search="ai virtual home staging micro-saas & agency kit full production pipeline furnishing empty property photos in under 35 seconds. complete with webhook api, presets, and architecture guide. n8n nano banana pro micro-saas real estate">
-        <div class="tool-media">
-          <img src="assets/gumroad/ai-virtual-staging-n8n.png" alt="AI Virtual Home Staging Micro-SaaS & Agency Kit" loading="lazy">
-          <span class="tool-price-tag">39 €</span>
-        </div>
-        <div class="tool-content">
-          <h4>AI Virtual Home Staging Micro-SaaS & Agency Kit</h4>
-          <p>Full production pipeline furnishing empty property photos in under 35 seconds. Complete with webhook API, presets, and architecture guide.</p>
-          <div class="tool-tags"><span class="tool-tag">n8n</span><span class="tool-tag">Nano Banana Pro</span><span class="tool-tag">Micro-SaaS</span><span class="tool-tag">Real Estate</span></div>
-          <div class="tool-actions">
-            <a href="https://mannyverse767.gumroad.com/l/ai-virtual-staging-n8n" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
-            <a href="https://whop.com/mr-studio-7faa/ai-virtual-home-staging-micro-saas-agency-kit-n8n-gemini-workflow" target="_blank" rel="noopener" class="btn-whop">Whop ↗</a>
+            <a href="https://mannyverse767.gumroad.com/l/programmatic-seo-markdown-generator-python-20260929" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
+            <a href="https://whop.com/mr-studio-7faa/programmatic-seo-engine-with-automated-quality-gates-python-markdown" target="_blank" rel="noopener" class="btn-whop">Whop ↗</a>
           </div>
         </div>
       </div>
@@ -221,6 +228,7 @@
   </div>
 </footer>
 
+<script src="assets/site.js"></script>
 <script>
 // Real-time Instant Filter & Search
 (function(){
