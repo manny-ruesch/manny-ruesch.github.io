@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Manny Ruesch - Resume</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap');
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  html, body {
+    width: 210mm;
+    height: 297mm;
+    overflow: hidden;
+  }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: #1A202C;
+    background: #FFFFFF;
+    line-height: 1.42;
+    font-size: 8.8pt;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    padding: 11mm 14mm;
+  }
+
+  /* Header */
+  .header {
+    border-bottom: 2px solid #0F172A;
+    padding-bottom: 10px;
+    margin-bottom: 11px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .header-left h1 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 24pt;
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    color: #0F172A;
+    line-height: 1;
+  }
+  .header-left .role {
+    font-size: 10pt;
+    font-weight: 700;
+    color: #C81D3E;
+    margin-top: 4px;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  .header-right {
+    text-align: right;
+    font-size: 8.2pt;
+    color: #475569;
+    line-height: 1.5;
+  }
+  .header-right a {
+    color: #0F172A;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .header-right .contact-line {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    align-items: center;
+  }
+
+  /* Summary */
+  .summary {
+    font-size: 8.8pt;
+    color: #334155;
+    line-height: 1.48;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #E2E8F0;
+  }
+  .summary b {
+    color: #0F172A;
+    font-weight: 700;
+  }
+
+  /* 2-Column Grid */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 67mm;
+    gap: 12mm;
+  }
+
+  /* Section titles */
+  .section-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 9.8pt;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #0F172A;
+    border-bottom: 1.5px solid #0F172A;
+    padding-bottom: 3px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .section-title .sub-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7pt;
+    color: #64748B;
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+
+  /* Experience Entries */
+  .item {
+    margin-bottom: 11px;
+  }
+  .item:last-child {
+    margin-bottom: 0;
+  }
+  .item-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .item-company {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 9.5pt;
+    font-weight: 800;
+    color: #0F172A;
+  }
+  .item-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7.6pt;
+    color: #64748B;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .item-sub {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: 1px;
+    margin-bottom: 4px;
+  }
+  .item-title {
+    font-size: 8.8pt;
+    font-weight: 650;
+    color: #C81D3E;
+  }
+  .item-location {
+    font-size: 7.6pt;
+    color: #64748B;
+    font-weight: 500;
+    font-style: italic;
+  }
+
+  .bullets {
+    list-style: none;
+    padding-left: 0;
+  }
+  .bullets li {
+    position: relative;
+    padding-left: 12px;
+    font-size: 8.3pt;
+    color: #334155;
+    line-height: 1.4;
+    margin-bottom: 4px;
+  }
+  .bullets li:last-child {
+    margin-bottom: 0;
+  }
+  .bullets li::before {
+    content: "▪";
+    position: absolute;
+    left: 0;
+    color: #C81D3E;
+    font-size: 8pt;
+    line-height: 1.2;
+  }
+  .bullets li b {
+    color: #0F172A;
+    font-weight: 650;
+  }
+
+  /* Side column blocks */
+  .side-block {
+    margin-bottom: 13px;
+  }
+  .side-block:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Impact Metrics */
+  .metric-badge {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-left: 3.5px solid #C81D3E;
+    padding: 6px 9px;
+    margin-bottom: 6px;
+    border-radius: 3px;
+  }
+  .metric-badge .m-val {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 11pt;
+    color: #0F172A;
+    line-height: 1.1;
+  }
+  .metric-badge .m-lbl {
+    font-size: 7.2pt;
+    color: #475569;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    margin-top: 2px;
+  }
+
+  /* Skills */
+  .skill-group {
+    margin-bottom: 8px;
+  }
+  .skill-group:last-child {
+    margin-bottom: 0;
+  }
+  .skill-group-name {
+    font-size: 8.1pt;
+    font-weight: 750;
+    color: #0F172A;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 1.5px;
+  }
+  .skill-group-desc {
+    font-size: 7.9pt;
+    color: #475569;
+    line-height: 1.36;
+  }
+
+  /* Education */
+  .edu-item {
+    margin-bottom: 8px;
+  }
+  .edu-item:last-child {
+    margin-bottom: 0;
+  }
+  .edu-degree {
+    font-size: 8.6pt;
+    font-weight: 750;
+    color: #0F172A;
+    line-height: 1.25;
+  }
+  .edu-school {
+    font-size: 8.1pt;
+    font-weight: 650;
+    color: #C81D3E;
+  }
+  .edu-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7.2pt;
+    color: #64748B;
+    font-weight: 600;
+  }
+  .edu-detail {
+    font-size: 7.6pt;
+    color: #64748B;
+    margin-top: 1px;
+    line-height: 1.22;
+  }
+
+  /* Languages */
+  .lang-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 8.1pt;
+    padding: 3px 0;
+    border-bottom: 1px dashed #E2E8F0;
+  }
+  .lang-row:last-child {
+    border-bottom: none;
+  }
+  .lang-name {
+    font-weight: 650;
+    color: #0F172A;
+  }
+  .lang-level {
+    color: #64748B;
+    font-weight: 500;
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-left">
+    <h1>Manny Ruesch</h1>
+    <div class="role">AI &amp; Automation Engineer · Full-Remote / Berlin</div>
+  </div>
+  <div class="header-right">
+    <div class="contact-line">
+      <a href="mailto:manny.ruesch@gmail.com">manny.ruesch@gmail.com</a>
+      <span>•</span>
+      <span>+33 6 12 63 03 31</span>
+    </div>
+    <div>Portfolio: <a href="https://manny-ruesch.github.io" target="_blank">manny-ruesch.github.io</a></div>
+    <div>GitHub: <a href="https://github.com/manny-ruesch" target="_blank">github.com/manny-ruesch</a></div>
+    <div>LinkedIn: <a href="https://linkedin.com/in/manny-ruesch" target="_blank">linkedin.com/in/manny-ruesch</a></div>
+  </div>
+</header>
+
+<div class="summary">
+  <b>Hybrid AI &amp; Automation Engineer</b> operating at the intersection of workflow orchestration, LLM engineering, and growth operations. Proven track record architecting <b>32+ production n8n workflows</b>, multi-agent AI systems, and automated data pipelines that eliminate manual operations. Expert in prompt chaining, API integrations, and programmatic execution. Fluent in <b>English (C1) and French (Native)</b>.
+</div>
+
+<div class="grid">
+  <!-- MAIN COLUMN: EXPERIENCE & SYSTEMS -->
+  <div class="main-col">
+    <div class="section-title">
+      <span>Professional Experience</span>
+      <span class="sub-tag">Systems &amp; Production</span>
+    </div>
+
+    <!-- ADEN IMMO -->
+    <div class="item">
+      <div class="item-top">
+        <span class="item-company">ADEN Immo GmbH</span>
+        <span class="item-date">Jan 2026 – Jul 2026</span>
+      </div>
+      <div class="item-sub">
+        <span class="item-title">Digital Marketing &amp; AI Automation Intern</span>
+        <span class="item-location">Berlin, Germany</span>
+      </div>
+      <ul class="bullets">
+        <li><b>Workflow Automation Architecture (n8n):</b> Designed, deployed, and monitored 30+ automated workflows connecting onOffice CRM, communication channels, and internal databases, reducing manual team overhead by ~350 hours/month.</li>
+        <li><b>LLM Pipelines &amp; AI Integration:</b> Built production LLM chains (OpenAI, Gemini) for automated multilingual content generation (DE / EN / FR), lead qualification, and multimodal document extraction with structured JSON schemas and automated validation.</li>
+        <li><b>Programmatic SEO &amp; Growth:</b> Engineered programmatic keyword clustering, landing page generation, and content tracking pipelines, driving continuous organic visibility gains in competitive prime Berlin districts.</li>
+        <li><b>Data Infrastructure &amp; UX:</b> Analyzed traffic attribution and user journeys via GA4 and Search Console; deployed custom webhooks, automated lead scoring, and routing to sales brokers.</li>
+      </ul>
+    </div>
+
+    <!-- INDEPENDENT BUILDER -->
+    <div class="item">
+      <div class="item-top">
+        <span class="item-company">AI Systems &amp; Autonomous Pipelines</span>
+        <span class="item-date">2025 – Present</span>
+      </div>
+      <div class="item-sub">
+        <span class="item-title">Independent AI Builder &amp; Engineer</span>
+        <span class="item-location">Remote / Production</span>
+      </div>
+      <ul class="bullets">
+        <li><b>AI Home-Staging Pipeline:</b> Developed a high-speed multimodal generative pipeline transforming empty interior photography into furnished listings in ~33s at sub-cent inference cost.</li>
+        <li><b>Autonomous B2B Lead Enrichment:</b> Engineered an automated waterfall scraper in n8n &amp; Python, discovering company hiring signals, enriching decision-makers via APIs, and applying LLM relevance scoring.</li>
+        <li><b>Multi-Agent RAG Sync Engine:</b> Built a bidirectional synchronization system between Notion, Airtable, and vector embeddings using critic-judge verification loops for high-reliability outputs.</li>
+        <li><b>Autonomous Commerce Pipelines:</b> Built and scheduled multi-channel distribution engines publishing automated digital products to Gumroad &amp; Whop via REST APIs.</li>
+      </ul>
+    </div>
+
+    <!-- PREVIOUS ROLES -->
+    <div class="item">
+      <div class="item-top">
+        <span class="item-company">Prytanée Sportif</span>
+        <span class="item-date">Sept 2025 – Dec 2025</span>
+      </div>
+      <div class="item-sub">
+        <span class="item-title">Youth Educator (Elite Athlete Academy)</span>
+        <span class="item-location">Pau, France</span>
+      </div>
+      <ul class="bullets">
+        <li>Supervised academic monitoring and operational routines for student-athletes; coordinated cross-functional communication between coaching staff, administration, and families.</li>
+      </ul>
+    </div>
+
+    <div class="item">
+      <div class="item-top">
+        <span class="item-company">Bijouterie Aélys</span>
+        <span class="item-date">Apr 2024 – Jun 2024</span>
+      </div>
+      <div class="item-sub">
+        <span class="item-title">Marketing &amp; Operations Intern</span>
+        <span class="item-location">Pau, France</span>
+      </div>
+      <ul class="bullets">
+        <li>Hands-on CRM customer segmentation, omnichannel stock logistics tracking, and promotional copy across digital channels.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SIDEBAR COLUMN: IMPACT, STACK, EDUCATION, LANGUAGES -->
+  <div class="side-col">
+    <!-- PROVEN METRICS -->
+    <div class="side-block">
+      <div class="section-title">Key Impact</div>
+      <div class="metric-badge">
+        <div class="m-val">32+ Workflows</div>
+        <div class="m-lbl">Active in Production (n8n)</div>
+      </div>
+      <div class="metric-badge">
+        <div class="m-val">~350 h / mo</div>
+        <div class="m-lbl">Saved via automation</div>
+      </div>
+      <div class="metric-badge">
+        <div class="m-val">~720 ops / mo</div>
+        <div class="m-lbl">Automated business operations</div>
+      </div>
+    </div>
+
+    <!-- TECHNICAL STACK -->
+    <div class="side-block">
+      <div class="section-title">Technical Stack</div>
+      
+      <div class="skill-group">
+        <div class="skill-group-name">Workflow Automation</div>
+        <div class="skill-group-desc">n8n (Self-hosted &amp; Cloud), Make, Webhooks, REST APIs, JSON data transformation</div>
+      </div>
+
+      <div class="skill-group">
+        <div class="skill-group-name">AI &amp; LLM Engineering</div>
+        <div class="skill-group-desc">OpenAI API, Anthropic Claude, Gemini, Multi-Agent Architectures, Prompt Chaining, Structured Output</div>
+      </div>
+
+      <div class="skill-group">
+        <div class="skill-group-name">Development &amp; Infra</div>
+        <div class="skill-group-desc">Python (Scraping, Data, Automation), JavaScript / TypeScript, FastAPI, Docker, Linux VPS, Git</div>
+      </div>
+
+      <div class="skill-group">
+        <div class="skill-group-name">Data &amp; Platforms</div>
+        <div class="skill-group-desc">PostgreSQL, NocoDB, GA4, Search Console, onOffice CRM, HubSpot</div>
+      </div>
+    </div>
+
+    <!-- EDUCATION -->
+    <div class="side-block">
+      <div class="section-title">Education</div>
+
+      <div class="edu-item">
+        <div class="edu-degree">MSc Finance &amp; Data Analytics</div>
+        <div class="edu-school">éklore-ed School of Management</div>
+        <div class="edu-date">2026 – 2028 · In progress</div>
+      </div>
+
+      <div class="edu-item">
+        <div class="edu-degree">Academic Exchange</div>
+        <div class="edu-school">Sejong University · Seoul, S. Korea</div>
+        <div class="edu-date">Feb 2025 – Jun 2025</div>
+        <div class="edu-detail">AI in Industry, Media Planning, Hospitality Management (Taught in English)</div>
+      </div>
+
+      <div class="edu-item">
+        <div class="edu-degree">Bachelor Business &amp; Marketing</div>
+        <div class="edu-school">éklore-ed School of Management</div>
+        <div class="edu-date">2023 – 2025 · Pau, France</div>
+        <div class="edu-detail">Specializations: Finance, Marketing &amp; Data Management</div>
+      </div>
+    </div>
+
+    <!-- LANGUAGES -->
+    <div class="side-block">
+      <div class="section-title">Languages</div>
+      <div class="lang-row">
+        <span class="lang-name">French</span>
+        <span class="lang-level">Native</span>
+      </div>
+      <div class="lang-row">
+        <span class="lang-name">English</span>
+        <span class="lang-level">C1 · Full Professional</span>
+      </div>
+      <div class="lang-row">
+        <span class="lang-name">Spanish</span>
+        <span class="lang-level">B1 · Professional</span>
+      </div>
+      <div class="lang-row">
+        <span class="lang-name">German</span>
+        <span class="lang-level">Elementary / Berlin exp.</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
