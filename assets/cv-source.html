@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Manny Ruesch - Resume</title>
+<title>Manny Ruesch — Resume</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
 
   @page {
     size: A4 portrait;
@@ -21,54 +21,55 @@
     overflow: hidden;
   }
   body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    color: #1A202C;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #26221F;
     background: #FFFFFF;
-    line-height: 1.42;
+    line-height: 1.44;
     font-size: 8.8pt;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
-    padding: 11mm 14mm;
+    padding: 13mm 15mm;
   }
 
   /* Header */
   .header {
-    border-bottom: 2px solid #0F172A;
-    padding-bottom: 10px;
-    margin-bottom: 11px;
+    border-bottom: 1.5px solid #26221F;
+    padding-bottom: 12px;
+    margin-bottom: 14px;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
   }
   .header-left h1 {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 24pt;
-    font-weight: 800;
-    letter-spacing: -0.035em;
-    color: #0F172A;
-    line-height: 1;
+    font-family: 'Newsreader', Georgia, serif;
+    font-size: 27pt;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: #1A1715;
+    line-height: 0.98;
   }
   .header-left .role {
-    font-size: 10pt;
-    font-weight: 700;
-    color: #C81D3E;
-    margin-top: 4px;
-    letter-spacing: -0.01em;
-    text-transform: uppercase;
     font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 9.5pt;
+    font-weight: 600;
+    color: #8C5332;
+    margin-top: 6px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
   }
   .header-right {
     text-align: right;
     font-size: 8.2pt;
-    color: #475569;
-    line-height: 1.5;
+    color: #635C55;
+    line-height: 1.55;
   }
   .header-right a {
-    color: #0F172A;
+    color: #26221F;
     text-decoration: none;
-    font-weight: 600;
+    font-weight: 500;
+    border-bottom: 1px solid #D1C9BF;
   }
-  .header-right .contact-line {
+  .header-right .contact-row {
     display: flex;
     justify-content: flex-end;
     gap: 8px;
@@ -77,51 +78,55 @@
 
   /* Summary */
   .summary {
-    font-size: 8.8pt;
-    color: #334155;
-    line-height: 1.48;
-    margin-bottom: 12px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #E2E8F0;
+    font-family: 'Newsreader', Georgia, serif;
+    font-size: 10.2pt;
+    font-style: italic;
+    color: #3D3732;
+    line-height: 1.5;
+    margin-bottom: 15px;
+    padding-bottom: 13px;
+    border-bottom: 1px solid #EAE5DE;
   }
   .summary b {
-    color: #0F172A;
-    font-weight: 700;
+    font-style: normal;
+    font-weight: 600;
+    color: #1A1715;
   }
 
   /* 2-Column Grid */
   .grid {
     display: grid;
-    grid-template-columns: 1fr 67mm;
-    gap: 12mm;
+    grid-template-columns: 1fr 66mm;
+    gap: 13mm;
   }
 
-  /* Section titles */
+  /* Section Titles */
   .section-title {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 9.8pt;
-    font-weight: 800;
-    letter-spacing: 0.05em;
+    font-size: 8.8pt;
+    font-weight: 700;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #0F172A;
-    border-bottom: 1.5px solid #0F172A;
-    padding-bottom: 3px;
-    margin-bottom: 10px;
+    color: #1A1715;
+    border-bottom: 1px solid #1A1715;
+    padding-bottom: 3.5px;
+    margin-bottom: 11px;
     display: flex;
     justify-content: space-between;
     align-items: baseline;
   }
   .section-title .sub-tag {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 7pt;
-    color: #64748B;
-    font-weight: 600;
+    font-family: 'Newsreader', serif;
+    font-style: italic;
+    font-size: 8.2pt;
+    color: #7D736A;
+    text-transform: none;
     letter-spacing: 0;
   }
 
-  /* Experience Entries */
+  /* Experience Items */
   .item {
-    margin-bottom: 11px;
+    margin-bottom: 12px;
   }
   .item:last-child {
     margin-bottom: 0;
@@ -132,16 +137,18 @@
     align-items: baseline;
   }
   .item-company {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 9.5pt;
-    font-weight: 800;
-    color: #0F172A;
+    font-family: 'Newsreader', Georgia, serif;
+    font-size: 11.2pt;
+    font-weight: 600;
+    color: #1A1715;
+    letter-spacing: -0.01em;
   }
   .item-date {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 7.6pt;
-    color: #64748B;
-    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 7.5pt;
+    color: #7D736A;
+    font-weight: 500;
+    letter-spacing: 0.02em;
     white-space: nowrap;
   }
   .item-sub {
@@ -149,17 +156,16 @@
     justify-content: space-between;
     align-items: baseline;
     margin-top: 1px;
-    margin-bottom: 4px;
+    margin-bottom: 5px;
   }
   .item-title {
-    font-size: 8.8pt;
-    font-weight: 650;
-    color: #C81D3E;
+    font-size: 8.4pt;
+    font-weight: 600;
+    color: #8C5332;
   }
   .item-location {
     font-size: 7.6pt;
-    color: #64748B;
-    font-weight: 500;
+    color: #8A8177;
     font-style: italic;
   }
 
@@ -170,28 +176,27 @@
   .bullets li {
     position: relative;
     padding-left: 12px;
-    font-size: 8.3pt;
-    color: #334155;
-    line-height: 1.4;
+    font-size: 8.25pt;
+    color: #3D3732;
+    line-height: 1.42;
     margin-bottom: 4px;
   }
   .bullets li:last-child {
     margin-bottom: 0;
   }
   .bullets li::before {
-    content: "▪";
+    content: "—";
     position: absolute;
     left: 0;
-    color: #C81D3E;
+    color: #8C5332;
     font-size: 8pt;
-    line-height: 1.2;
   }
   .bullets li b {
-    color: #0F172A;
-    font-weight: 650;
+    color: #1A1715;
+    font-weight: 600;
   }
 
-  /* Side column blocks */
+  /* Sidebar blocks */
   .side-block {
     margin-bottom: 13px;
   }
@@ -199,29 +204,29 @@
     margin-bottom: 0;
   }
 
-  /* Impact Metrics */
-  .metric-badge {
-    background: #F8FAFC;
-    border: 1px solid #E2E8F0;
-    border-left: 3.5px solid #C81D3E;
-    padding: 6px 9px;
+  /* Impact Metrics - Elegant Editorial Cards */
+  .metric-card {
+    background: #FAF8F5;
+    border: 1px solid #EAE5DE;
+    padding: 6.5px 10px;
     margin-bottom: 6px;
-    border-radius: 3px;
+    border-radius: 2px;
   }
-  .metric-badge .m-val {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-weight: 800;
-    font-size: 11pt;
-    color: #0F172A;
+  .metric-card .m-val {
+    font-family: 'Newsreader', Georgia, serif;
+    font-size: 13.5pt;
+    font-weight: 500;
+    color: #1A1715;
     line-height: 1.1;
   }
-  .metric-badge .m-lbl {
-    font-size: 7.2pt;
-    color: #475569;
+  .metric-card .m-lbl {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 7pt;
+    color: #7D736A;
     text-transform: uppercase;
-    font-weight: 700;
-    letter-spacing: 0.03em;
-    margin-top: 2px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    margin-top: 1.5px;
   }
 
   /* Skills */
@@ -232,46 +237,47 @@
     margin-bottom: 0;
   }
   .skill-group-name {
-    font-size: 8.1pt;
-    font-weight: 750;
-    color: #0F172A;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 7.8pt;
+    font-weight: 700;
+    color: #1A1715;
     text-transform: uppercase;
-    letter-spacing: 0.03em;
-    margin-bottom: 1.5px;
+    letter-spacing: 0.04em;
+    margin-bottom: 2px;
   }
   .skill-group-desc {
     font-size: 7.9pt;
-    color: #475569;
+    color: #5C554E;
     line-height: 1.36;
   }
 
   /* Education */
   .edu-item {
-    margin-bottom: 8px;
+    margin-bottom: 8.5px;
   }
   .edu-item:last-child {
     margin-bottom: 0;
   }
   .edu-degree {
-    font-size: 8.6pt;
-    font-weight: 750;
-    color: #0F172A;
-    line-height: 1.25;
+    font-family: 'Newsreader', Georgia, serif;
+    font-size: 9.8pt;
+    font-weight: 600;
+    color: #1A1715;
+    line-height: 1.2;
   }
   .edu-school {
-    font-size: 8.1pt;
-    font-weight: 650;
-    color: #C81D3E;
+    font-size: 7.9pt;
+    font-weight: 600;
+    color: #8C5332;
   }
   .edu-date {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 7.2pt;
-    color: #64748B;
-    font-weight: 600;
+    color: #8A8177;
   }
   .edu-detail {
     font-size: 7.6pt;
-    color: #64748B;
+    color: #6E665E;
     margin-top: 1px;
     line-height: 1.22;
   }
@@ -280,20 +286,19 @@
   .lang-row {
     display: flex;
     justify-content: space-between;
-    font-size: 8.1pt;
+    font-size: 8pt;
     padding: 3px 0;
-    border-bottom: 1px dashed #E2E8F0;
+    border-bottom: 1px dashed #EAE5DE;
   }
   .lang-row:last-child {
     border-bottom: none;
   }
   .lang-name {
-    font-weight: 650;
-    color: #0F172A;
+    font-weight: 600;
+    color: #1A1715;
   }
   .lang-level {
-    color: #64748B;
-    font-weight: 500;
+    color: #7D736A;
   }
 </style>
 </head>
@@ -302,22 +307,22 @@
 <header class="header">
   <div class="header-left">
     <h1>Manny Ruesch</h1>
-    <div class="role">AI &amp; Automation Engineer · Full-Remote / Berlin</div>
+    <div class="role">AI &amp; Automation Builder · Operations, Growth &amp; Systems</div>
   </div>
   <div class="header-right">
-    <div class="contact-line">
+    <div class="contact-row">
       <a href="mailto:manny.ruesch@gmail.com">manny.ruesch@gmail.com</a>
-      <span>•</span>
+      <span>·</span>
       <span>+33 6 12 63 03 31</span>
     </div>
     <div>Portfolio: <a href="https://manny-ruesch.github.io" target="_blank">manny-ruesch.github.io</a></div>
-    <div>GitHub: <a href="https://github.com/manny-ruesch" target="_blank">github.com/manny-ruesch</a></div>
     <div>LinkedIn: <a href="https://linkedin.com/in/manny-ruesch" target="_blank">linkedin.com/in/manny-ruesch</a></div>
+    <div>GitHub: <a href="https://github.com/manny-ruesch" target="_blank">github.com/manny-ruesch</a></div>
   </div>
 </header>
 
 <div class="summary">
-  <b>Hybrid AI &amp; Automation Engineer</b> operating at the intersection of workflow orchestration, LLM engineering, and growth operations. Proven track record architecting <b>32+ production n8n workflows</b>, multi-agent AI systems, and automated data pipelines that eliminate manual operations. Expert in prompt chaining, API integrations, and programmatic execution. Fluent in <b>English (C1) and French (Native)</b>.
+  Marketing automation and AI systems builder working at the crossroads of business operations, growth, and generative AI. Proven experience designing <b>32+ autonomous production workflows</b>, custom LLM pipelines, and automated lead infrastructure that save hundreds of operational hours monthly. Fluent in <b>English (C1) and French (Native)</b>.
 </div>
 
 <div class="grid">
@@ -325,7 +330,7 @@
   <div class="main-col">
     <div class="section-title">
       <span>Professional Experience</span>
-      <span class="sub-tag">Systems &amp; Production</span>
+      <span class="sub-tag">Production &amp; Systems</span>
     </div>
 
     <!-- ADEN IMMO -->
@@ -339,28 +344,28 @@
         <span class="item-location">Berlin, Germany</span>
       </div>
       <ul class="bullets">
-        <li><b>Workflow Automation Architecture (n8n):</b> Designed, deployed, and monitored 30+ automated workflows connecting onOffice CRM, communication channels, and internal databases, reducing manual team overhead by ~350 hours/month.</li>
-        <li><b>LLM Pipelines &amp; AI Integration:</b> Built production LLM chains (OpenAI, Gemini) for automated multilingual content generation (DE / EN / FR), lead qualification, and multimodal document extraction with structured JSON schemas and automated validation.</li>
-        <li><b>Programmatic SEO &amp; Growth:</b> Engineered programmatic keyword clustering, landing page generation, and content tracking pipelines, driving continuous organic visibility gains in competitive prime Berlin districts.</li>
-        <li><b>Data Infrastructure &amp; UX:</b> Analyzed traffic attribution and user journeys via GA4 and Search Console; deployed custom webhooks, automated lead scoring, and routing to sales brokers.</li>
+        <li><b>Workflow Automation Architecture (n8n):</b> Designed and deployed 30+ production workflows bridging onOffice CRM, communication channels, and databases, saving ~350 hours per month across sales and operations.</li>
+        <li><b>Generative AI Integration:</b> Built production LLM pipelines (OpenAI API, Gemini) automating multilingual property listing generation (DE / EN / FR), lead qualification, and document data extraction with schema validation.</li>
+        <li><b>Programmatic SEO &amp; Growth:</b> Engineered programmatic keyword research, localized landing page generation, and search performance pipelines, scaling organic search visibility in prime Berlin districts.</li>
+        <li><b>Data Operations &amp; UX:</b> Analyzed traffic attribution and user conversion funnels via GA4 and Search Console; implemented webhook-driven lead routing and automated scoring for agents.</li>
       </ul>
     </div>
 
     <!-- INDEPENDENT BUILDER -->
     <div class="item">
       <div class="item-top">
-        <span class="item-company">AI Systems &amp; Autonomous Pipelines</span>
+        <span class="item-company">Independent AI Systems &amp; Automation</span>
         <span class="item-date">2025 – Present</span>
       </div>
       <div class="item-sub">
-        <span class="item-title">Independent AI Builder &amp; Engineer</span>
-        <span class="item-location">Remote / Production</span>
+        <span class="item-title">Designer &amp; Builder</span>
+        <span class="item-location">Production Deployments</span>
       </div>
       <ul class="bullets">
-        <li><b>AI Home-Staging Pipeline:</b> Developed a high-speed multimodal generative pipeline transforming empty interior photography into furnished listings in ~33s at sub-cent inference cost.</li>
-        <li><b>Autonomous B2B Lead Enrichment:</b> Engineered an automated waterfall scraper in n8n &amp; Python, discovering company hiring signals, enriching decision-makers via APIs, and applying LLM relevance scoring.</li>
-        <li><b>Multi-Agent RAG Sync Engine:</b> Built a bidirectional synchronization system between Notion, Airtable, and vector embeddings using critic-judge verification loops for high-reliability outputs.</li>
-        <li><b>Autonomous Commerce Pipelines:</b> Built and scheduled multi-channel distribution engines publishing automated digital products to Gumroad &amp; Whop via REST APIs.</li>
+        <li><b>AI Virtual Home-Staging Pipeline:</b> Built an end-to-end multimodal pipeline converting empty interior photos into furnished real-estate visuals in ~33 seconds at sub-cent inference cost.</li>
+        <li><b>Autonomous B2B Lead Enrichment:</b> Engineered automated waterfall enrichment workflows in n8n &amp; Python, extracting company hiring signals and applying AI relevance scoring.</li>
+        <li><b>Multi-Agent RAG Sync Engine:</b> Developed a bidirectional synchronization engine connecting Notion, Airtable, and local vector embeddings with automated critic-judge verification.</li>
+        <li><b>Automated Commerce Distribution:</b> Designed scheduled pipelines managing digital product releases and license delivery on Gumroad &amp; Whop via REST APIs.</li>
       </ul>
     </div>
 
@@ -375,7 +380,7 @@
         <span class="item-location">Pau, France</span>
       </div>
       <ul class="bullets">
-        <li>Supervised academic monitoring and operational routines for student-athletes; coordinated cross-functional communication between coaching staff, administration, and families.</li>
+        <li>Coordinated daily operational routines and academic follow-up for student-athletes; structured cross-functional reporting across coaching staff and administration.</li>
       </ul>
     </div>
 
@@ -389,7 +394,7 @@
         <span class="item-location">Pau, France</span>
       </div>
       <ul class="bullets">
-        <li>Hands-on CRM customer segmentation, omnichannel stock logistics tracking, and promotional copy across digital channels.</li>
+        <li>Assisted omnichannel retail logistics, inventory data tracking, digital customer engagement, and CRM customer segmentation.</li>
       </ul>
     </div>
   </div>
@@ -399,23 +404,23 @@
     <!-- PROVEN METRICS -->
     <div class="side-block">
       <div class="section-title">Key Impact</div>
-      <div class="metric-badge">
+      <div class="metric-card">
         <div class="m-val">32+ Workflows</div>
         <div class="m-lbl">Active in Production (n8n)</div>
       </div>
-      <div class="metric-badge">
+      <div class="metric-card">
         <div class="m-val">~350 h / mo</div>
-        <div class="m-lbl">Saved via automation</div>
+        <div class="m-lbl">Saved via automated systems</div>
       </div>
-      <div class="metric-badge">
+      <div class="metric-card">
         <div class="m-val">~720 ops / mo</div>
         <div class="m-lbl">Automated business operations</div>
       </div>
     </div>
 
-    <!-- TECHNICAL STACK -->
+    <!-- TECHNICAL & OPERATIONS STACK -->
     <div class="side-block">
-      <div class="section-title">Technical Stack</div>
+      <div class="section-title">Expertise &amp; Tools</div>
       
       <div class="skill-group">
         <div class="skill-group-name">Workflow Automation</div>
@@ -424,17 +429,17 @@
 
       <div class="skill-group">
         <div class="skill-group-name">AI &amp; LLM Engineering</div>
-        <div class="skill-group-desc">OpenAI API, Anthropic Claude, Gemini, Multi-Agent Architectures, Prompt Chaining, Structured Output</div>
+        <div class="skill-group-desc">OpenAI API, Anthropic Claude, Gemini, Multi-Agent Systems, Structured Outputs, Prompt Chaining</div>
       </div>
 
       <div class="skill-group">
-        <div class="skill-group-name">Development &amp; Infra</div>
-        <div class="skill-group-desc">Python (Scraping, Data, Automation), JavaScript / TypeScript, FastAPI, Docker, Linux VPS, Git</div>
+        <div class="skill-group-name">Scripting &amp; Infrastructure</div>
+        <div class="skill-group-desc">Python (APIs, Scraping, Automation), JavaScript, FastAPI, Docker, Linux VPS, Git</div>
       </div>
 
       <div class="skill-group">
         <div class="skill-group-name">Data &amp; Platforms</div>
-        <div class="skill-group-desc">PostgreSQL, NocoDB, GA4, Search Console, onOffice CRM, HubSpot</div>
+        <div class="skill-group-desc">PostgreSQL, NocoDB, Google Analytics 4, Search Console, onOffice CRM, HubSpot</div>
       </div>
     </div>
 
