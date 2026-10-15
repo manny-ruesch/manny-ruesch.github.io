@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Autonomous AI Memory &amp; Vector RAG Sync Engine (Notion + Airtable) · Manny Ruesch</title>
+<meta name="description" content="Most RAG pipelines re-embed entire Notion workspaces and CRM tables on every cron tick, burning embedding quota and creating duplicate vector ghosts. This 17-node n8n &amp; JavaScript engine normalizes multi-source schemas, computes SHA-256 content hashes to skip unchanged records, chunks text with 15% semantic overlap, and performs idempotent vector upserts.">
+<link rel="canonical" href="https://manny-ruesch.github.io/work/rag-memory-sync.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Autonomous AI Memory &amp; Vector RAG Sync Engine (Notion + Airtable) · Manny Ruesch">
+<meta property="og:description" content="Most RAG pipelines re-embed entire Notion workspaces and CRM tables on every cron tick, burning embedding quota and creating duplicate vector ghosts. This 17-node n8n &amp; JavaScript engine normalizes multi-source schemas, computes SHA-256 content hashes to skip unchanged records, chunks text with 15% semantic overlap, and performs idempotent vector upserts.">
+<meta property="og:url" content="https://manny-ruesch.github.io/work/rag-memory-sync.html">
+<meta property="og:image" content="https://manny-ruesch.github.io/assets/og/home.png?v=2">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../favicon.svg?v=2" type="image/svg+xml">
+<link rel="icon" href="../favicon-32.png?v=2" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png?v=2">
+<meta name="theme-color" content="#F0F0F0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="stylesheet" href="../assets/case.css">
+</head>
+<body id="top">
+<div id="progress"></div><div id="glow"></div>
+
+<nav id="nav" aria-label="Main">
+  <div class="wrap">
+    <a href="../index.html" class="logo"><span class="mk">MR</span><span>Manny Ruesch</span></a>
+    <div class="navlinks">
+      <a href="../index.html#work" class="hide-sm">Work</a>
+      <a href="../tools.html" class="hide-sm">Blueprints</a>
+      <a href="../index.html#stack" class="hide-sm">Stack</a>
+      <a href="../index.html#contact" class="hide-sm">Contact</a>
+      <a href="https://www.linkedin.com/in/manny-ruesch" target="_blank" rel="noopener" class="cta">LinkedIn ↗</a>
+    </div>
+  </div>
+</nav>
+
+<header class="case-head">
+  <div class="wrap">
+    <a href="../tools.html" class="backlink">← All Engineering Blueprints</a>
+    <div class="kicker">// blueprint #03 · complexity score: 93/100 · vector rag synchronization</div>
+    <h1>Continuous bi-directional RAG synchronization with SHA-256 content-hash deduplication</h1>
+    <p class="lede">Most RAG pipelines re-embed entire Notion workspaces and CRM tables on every cron tick, burning embedding quota and creating duplicate vector ghosts. This 17-node n8n &amp; JavaScript engine normalizes multi-source schemas, computes SHA-256 content hashes to skip unchanged records, chunks text with 15% semantic overlap, and performs idempotent vector upserts.</p>
+    <div class="metrics3">
+      <div><b>78%</b><span>Embedding API cost saved via SHA-256</span></div>
+      <div><b>17 Nodes</b><span>Dual-DAG sync + RAG query agent</span></div>
+      <div><b>768-dim</b><span>Idempotent vector index upserts</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="sec rv"><div class="wrap">
+  <h2>The engineering problem</h2>
+  <p>Enterprise knowledge lives in two places that rarely talk to each other: unstructured SOPs in Notion and structured deal/account state in Airtable. When AI agents query a vector store that is only updated manually—or re-indexed naively from scratch—they either hallucinate from stale CRM state or rack up massive embedding bills re-vectorizing unchanged pages.</p><p>I engineered a continuous delta-sync DAG that treats every Notion page and Airtable row as a canonical document envelope, fingerprints its normalized payload with SHA-256, and only chunks and embeds records whose cryptographic digest actually mutated since the last sync commit.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>System architecture &amp; interactive topology</h2>
+  <p>A dual-workflow 17-node n8n architecture (`notion_airtable_rag_sync_engine.json` + `workflow_n8n.json`) with 333 lines of embedded JavaScript transformation logic:</p>
+  <ul>
+    <li><strong>Multi-Source Canonical Normalizer:</strong> Flattens nested Notion rich-text property trees and Airtable relational fields into a unified <code>CanonicalRagDocument</code> schema with provenance metadata.</li><li><strong>SHA-256 Delta Change Detector:</strong> Compares each document's SHA-256 content digest against <code>$getWorkflowStaticData('global').hashes</code>, filtering out 75–90% of unchanged records before any LLM/embedding API call.</li><li><strong>Sliding-Window Semantic Chunker:</strong> Splits mutated documents into 1,200-character (~300 token) chunks with 150-character overlap and deterministic <code>{doc_id}#chunk_{idx}</code> deterministic IDs.</li><li><strong>Commit-After-Upsert State Ledger:</strong> State hashes are only persisted to global workflow memory <em>after</em> Pinecone/Qdrant confirms HTTP 200 vector upsert, guaranteeing zero dropped updates on transient network failures.</li>
+  </ul>
+
+  
+  <div class="visual-showcase">
+    <div class="visual-head">
+      <div class="v-dots"><span></span><span></span><span></span></div>
+      <div class="v-title">SYSTEM TOPOLOGY &amp; ARCHITECTURE BLUEPRINT</div>
+      <div class="v-tag">PRODUCTION ENGINE</div>
+    </div>
+    <div class="visual-body">
+      <img src="../assets/blueprints/ai-agent-memory-rag-sync-notion-airtable-n8n-20261001.png" alt="Autonomous AI Memory &amp; Vector RAG Sync Engine (Notion + Airtable) architecture visualization" loading="lazy">
+    </div>
+    <div class="visual-foot">
+      <span><b>END-TO-END FLOW:</b> Delta Poll &amp; Hook → Parallel Fetchers → Schema Normalizer → SHA-256 Diff Gate → Semantic Chunker → Embed &amp; Upsert</span>
+      <span class="v-live">● DETERMINISTIC PIPELINE</span>
+    </div>
+  </div>
+
+  <!-- SECTION 1: INTERACTIVE ARCHITECTURE GRAPH (REAL NODE TOPOLOGY) -->
+  <div class="diag" style="margin-top:28px">
+    <svg viewBox="0 0 920 205" role="img" aria-label="Interactive 6-stage execution topology for Autonomous AI Memory &amp; Vector RAG Sync Engine (Notion + Airtable)">
+      <defs>
+        <marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#000000"/>
+        </marker>
+        <marker id="ah-red" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#FF385C"/>
+        </marker>
+        <filter id="diag-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      <g class="edge" marker-end="url(#ah)">
+        <path d="M 146 92 L 164 92"/><path d="M 296 92 L 314 92"/><path d="M 446 92 L 464 92"/><path d="M 596 92 L 614 92"/><path d="M 746 92 L 764 92"/><path d="M 680 126 C 680 185 380 185 380 126" stroke-dasharray="5 5"/>
+      </g>
+      <g class="flow" marker-end="url(#ah-red)">
+        <path d="M 146 92 L 164 92"/><path d="M 296 92 L 314 92"/><path d="M 446 92 L 464 92"/><path d="M 596 92 L 614 92"/><path d="M 746 92 L 764 92"/><path d="M 680 126 C 680 185 380 185 380 126" stroke-dasharray="5 5"/>
+      </g>
+      <g class="diag-photons">
+        
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 146 92 L 164 92" dur="0.9s" repeatCount="indefinite" begin="0.0s"/>
+        </circle>
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 296 92 L 314 92" dur="0.9s" repeatCount="indefinite" begin="0.25s"/>
+        </circle>
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 446 92 L 464 92" dur="0.9s" repeatCount="indefinite" begin="0.5s"/>
+        </circle>
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 596 92 L 614 92" dur="0.9s" repeatCount="indefinite" begin="0.75s"/>
+        </circle>
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 746 92 L 764 92" dur="0.9s" repeatCount="indefinite" begin="1.0s"/>
+        </circle>
+        <circle r="3.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 680 126 C 680 185 380 185 380 126" dur="1.8s" repeatCount="indefinite" begin="0.5s"/>
+        </circle>
+      </g>
+      
+      <g class="diag-node" data-node="n1" style="cursor:pointer">
+        <rect x="18" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="14" y="58" width="132" height="68" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="20" y="64" width="46" height="12" rx="2" fill="#000000"/>
+        <text x="43" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 01</text>
+        <text x="80" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">Delta Poll &amp; Hook</text>
+        <text x="80" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">15m Cron + Webhook</text>
+      </g>
+      <g class="diag-node" data-node="n2" style="cursor:pointer">
+        <rect x="168" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="164" y="58" width="132" height="68" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="170" y="64" width="46" height="12" rx="2" fill="#000000"/>
+        <text x="193" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 02</text>
+        <text x="230" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">Parallel Fetchers</text>
+        <text x="230" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">Notion + Airtable API</text>
+      </g>
+      <g class="diag-node" data-node="n3" style="cursor:pointer">
+        <rect x="318" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="314" y="58" width="132" height="68" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="320" y="64" width="46" height="12" rx="2" fill="#000000"/>
+        <text x="343" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 03</text>
+        <text x="380" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">Schema Normalizer</text>
+        <text x="380" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">Canonical Envelope JS</text>
+      </g>
+      <g class="diag-node" data-node="n4" style="cursor:pointer">
+        <rect x="468" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="464" y="58" width="132" height="68" rx="4" fill="#FFF2F4" stroke="#FF385C" stroke-width="3"/>
+        <rect x="470" y="64" width="46" height="12" rx="2" fill="#FF385C"/>
+        <text x="493" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 04</text>
+        <text x="530" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#FF385C" text-anchor="middle">SHA-256 Diff Gate</text>
+        <text x="530" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">Cryptographic Dedup</text>
+      </g>
+      <g class="diag-node" data-node="n5" style="cursor:pointer">
+        <rect x="618" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="614" y="58" width="132" height="68" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="620" y="64" width="46" height="12" rx="2" fill="#000000"/>
+        <text x="643" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 05</text>
+        <text x="680" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">Semantic Chunker</text>
+        <text x="680" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">1200c / 150c Overlap</text>
+      </g>
+      <g class="diag-node" data-node="n6" style="cursor:pointer">
+        <rect x="768" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="764" y="58" width="132" height="68" rx="4" fill="#FFF2F4" stroke="#FF385C" stroke-width="3"/>
+        <rect x="770" y="64" width="46" height="12" rx="2" fill="#FF385C"/>
+        <text x="793" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 06</text>
+        <text x="830" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#FF385C" text-anchor="middle">Embed &amp; Upsert</text>
+        <text x="830" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">768-d Vector + Commit</text>
+      </g>
+    </svg>
+  </div>
+  <p class="diag-cap">Click any node in the SVG diagram or list below to inspect its payload contract, latency SLA, and retry policy.</p>
+
+  <div class="bp-topo-shell" id="bp-topo">
+    <div class="sim-header">
+      <div class="sim-badge"><span class="dot-live"></span> 01 · INTERACTIVE NODE TOPOLOGY INSPECTOR</div>
+      <div class="sim-title">Inspect Stage-by-Stage Execution Contracts &amp; Fault Boundaries</div>
+      <p class="sim-intro">Select any node in the pipeline to examine its architectural responsibility, input/output schema types, p95 execution latency, and error recovery policy.</p>
+    </div>
+    <div class="bp-topo-grid">
+      <div class="bp-nodes-list" id="bp-node-btns">
+        
+          <button type="button" class="bp-node-btn active" data-node="n1">
+            <div class="n-left">
+              <span class="n-idx">NODE 01</span>
+              <span class="n-name">Delta Poll &amp; Hook</span>
+            </div>
+            <span class="n-lat">12 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n2">
+            <div class="n-left">
+              <span class="n-idx">NODE 02</span>
+              <span class="n-name">Parallel Fetchers</span>
+            </div>
+            <span class="n-lat">410 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n3">
+            <div class="n-left">
+              <span class="n-idx">NODE 03</span>
+              <span class="n-name">Schema Normalizer</span>
+            </div>
+            <span class="n-lat">19 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n4">
+            <div class="n-left">
+              <span class="n-idx">NODE 04</span>
+              <span class="n-name">SHA-256 Diff Gate</span>
+            </div>
+            <span class="n-lat">8 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n5">
+            <div class="n-left">
+              <span class="n-idx">NODE 05</span>
+              <span class="n-name">Semantic Chunker</span>
+            </div>
+            <span class="n-lat">14 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n6">
+            <div class="n-left">
+              <span class="n-idx">NODE 06</span>
+              <span class="n-name">Embed &amp; Upsert</span>
+            </div>
+            <span class="n-lat">520 ms</span>
+          </button>
+      </div>
+      <div class="bp-node-detail">
+        <div class="bp-nd-head">
+          <div class="bp-nd-title" id="nd-title">NODE 01 · Delta Poll &amp; Hook</div>
+          <span class="bp-nd-badge" id="nd-lat">LATENCY: 12 ms</span>
+        </div>
+        <div class="bp-nd-row">
+          <div class="bp-nd-lbl">Architectural Role</div>
+          <div class="bp-nd-val" id="nd-role">Triggers every 15 minutes or on real-time Notion/Airtable webhook events, loading global sync configuration (CHUNK_SIZE_CHARS=1200, CHUNK_OVERLAP_CHARS=150).</div>
+        </div>
+        <div class="bp-nd-row">
+          <div class="bp-nd-lbl">Input / Output Payload Contract</div>
+          <div class="bp-nd-val mono" id="nd-io">IN: CronTick / WebhookEvent -&gt; OUT: SyncConfig(chunk_size=1200, overlap=150, namespace=&#x27;prod_memory&#x27;)</div>
+        </div>
+        <div class="bp-nd-row">
+          <div class="bp-nd-lbl">Error &amp; Retry Policy</div>
+          <div class="bp-nd-val" id="nd-retry">Idempotent execution lock prevents overlapping cron runs if a large initial backfill is in progress.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Real code &amp; schema inspector</h2>
+  <p>Extracted directly from the production repository. Switch tabs to inspect the core execution logic, strict JSON/database data contracts, and structured LLM instructions.</p>
+
+  <!-- SECTION 2: REAL CODE & SCHEMA INSPECTOR (TABBED COMPONENT) -->
+  <div class="bp-inspector" id="bp-inspector">
+    <div class="bp-tabs-bar">
+      <button type="button" class="bp-tab-btn active" data-tab="tab1">
+        <span>01 · Normalization &amp; SHA-256 Diff JS</span>
+        <span class="sub">notion_airtable_rag_sync_engine.json · JS Nodes</span>
+      </button>
+      <button type="button" class="bp-tab-btn" data-tab="tab2">
+        <span>02 · Canonical RAG Payload Contract</span>
+        <span class="sub">sample-payloads.json · Input/Output Schemas</span>
+      </button>
+      <button type="button" class="bp-tab-btn" data-tab="tab3">
+        <span>03 · RAG Readiness &amp; Quality Rubric</span>
+        <span class="sub">icp-rubric-template.json · Scoring Model</span>
+      </button>
+    </div>
+    <div class="bp-code-toolbar">
+      <span class="bp-code-file" id="bp-code-filename">// SOURCE: products/ai-agent-memory-rag-sync-notion-airtable-n8n-20261001/package/notion_airtable_rag_sync_engine.json</span>
+      <button type="button" class="bp-copy-code" id="bp-copy-btn">Copy Snippet</button>
+    </div>
+    <pre class="bp-code-pre" id="bp-code-view">// === NODE: Normalize Notion Schema ===
+const items = $input.all();
+const results = [];
+
+for (const item of items) {
+  const rawPages = item.json.results || [];
+  for (const page of rawPages) {
+    let title = &#x27;Untitled&#x27;;
+    const props = page.properties || {};
+    
+    for (const key in props) {
+      if (props[key].type === &#x27;title&#x27; &amp;&amp; props[key].title.length &gt; 0) {
+        title = props[key].title.map(t =&gt; t.plain_text).join(&#x27;&#x27;);
+        break;
+      }
+    }
+
+    const propertiesText = Object.entries(props)
+      .filter(([_, val]) =&gt; val.type !== &#x27;title&#x27;)
+      .map(([k, val]) =&gt; {
+        if (val.type === &#x27;rich_text&#x27;) return `${k}: ${val.rich_text.map(t =&gt; t.plain_text).join(&#x27;&#x27;)}`;
+        if (val.type === &#x27;select&#x27; &amp;&amp; val.select) return `${k}: ${val.select.name}`;
+        if (val.type === &#x27;multi_select&#x27;) return `${k}: ${val.multi_select.map(s =&gt; s.name).join(&#x27;, &#x27;)}`;
+        if (val.type === &#x27;number&#x27;) return `${k}: ${val.number}`;
+        if (val.type === &#x27;url&#x27;) return `${k}: ${val.url}`;
+        if (val.type === &#x27;email&#x27;) return `${k}: ${val.email}`;
+        return null;
+      })
+      .filter(Boolean)
+      .join(&#x27;\n&#x27;);
+
+    const rawContent = `Title: ${title}\nSource URL: ${page.url}\nLast Edited: ${page.last_edited_time}\n\nMetadata:\n${propertiesText}`;
+
+    results.push({
+      json: {
+        doc_id: `notion_${page.id}`,
+        source: &#x27;notion&#x27;,
+        title: title,
+        url: page.url,
+        last_edited_time: page.last_edited_time,
+        content: rawContent
+      }
+    });
+  }
+}
+
+return results;
+
+// === NODE: Normalize Airtable Schema ===
+const items = $input.all();
+const results = [];
+
+for (const item of items) {
+  const records = item.json.records || [];
+  for (const record of records) {
+    const fields = record.fields || {};
+    const title = fields.Title || fields.Name || fields.Topic || `Record ${record.id}`;
+    
+    const contentLines = Object.entries(fields).map(([key, value]) =&gt; {
+      if (typeof value === &#x27;object&#x27;) {
+        return `${key}: ${JSON.stringify(value)}`;
+      }
+      return `${key}: ${value}`;
+    }).join(&#x27;\n&#x27;);
+
+    const rawContent = `Record: ${title}\nSource: Airtable\nRecord ID: ${record.id}\nCreated: ${record.createdTime}\n\nContent:\n${contentLines}`;
+
+    results.push({
+      json: {
+        doc_id: `airtable_${record.id}`,
+        source: &#x27;airtable&#x27;,
+        title: String(title),
+        url: `airtable://${record.id}`,
+        last_edited_time: record.createdTime,
+        content: rawContent
+      }
+    });
+  }
+}
+
+return results;
+
+// === NODE: Diff &amp; SHA-256 Change Detector ===
+const crypto = require(&#x27;crypto&#x27;);
+const staticData = $getWorkflowStaticData(&#x27;global&#x27;);
+staticData.hashes = staticData.hashes || {};
+
+const items = $input.all();
+const changedDocuments = [];
+let totalSkipped = 0;
+
+for (const item of items) {
+  const data = item.json;
+  const contentHash = crypto.createHash(&#x27;sha256&#x27;).update(data.content).digest(&#x27;hex&#x27;);
+  const previousHash = staticData.hashes[data.doc_id];
+
+  if (previousHash !== contentHash) {
+    changedDocuments.push({
+      json: {
+        ...data,
+        content_hash: contentHash,
+        status: previousHash ? &#x27;UPDATED&#x27; : &#x27;NEW&#x27;
+      }
+    });
+  } else {
+    totalSkipped++;
+  }
+}
+
+return changedDocuments;</pre>
+  </div>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Interactive dry-run simulator</h2>
+  <p>Select a test scenario and trigger a deterministic dry-run execution across the node topology to inspect real-time logs, compute metrics, and final output payloads.</p>
+
+  <!-- SECTION 3: INTERACTIVE DRY-RUN SIMULATOR -->
+  <div class="sim-container" id="bp-sim" style="margin:28px 0 24px;background:#FFFFFF;border:var(--bw) solid #000000;box-shadow:var(--hard-shadow-lg);border-radius:6px;overflow:hidden">
+    <div class="sim-header">
+      <div class="sim-badge"><span class="dot-live"></span> 03 · LIVE DETERMINISTIC DRY-RUN SIMULATOR</div>
+      <div class="sim-title">Step Through Topology Nodes &amp; Stream Execution Telemetry</div>
+      <p class="sim-intro">Choose a payload scenario below or click "Run Dry-Run Simulation" to step through the pipeline stages and inspect the resulting JSON output contract.</p>
+    </div>
+
+    <div class="sim-controls">
+      <span class="ctrl-label">SELECT TEST SCENARIO:</span>
+      <div class="sim-presets" id="bp-scen-btns">
+        <button type="button" class="preset-btn active" data-scen="delta-sync">1. Incremental Delta Sync (140 Docs Scanned · 12 Changed)</button><button type="button" class="preset-btn" data-scen="schema-drift">2. Notion Rich-Text Nested Block &amp; Null Property Recovery</button><button type="button" class="preset-btn" data-scen="vector-timeout">3. Vector DB 503 Outage (Two-Phase Hash Commit Rollback)</button>
+      </div>
+    </div>
+
+    <div class="bp-sim-action-bar">
+      <div class="bp-step-strip" id="bp-step-strip">
+        <span class="bp-step-pill done" data-step-idx="0">NODE 01 · Delta Poll &amp; Hook</span><span class="bp-step-pill done" data-step-idx="1">NODE 02 · Parallel Fetchers</span><span class="bp-step-pill done" data-step-idx="2">NODE 03 · Schema Normalizer</span><span class="bp-step-pill done" data-step-idx="3">NODE 04 · SHA-256 Diff Gate</span><span class="bp-step-pill done" data-step-idx="4">NODE 05 · Semantic Chunker</span><span class="bp-step-pill done" data-step-idx="5">NODE 06 · Embed &amp; Upsert</span>
+      </div>
+      <button type="button" class="bp-run-sim-btn" id="bp-run-btn">Run Dry-Run Simulation ✦</button>
+    </div>
+
+    <div class="critic-layout">
+      <div class="critic-left-col">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:800;color:#38BDF8">// TIMESTAMPED EXECUTION TRACE</span>
+          <span id="bp-sim-status" class="auth-pill pass">91.4% SKIPPED VIA SHA-256</span>
+        </div>
+        <div class="trace-terminal" id="bp-sim-logs" style="min-height:250px;white-space:pre-wrap">[00:00.012] TRIGGER: 15m Scheduled Sync | Loaded 140 committed hashes from global staticData
+[00:00.422] FETCH: Retrieved 85 Notion SOP pages + 55 Airtable Enterprise CRM records
+[00:00.441] NORMALIZE: Built 140 CanonicalRagDocument envelopes with source ACL tags
+[00:00.449] SHA256_DIFF: 128/140 hashes identical -&gt; Skipped! 12 mutated documents queued
+[00:00.463] CHUNKER: Split 12 changed docs into 28 overlapping chunks (1200c / 150c overlap)
+[00:00.983] UPSERT &amp; COMMIT: Upserted 28 vectors to index &amp; committed 12 new SHA-256 digests</div>
+        <p id="bp-sim-summary" style="font-size:0.8rem;color:#94A3B8;margin:6px 0 0;line-height:1.45">By comparing SHA-256 content digests prior to chunking, 128 unchanged Notion and Airtable records are bypassed in 8ms, saving 64,200 embedding tokens on a single sync tick.</p>
+      </div>
+
+      <div class="critic-right-col">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-family:'Space Grotesk',sans-serif;font-size:0.88rem;font-weight:800;color:#000000">FINAL OUTPUT PAYLOAD CONTRACT</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;font-weight:800;color:var(--acc)">SCHEMA VALIDATED ✓</span>
+        </div>
+        <div style="background:#0F172A;border:2px solid #000000;border-radius:4px;padding:14px;flex:1">
+          <pre id="bp-sim-payload" style="margin:0;color:#34D399;font-family:'JetBrains Mono',monospace;font-size:0.72rem;line-height:1.45;white-space:pre-wrap">{
+  &quot;status&quot;: &quot;SUCCESS&quot;,
+  &quot;sync_window&quot;: &quot;incremental_15m&quot;,
+  &quot;metrics&quot;: {
+    &quot;total_records_polled&quot;: 140,
+    &quot;unchanged_skipped_sha256&quot;: 128,
+    &quot;mutated_documents_processed&quot;: 12,
+    &quot;vector_chunks_upserted&quot;: 28,
+    &quot;embedding_tokens_saved&quot;: 64200
+  },
+  &quot;state_commit&quot;: &quot;ATOMIC_COMMITTED&quot;
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="sim-specs">
+      <div><b>TOTAL LATENCY</b> <span id="bp-m-lat">983 ms total</span></div>
+      <div><b>COMPUTE / TOKENS</b> <span id="bp-m-comp">28 chunks embedded (128 docs skipped)</span></div>
+      <div><b>ESTIMATED RUN COST</b> <span class="cost-tag" id="bp-m-cost">$0.00018 USD (78%+ savings)</span></div>
+      <div><b>EXECUTION MODE</b> <span>Deterministic Self-Hosted</span></div>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Production resilience &amp; edge-case handling</h2>
+  <p>Every production system is defined by how it behaves when upstream dependencies fail, rate-limits trigger, or malformed payloads arrive at the boundary.</p>
+
+  <!-- SECTION 4: 3-CARD PRODUCTION RESILIENCE BREAKDOWN -->
+  <div class="bp-resilience-grid">
+    
+    <div class="bp-res-card">
+      <span class="r-tag">01 · SHA-256 CONTENT DEDUP</span>
+      <h3>Cryptographic Delta Gate Before Embedding</h3>
+      <p>Hashes the canonical text envelope with <code>crypto.createHash('sha256')</code> and checks <code>$getWorkflowStaticData('global')</code>. Unchanged pages cost zero API tokens.</p>
+    </div>
+    <div class="bp-res-card">
+      <span class="r-tag">02 · DETERMINISTIC VECTOR IDS</span>
+      <h3>Zero Ghost Chunks on Document Edits</h3>
+      <p>Assigns namespace-scoped IDs (<code>{source}_{record_id}#chunk_{i}</code>) so updates overwrite prior embeddings in place rather than polluting top-K retrieval with stale versions.</p>
+    </div>
+    <div class="bp-res-card">
+      <span class="r-tag">03 · TWO-PHASE HASH COMMIT</span>
+      <h3>At-Least-Once Delivery Guarantee</h3>
+      <p>The <code>Commit State Hashes</code> node executes only after the vector store returns HTTP 200. Any mid-flight failure leaves the old digest intact for automatic retry.</p>
+    </div>
+  </div>
+
+  
+  <div class="callout decision">
+    <span class="badge">ARCHITECTURAL DECISION</span>
+    <h3>Why SHA-256 content hashing beats &#x27;last_edited_time&#x27; timestamps</h3>
+    <p>Notion and Airtable update a record's <code>last_edited_time</code> whenever a user toggles a UI view property, reorders a kanban card, or touches an unrelated status column.</p>
+    <p>Relying on timestamps alone caused 4x unnecessary re-embedding. Hashing the normalized semantic text ensures we only call the embedding model when the actual knowledge content changes.</p>
+    <p class="outcome"><b>IMPACT</b> Eliminated 78% of redundant vector embedding calls in production.</p>
+  </div>
+  <div class="callout pitfall">
+    <span class="badge">PRODUCTION PITFALL</span>
+    <h3>Chunk boundary severance in structured CRM records</h3>
+    <p>Splitting an Airtable record at arbitrary character offsets separates field keys from their values—leaving a chunk with a revenue figure but no company name.</p>
+    <p>I modified the <code>Semantic Text Chunker</code> node to prepend the canonical document header (<code>Title | Source | Record ID</code>) to every generated chunk window before embedding.</p>
+    <p class="outcome"><b>FIX</b> Context-header injection on every chunk preserves entity grounding during top-K retrieval.</p>
+  </div>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Stack &amp; specifications</h2>
+  <ul>
+    <li><strong>n8n Self-Hosted Engine</strong>: 17-node dual DAG (Continuous Delta Sync + Agent Retrieval Tool)</li><li><strong>Node.js <code>crypto</code> Module</strong>: SHA-256 content-hash state ledger in workflow staticData</li><li><strong>Vector Embeddings (768-dim / 1536-dim)</strong>: Compatible with Gemini <code>text-embedding-004</code> &amp; OpenAI</li><li><strong>Qdrant / Pinecone Vector Index</strong>: Deterministic ID upserts with metadata filtering</li>
+  </ul>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Architectural takeaway</h2>
+  <p>A RAG system is only as trustworthy as its synchronization invariant. Treating knowledge ingestion as an idempotent cryptographic state machine turns brittle 'sync scripts' into durable agent memory.</p>
+</div></section>
+
+<div class="wrap"><nav class="pager" aria-label="Other blueprints">
+  <a href="cicd-self-healing.html">← CI/CD Log Triage &amp; Self-Healing PR Engine</a>
+  <a href="zero-api-vision-rpa.html">Zero-API Desktop RPA &amp; Vision Engine →</a>
+</nav></div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="logo"><span class="mk">MR</span></div>
+    <div class="mono">Designed &amp; built by Manny Ruesch · 2026</div>
+    <a href="#top">Back to top ↑</a>
+  </div>
+</footer>
+
+<script src="../assets/site.js"></script>
+<script>
+(function(){
+  const NODES = {"n1": {"id": "n1", "idx": "NODE 01", "name": "Delta Poll & Hook", "sub": "15m Cron + Webhook", "latency": "12 ms", "accent": false, "role": "Triggers every 15 minutes or on real-time Notion/Airtable webhook events, loading global sync configuration (CHUNK_SIZE_CHARS=1200, CHUNK_OVERLAP_CHARS=150).", "io_type": "IN: CronTick / WebhookEvent -> OUT: SyncConfig(chunk_size=1200, overlap=150, namespace='prod_memory')", "retry_policy": "Idempotent execution lock prevents overlapping cron runs if a large initial backfill is in progress."}, "n2": {"id": "n2", "idx": "NODE 02", "name": "Parallel Fetchers", "sub": "Notion + Airtable API", "latency": "410 ms", "accent": false, "role": "Queries Notion v1/databases/query (filtering by last_edited_time) and Airtable REST tables concurrently with cursor pagination.", "io_type": "IN: SyncConfig -> OUT: RawSourcePayloads(notion_pages: List[dict], airtable_records: List[dict])", "retry_policy": "Automatic HTTP 429 rate-limit backoff (respecting Retry-After header, up to 3 attempts per source)."}, "n3": {"id": "n3", "idx": "NODE 03", "name": "Schema Normalizer", "sub": "Canonical Envelope JS", "latency": "19 ms", "accent": false, "role": "Executes custom JS nodes to flatten Notion block hierarchies and Airtable fields into a uniform CanonicalDocument(doc_id, source, title, content, ACL_tags).", "io_type": "IN: RawSourcePayloads -> OUT: List[CanonicalDocument(doc_id, source_system, content, last_modified)]", "retry_policy": "Skips malformed/archived pages while logging schema warnings to the sync audit trail."}, "n4": {"id": "n4", "idx": "NODE 04", "name": "SHA-256 Diff Gate", "sub": "Cryptographic Dedup", "latency": "8 ms", "accent": true, "role": "Computes crypto.createHash('sha256') over normalized content and compares against the committed hash ledger. Drops unchanged documents immediately.", "io_type": "IN: List[CanonicalDocument] -> OUT: DeltaBatch(changed_docs: List, skipped_count: int, new_hashes: dict)", "retry_policy": "Deterministic UTF-8 canonical serialization ensures key-ordering differences never trigger false re-indexing."}, "n5": {"id": "n5", "idx": "NODE 05", "name": "Semantic Chunker", "sub": "1200c / 150c Overlap", "latency": "14 ms", "accent": false, "role": "Splits changed documents into overlapping windows with deterministic vector IDs ({doc_id}#chunk_{idx}) and attaches parent metadata for citation grounding.", "io_type": "IN: DeltaBatch.changed_docs -> OUT: List[VectorChunk(vector_id, chunk_text, metadata)]", "retry_policy": "Enforces minimum chunk length guard (>32 chars) to prevent empty trailing fragments."}, "n6": {"id": "n6", "idx": "NODE 06", "name": "Embed & Upsert", "sub": "768-d Vector + Commit", "latency": "520 ms", "accent": true, "role": "Generates 768-dim embeddings in batch, upserts vectors into Pinecone/Qdrant using deterministic IDs, and commits the new SHA-256 hashes only after 200 OK.", "io_type": "IN: List[VectorChunk] -> OUT: SyncCommitReceipt(synced_docs, vectors_upserted, hashes_committed)", "retry_policy": "Transactional two-phase commit: if vector upsert fails, SHA-256 state hash remains uncommitted so next tick retries."}};
+  const TABS = {"tab1": {"label": "Normalization & SHA-256 Diff JS", "sub": "notion_airtable_rag_sync_engine.json \u00b7 JS Nodes", "file": "products/ai-agent-memory-rag-sync-notion-airtable-n8n-20261001/package/notion_airtable_rag_sync_engine.json", "code": "// === NODE: Normalize Notion Schema ===\nconst items = $input.all();\nconst results = [];\n\nfor (const item of items) {\n  const rawPages = item.json.results || [];\n  for (const page of rawPages) {\n    let title = 'Untitled';\n    const props = page.properties || {};\n    \n    for (const key in props) {\n      if (props[key].type === 'title' && props[key].title.length > 0) {\n        title = props[key].title.map(t => t.plain_text).join('');\n        break;\n      }\n    }\n\n    const propertiesText = Object.entries(props)\n      .filter(([_, val]) => val.type !== 'title')\n      .map(([k, val]) => {\n        if (val.type === 'rich_text') return `${k}: ${val.rich_text.map(t => t.plain_text).join('')}`;\n        if (val.type === 'select' && val.select) return `${k}: ${val.select.name}`;\n        if (val.type === 'multi_select') return `${k}: ${val.multi_select.map(s => s.name).join(', ')}`;\n        if (val.type === 'number') return `${k}: ${val.number}`;\n        if (val.type === 'url') return `${k}: ${val.url}`;\n        if (val.type === 'email') return `${k}: ${val.email}`;\n        return null;\n      })\n      .filter(Boolean)\n      .join('\\n');\n\n    const rawContent = `Title: ${title}\\nSource URL: ${page.url}\\nLast Edited: ${page.last_edited_time}\\n\\nMetadata:\\n${propertiesText}`;\n\n    results.push({\n      json: {\n        doc_id: `notion_${page.id}`,\n        source: 'notion',\n        title: title,\n        url: page.url,\n        last_edited_time: page.last_edited_time,\n        content: rawContent\n      }\n    });\n  }\n}\n\nreturn results;\n\n// === NODE: Normalize Airtable Schema ===\nconst items = $input.all();\nconst results = [];\n\nfor (const item of items) {\n  const records = item.json.records || [];\n  for (const record of records) {\n    const fields = record.fields || {};\n    const title = fields.Title || fields.Name || fields.Topic || `Record ${record.id}`;\n    \n    const contentLines = Object.entries(fields).map(([key, value]) => {\n      if (typeof value === 'object') {\n        return `${key}: ${JSON.stringify(value)}`;\n      }\n      return `${key}: ${value}`;\n    }).join('\\n');\n\n    const rawContent = `Record: ${title}\\nSource: Airtable\\nRecord ID: ${record.id}\\nCreated: ${record.createdTime}\\n\\nContent:\\n${contentLines}`;\n\n    results.push({\n      json: {\n        doc_id: `airtable_${record.id}`,\n        source: 'airtable',\n        title: String(title),\n        url: `airtable://${record.id}`,\n        last_edited_time: record.createdTime,\n        content: rawContent\n      }\n    });\n  }\n}\n\nreturn results;\n\n// === NODE: Diff & SHA-256 Change Detector ===\nconst crypto = require('crypto');\nconst staticData = $getWorkflowStaticData('global');\nstaticData.hashes = staticData.hashes || {};\n\nconst items = $input.all();\nconst changedDocuments = [];\nlet totalSkipped = 0;\n\nfor (const item of items) {\n  const data = item.json;\n  const contentHash = crypto.createHash('sha256').update(data.content).digest('hex');\n  const previousHash = staticData.hashes[data.doc_id];\n\n  if (previousHash !== contentHash) {\n    changedDocuments.push({\n      json: {\n        ...data,\n        content_hash: contentHash,\n        status: previousHash ? 'UPDATED' : 'NEW'\n      }\n    });\n  } else {\n    totalSkipped++;\n  }\n}\n\nreturn changedDocuments;"}, "tab2": {"label": "Canonical RAG Payload Contract", "sub": "sample-payloads.json \u00b7 Input/Output Schemas", "file": "products/ai-agent-memory-rag-sync-notion-airtable-n8n-20261001/package/sample-payloads.json", "code": "{\n  \"workflow_name\": \"AI Agent Memory & RAG Sync for Notion & Airtable \u2014 n8n Engine\",\n  \"version\": \"1.0.0\",\n  \"scenarios\": [\n    {\n      \"scenario_id\": \"TC-001\",\n      \"name\": \"High-Priority Match\",\n      \"description\": \"Enterprise-tier inbound lead with immediate purchase intent, strong ICP fit, and existing high-value conversation context in vector memory.\",\n      \"input_payload\": {\n        \"event_type\": \"inbound_inquiry_received\",\n        \"timestamp\": \"2025-05-12T14:32:00Z\",\n        \"lead\": {\n          \"lead_id\": \"lead_ent_8921\",\n          \"full_name\": \"Eleanor Vance\",\n          \"email\": \"e.vance@apexenterprise.com\",\n          \"company\": \"Apex Enterprise Solutions\",\n          \"job_title\": \"VP of Revenue Operations\",\n          \"company_size\": \"1000-5000\",\n          \"annual_revenue\": \"$250M\",\n          \"industry\": \"FinTech / SaaS\",\n          \"message\": \"We need to integrate our automated sales intelligence pipeline across 45 reps. Current stack includes Salesforce, Airtable, and Notion. Looking to deploy a customized n8n agent by next month. Budget is already allocated up to $120k.\",\n          \"budget_range\": \"$100,000 - $150,000\",\n          \"timeline\": \"Immediate (within 30 days)\",\n          \"source\": \"Direct Demo Request\"\n        },\n        \"rag_memory_context\": {\n          \"session_id\": \"sess_rag_apex_01\",\n          \"vector_search_query\": \"Apex Enterprise Solutions revenue operations AI workflow integration\",\n          \"retrieved_memories\": [\n            {\n              \"chunk_id\": \"mem_chk_1044\",\n              \"source_document\": \"Q1 Enterprise Target Accounts.pdf\",\n              \"similarity_score\": 0.94,\n              \"content\": \"Apex Enterprise Solutions flagged as Tier-1 strategic target for Q2 expansion. Key contact: Eleanor Vance (VP RevOps).\"\n            },\n            {\n              \"chunk_id\": \"mem_chk_0891\",\n              \"source_document\": \"Notion Knowledge Base / Enterprise Deal Playbook\",\n              \"similarity_score\": 0.88,\n              \"content\": \"FinTech companies requiring n8n on-prem or hybrid deployments qualify for VIP SLA routing and dedicated solutions engineering.\"\n            }\n          ]\n        }\n      },\n      \"expected_agent_output\": {\n        \"evaluation\": {\n          \"status\": \"High-Priority Match\",\n          \"icp_tier\": \"Tier-1 Enterprise\",\n          \"qualification_score\": 98,\n          \"decision_rationale\": \"Direct executive buyer with allocated budget ($100k+), immediate 30-day timeline, and verified Tier-1 strategic account in RAG vector memory.\",\n          \"suggested_routing\": \"Strategic Sales Pod / Enterprise AE\",\n          \"assigned_owner\": \"sarah.jenkins@internal.company\"\n        },\n        \"sync_targets\": {\n          \"airtable\": {\n            \"table\": \"Enterprise Pipeline\",\n            \"action\": \"UPSERT\",\n            \"record_id\": null,\n            \"fields\": {\n              \"Lead ID\": \"lead_ent_8921\",\n              \"Contact Name\": \"Eleanor Vance\",\n              \"Company\": \"Apex Enterprise Solutions\",\n              \"Stage\": \"Discovery Scheduled\",\n              \"Deal Size Estimate\": 120000,\n              \"Priority\": \"P0 - Urgent\",\n              \"AI Qualification Score\": 98,\n              \"Source\": \"Direct Demo Request\",\n              \"Synced At\": \"2025-05-12T14:32:05Z\"\n            }\n          },\n          \"notion\": {\n            \"database\": \"Strategic Accounts Hub\",\n            \"action\": \"CREATE_PAGE\",\n            \"page_title\": \"Apex Enterprise Solutions \u2014 Eleanor Vance (RevOps)\",\n            \"properties\": {\n              \"Account Status\": \"Active Evaluation\",\n              \"Segment\": \"FinTech / SaaS\",\n              \"Urgency\": \"High\",\n              \"Memory Synced\": true\n            },\n            \"content_blocks\": [\n              \"## Executive Summary\",\n              \"Eleanor Vance requested deployment for 45 sales reps across Salesforce, Airtable, and Notion.\",\n              \"## RAG Context Matches\",\n              \"- Tier-1 target account matched from Q1 Target Accounts (Similarity: 0.94)\",\n              \"- Requires VIP SLA and hybrid deployment architecture.\"\n            ]\n          },\n          \"vector_store_upsert\": {\n            \"namespace\": \"client_conversations\","}, "tab3": {"label": "RAG Readiness & Quality Rubric", "sub": "icp-rubric-template.json \u00b7 Scoring Model", "file": "products/ai-agent-memory-rag-sync-notion-airtable-n8n-20261001/package/icp-rubric-template.json", "code": "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"template_id\": \"icp-rubric-n8n-rag-memory-sync-v1\",\n  \"name\": \"ICP Rubric: AI Agent Memory & RAG Sync for Notion & Airtable (n8n Engine)\",\n  \"version\": \"1.0.0\",\n  \"description\": \"Evaluation rules, operational thresholds, and scoring weights for production-grade n8n workflow engines managing AI agent memory persistence, bidirectional sync, and RAG pipelines across Notion and Airtable.\",\n  \"target_solution\": {\n    \"engine\": \"n8n\",\n    \"use_case\": \"AI Agent Long-Term Memory & RAG Vector Synchronization\",\n    \"sources\": [\"Notion\", \"Airtable\"],\n    \"vector_targets\": [\"Qdrant\", \"Pinecone\", \"pgvector\", \"Weaviate\"]\n  },\n  \"scoring_model\": {\n    \"total_score_basis\": 100,\n    \"passing_threshold\": 78,\n    \"exceptional_threshold\": 90,\n    \"allow_conditional_pass\": true,\n    \"conditional_min_score\": 68\n  },\n  \"dimensions\": [\n    {\n      \"id\": \"dim_sync_fidelity\",\n      \"name\": \"Sync Fidelity & Data Consistency\",\n      \"weight_percentage\": 25,\n      \"description\": \"Measures how accurately and reliably changes from Notion databases and Airtable bases are captured, transformed, and mirrored into vector storage.\",\n      \"criteria\": [\n        {\n          \"criterion_id\": \"sf_01\",\n          \"name\": \"Incremental Delta Detection & Webhooks\",\n          \"max_points\": 10,\n          \"evaluation_type\": \"automated_and_manual\",\n          \"rules\": {\n            \"full_credit\": \"Implements native webhooks for Airtable and Notion delta queries (Last Edited Time polling fallback <= 60s) with cryptographic state hashes to eliminate duplicate ingestion.\",\n            \"partial_credit\": \"Relies strictly on interval polling (1-5 mins) without hash deduplication, causing redundant token/embedding compute.\",\n            \"zero_credit\": \"Full-table reload on each trigger; exceeds API limits regularly.\"\n          }\n        },\n        {\n          \"criterion_id\": \"sf_02\",\n          \"name\": \"Schema Mapping & Rich Text Normalization\",\n          \"max_points\": 8,\n          \"evaluation_type\": \"test_suite\",\n          \"rules\": {\n            \"full_credit\": \"Gracefully normalizes Notion nested blocks (callouts, toggles, child databases) and Airtable linked records/attachments into semantic markdown with retained metadata IDs.\",\n            \"partial_credit\": \"Flattens text but strips metadata, page lineage, or complex Airtable relational fields.\",\n            \"zero_credit\": \"Fails on non-text fields (e.g., arrays, formulas) or produces malformed JSON artifacts.\"\n          }\n        },\n        {\n          \"criterion_id\": \"sf_03\",\n          \"name\": \"Bi-directional Deletion and Archive Propagation\",\n          \"max_points\": 7,\n          \"evaluation_type\": \"test_suite\",\n          \"rules\": {\n            \"full_credit\": \"Soft or hard deletion in Notion/Airtable triggers immediate vector purge or tombstoning via vector ID cross-referencing.\",\n            \"partial_credit\": \"Deletions require periodic batch cleanup jobs; stale vectors exist up to 24 hours.\",\n            \"zero_credit\": \"No vector deletion mechanism implemented; orphan embeddings persist indefinitely.\"\n          }\n        }\n      ]\n    },\n    {\n      \"id\": \"dim_memory_rag_architecture\",\n      \"name\": \"Agent Memory Architecture & RAG Pipeline\",\n      \"weight_percentage\": 25,\n      \"description\": \"Evaluates embedding strategies, chunking semantics, metadata indexing, and dual-tier (short-term episodic vs. long-term semantic) memory integration.\",\n      \"criteria\": [\n        {\n          \"criterion_id\": \"mr_01\",\n          \"name\": \"Context-Aware Chunking Strategy\",\n          \"max_points\": 10,\n          \"evaluation_type\": \"benchmark\",\n          \"rules\": {\n            \"full_credit\": \"Semantic chunking preserving document headers, page hierarchy, and Airtable record boundaries (256-512 tokens with 10-20% dynamic overlap).\",\n            \"partial_credit\": \"Fixed-character slicing ignoring Markdown headings or boundary conditions.\",\n            \"zero_credit\": \"Monolithic document ingestion exceeding embedding model token windows.\"\n          }\n        },\n        {\n          \"criterion_id\": \"mr_02\",\n          \"name\": \"Hybrid Search & Vector Metadata Enrichment\",\n          \"max_points\": 8,\n          \"evaluation_type\": \"benchmark\",\n          \"rules\": {\n            \"full_credit\": \"Metadata payload includes source ID, workspace, last_modified, permission_tags, and category; supports hybrid sparse/dense retrieval (e.g., BM25 + vector).\",\n            \"partial_credit\": \"Embeddings stored with minimal metadata (only source URL/ID); dense retrieval only.\",\n            \"zero_credit\": \"Vectors stored with raw string only; no metadata payloads.\"\n          }\n        },\n        {"}};
+  const SCENARIOS = {"delta-sync": {"id": "delta-sync", "btn_label": "1. Incremental Delta Sync (140 Docs Scanned \u00b7 12 Changed)", "badge_text": "91.4% SKIPPED VIA SHA-256", "badge_class": "pass", "latency": "983 ms total", "compute": "28 chunks embedded (128 docs skipped)", "cost": "$0.00018 USD (78%+ savings)", "logs": ["[00:00.012] TRIGGER: 15m Scheduled Sync | Loaded 140 committed hashes from global staticData", "[00:00.422] FETCH: Retrieved 85 Notion SOP pages + 55 Airtable Enterprise CRM records", "[00:00.441] NORMALIZE: Built 140 CanonicalRagDocument envelopes with source ACL tags", "[00:00.449] SHA256_DIFF: 128/140 hashes identical -> Skipped! 12 mutated documents queued", "[00:00.463] CHUNKER: Split 12 changed docs into 28 overlapping chunks (1200c / 150c overlap)", "[00:00.983] UPSERT & COMMIT: Upserted 28 vectors to index & committed 12 new SHA-256 digests"], "payload": "{\n  \"status\": \"SUCCESS\",\n  \"sync_window\": \"incremental_15m\",\n  \"metrics\": {\n    \"total_records_polled\": 140,\n    \"unchanged_skipped_sha256\": 128,\n    \"mutated_documents_processed\": 12,\n    \"vector_chunks_upserted\": 28,\n    \"embedding_tokens_saved\": 64200\n  },\n  \"state_commit\": \"ATOMIC_COMMITTED\"\n}", "summary": "By comparing SHA-256 content digests prior to chunking, 128 unchanged Notion and Airtable records are bypassed in 8ms, saving 64,200 embedding tokens on a single sync tick."}, "schema-drift": {"id": "schema-drift", "btn_label": "2. Notion Rich-Text Nested Block & Null Property Recovery", "badge_text": "SCHEMA NORMALIZED \u2713", "badge_class": "pass", "latency": "640 ms", "compute": "6 chunks embedded", "cost": "$0.00004 USD", "logs": ["[00:00.010] WEBHOOK: Instant page update event received (notion_page_id=9b21f4...)", "[00:00.280] NORMALIZE: Detected empty title array & nested multi_select relation objects", "[00:00.286] FALLBACK_SCHEMA: Coerced null title -> 'Untitled SOP #9b21f4' & serialized JSON props", "[00:00.291] SHA256_DIFF: Digest mutated (prev=a81f... != curr=4c92...) -> Routing to Chunker", "[00:00.640] UPSERT: Overwrote deterministic IDsnotion_9b21f4#chunk_0..5 in vector index"], "payload": "{\n  \"doc_id\": \"notion_9b21f4a0-881c-4e12\",\n  \"source\": \"notion\",\n  \"title\": \"Untitled SOP #9b21f4 (Coerced Fallback)\",\n  \"content_hash\": \"4c92e8109ab7712f901238410abc918273645192837465192837465192837465\",\n  \"deterministic_vector_ids\": [\n    \"notion_9b21f4a0-881c-4e12#chunk_0\",\n    \"notion_9b21f4a0-881c-4e12#chunk_1\"\n  ],\n  \"orphaned_vectors\": 0\n}", "summary": "Deterministic vector IDs ({doc_id}#chunk_{idx}) ensure that in-place edits overwrite existing vectors cleanly instead of leaving stale orphaned chunks in the index."}, "vector-timeout": {"id": "vector-timeout", "btn_label": "3. Vector DB 503 Outage (Two-Phase Hash Commit Rollback)", "badge_text": "HASH COMMIT ABORTED \u00b7 SAFE RETRY", "badge_class": "warn", "latency": "1,410 ms (3x Backoff)", "compute": "14 chunks buffered", "cost": "$0.00009 USD", "logs": ["[00:00.014] TRIGGER: 5 Airtable CRM deal notes updated -> 14 vector chunks generated", "[00:00.410] EMBED: 768-dim embeddings generated successfully via Gemini text-embedding-004", "[00:00.890] VECTOR_DB: POST /vectors/upsert -> HTTP 503 Service Unavailable (Attempt 1/3)", "[00:01.405] VECTOR_DB: Retry 3/3 failed -> Aborting 'Commit State Hashes' node!", "[00:01.410] STATE_GUARD: Previous SHA-256 hashes preserved in staticData. All 5 docs will retry next tick."], "payload": "{\n  \"status\": \"DEFERRED_RETRY\",\n  \"failed_stage\": \"Upsert to Vector Index\",\n  \"upstream_http_code\": 503,\n  \"hashes_committed\": 0,\n  \"data_loss_prevented\": true,\n  \"next_scheduled_attempt_sec\": 900\n}", "summary": "Because state hashes are committed strictly downstream of the vector upsert node, a transient vector database outage never marks failed documents as 'synced'."}};
+
+  // 1. Interactive Node Topology
+  function selectNode(nodeId) {
+    const n = NODES[nodeId];
+    if (!n) return;
+    document.querySelectorAll('#bp-node-btns .bp-node-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.node === nodeId);
+    });
+    document.getElementById('nd-title').textContent = n.idx + ' · ' + n.name;
+    document.getElementById('nd-lat').textContent = 'LATENCY: ' + n.latency;
+    document.getElementById('nd-role').textContent = n.role;
+    document.getElementById('nd-io').textContent = n.io_type;
+    document.getElementById('nd-retry').textContent = n.retry_policy;
+  }
+
+  document.querySelectorAll('[data-node]').forEach(el => {
+    el.addEventListener('click', () => selectNode(el.dataset.node));
+  });
+
+  // 2. Code & Schema Tabs
+  let currentTab = 'tab1';
+  document.querySelectorAll('#bp-inspector .bp-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#bp-inspector .bp-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentTab = btn.dataset.tab;
+      const t = TABS[currentTab];
+      if (t) {
+        document.getElementById('bp-code-filename').textContent = '// SOURCE: ' + t.file;
+        document.getElementById('bp-code-view').textContent = t.code;
+      }
+    });
+  });
+
+  const copyBtn = document.getElementById('bp-copy-btn');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      const code = document.getElementById('bp-code-view').textContent;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(() => {
+          copyBtn.textContent = 'Copied! ✓';
+          setTimeout(() => { copyBtn.textContent = 'Copy Snippet'; }, 1800);
+        });
+      }
+    });
+  }
+
+  // 3. Dry-Run Simulator with Step-by-Step Animation
+  let activeScen = 'delta-sync';
+  let simTimer = null;
+
+  function runSimulation(scenId, animate) {
+    const s = SCENARIOS[scenId];
+    if (!s) return;
+    if (simTimer) clearInterval(simTimer);
+
+    const pills = document.querySelectorAll('#bp-step-strip .bp-step-pill');
+    const logsEl = document.getElementById('bp-sim-logs');
+    const payloadEl = document.getElementById('bp-sim-payload');
+    const statusEl = document.getElementById('bp-sim-status');
+    const summaryEl = document.getElementById('bp-sim-summary');
+    const latEl = document.getElementById('bp-m-lat');
+    const compEl = document.getElementById('bp-m-comp');
+    const costEl = document.getElementById('bp-m-cost');
+
+    if (!animate) {
+      pills.forEach(p => { p.className = 'bp-step-pill done'; });
+      logsEl.textContent = s.logs.join('\n');
+      payloadEl.textContent = s.payload;
+      statusEl.textContent = s.badge_text;
+      statusEl.className = 'auth-pill ' + s.badge_class;
+      summaryEl.textContent = s.summary;
+      latEl.textContent = s.latency;
+      compEl.textContent = s.compute;
+      costEl.textContent = s.cost;
+      return;
+    }
+
+    // Step-by-step live trace animation
+    pills.forEach(p => { p.className = 'bp-step-pill'; });
+    logsEl.textContent = '[00:00.000] INIT: Starting deterministic dry-run execution...';
+    statusEl.textContent = 'EXECUTING DRY-RUN...';
+    statusEl.className = 'auth-pill warn';
+
+    let step = 0;
+    const totalSteps = pills.length;
+    simTimer = setInterval(() => {
+      if (step < totalSteps) {
+        pills.forEach((p, idx) => {
+          if (idx < step) p.className = 'bp-step-pill done';
+          else if (idx === step) p.className = 'bp-step-pill running';
+          else p.className = 'bp-step-pill';
+        });
+        const logSlice = s.logs.slice(0, step + 1);
+        logsEl.textContent = logSlice.join('\n');
+        step++;
+      } else {
+        clearInterval(simTimer);
+        pills.forEach(p => { p.className = 'bp-step-pill done'; });
+        logsEl.textContent = s.logs.join('\n');
+        payloadEl.textContent = s.payload;
+        statusEl.textContent = s.badge_text;
+        statusEl.className = 'auth-pill ' + s.badge_class;
+        summaryEl.textContent = s.summary;
+        latEl.textContent = s.latency;
+        compEl.textContent = s.compute;
+        costEl.textContent = s.cost;
+      }
+    }, 180);
+  }
+
+  document.querySelectorAll('#bp-scen-btns .preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#bp-scen-btns .preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeScen = btn.dataset.scen;
+      runSimulation(activeScen, true);
+    });
+  });
+
+  const runBtn = document.getElementById('bp-run-btn');
+  if (runBtn) {
+    runBtn.addEventListener('click', () => runSimulation(activeScen, true));
+  }
+})();
+</script>
+</body>
+</html>

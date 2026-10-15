@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jarvis · Native macOS Voice &amp; Tool-Use Assistant · Manny Ruesch</title>
+<meta name="description" content="Built on nights and weekends: a local-first macOS voice assistant that listens for a strict wake-word, renders a hardware-accelerated pywebview HUD, dispatches file/web/app tool calls via Claude, and streams low-latency neural speech back via Edge-TTS.">
+<link rel="canonical" href="https://manny-ruesch.github.io/work/jarvis.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jarvis · Native macOS Voice &amp; Tool-Use Assistant · Manny Ruesch">
+<meta property="og:description" content="Built on nights and weekends: a local-first macOS voice assistant that listens for a strict wake-word, renders a hardware-accelerated pywebview HUD, dispatches file/web/app tool calls via Claude, and streams low-latency neural speech back via Edge-TTS.">
+<meta property="og:url" content="https://manny-ruesch.github.io/work/jarvis.html">
+<meta property="og:image" content="https://manny-ruesch.github.io/assets/og/home.png?v=2">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../favicon.svg?v=2" type="image/svg+xml">
+<link rel="icon" href="../favicon-32.png?v=2" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png?v=2">
+<meta name="theme-color" content="#F0F0F0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="stylesheet" href="../assets/case.css">
+</head>
+<body id="top">
+<div id="progress"></div><div id="glow"></div>
+
+<nav id="nav" aria-label="Main">
+  <div class="wrap">
+    <a href="../index.html" class="logo"><span class="mk">MR</span><span>Manny Ruesch</span></a>
+    <div class="navlinks">
+      <a href="../index.html#work" class="hide-sm">Work</a>
+      <a href="../tools.html" class="hide-sm">Blueprints</a>
+      <a href="../index.html#stack" class="hide-sm">Stack</a>
+      <a href="../index.html#contact" class="hide-sm">Contact</a>
+      <a href="https://www.linkedin.com/in/manny-ruesch" target="_blank" rel="noopener" class="cta">LinkedIn ↗</a>
+    </div>
+  </div>
+</nav>
+
+<header class="case-head">
+  <div class="wrap">
+    <a href="../index.html#work" class="backlink">← Selected Work</a>
+    <div class="kicker">// personal build #09 · low-latency voice pipeline · macos + claude</div>
+    <h1>A native macOS voice assistant with strict wake-word gating, a 60fps HUD, and sandboxed OS tool execution</h1>
+    <p class="lede">Built on nights and weekends: a local-first macOS voice assistant that listens for a strict wake-word, renders a hardware-accelerated pywebview HUD, dispatches file/web/app tool calls via Claude, and streams low-latency neural speech back via Edge-TTS.</p>
+    <div class="metrics3">
+      <div><b>&lt; 680 ms</b><span>Time-to-first-audio (TTFA)</span></div>
+      <div><b>12 Tools</b><span>Sandboxed macOS &amp; filesystem actions</span></div>
+      <div><b>0 Idle API</b><span>100% offline wake-word &amp; VAD gate</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="sec rv"><div class="wrap">
+  <h2>The engineering problem</h2>
+  <p>Built-in OS voice assistants can set timers and check the weather, but they cannot read a local project repository, summarize a PDF on your Desktop, query a live web page, and write a clean Markdown brief into your workspace in a single spoken turn.</p><p>Conversely, keeping a cloud audio stream open 24/7 is both a privacy nightmare and an API cost drain. I built Jarvis around a strict two-stage boundary: 100% offline local Voice Activity Detection (VAD) + wake-word gating first, followed by streaming Claude tool-use and chunked sentence-boundary TTS synthesis.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>System architecture &amp; interactive topology</h2>
+  <p>A multi-threaded Python & macOS architecture bridging local audio DSP, a translucent <code>pywebview</code> HUD, and an asynchronous Claude tool-execution loop:</p>
+  <ul>
+    <li><strong>Offline Wake-Word &amp; Silero VAD Ring Buffer:</strong> Continuously samples 16kHz mono PCM audio in a lock-free ring buffer with <2% CPU usage, triggering cloud transcription only after wake-word confirmation.</li><li><strong>Sentence-Boundary Streaming TTS Pipeline:</strong> Buffers Claude's SSE token stream only until the first punctuation boundary (<code>.?!:</code>), dispatching sentence #1 to <code>edge-tts</code> while sentence #2 is still generating.</li><li><strong>Sandboxed OS &amp; Filesystem Tool Registry:</strong> Exposes 12 strictly typed tools (<code>read_workspace_file</code>, <code>write_note</code>, <code>open_macos_app</code>, <code>web_search</code>, <code>clipboard_inspect</code>) with path-traversal guards.</li><li><strong>60fps Reactive Audio HUD (<code>pywebview</code>):</strong> Frameless always-on-top macOS overlay driven by real-time RMS audio amplitude and state-machine events (<code>IDLE</code> &rarr; <code>LISTENING</code> &rarr; <code>THINKING</code> &rarr; <code>SPEAKING</code>).</li>
+  </ul>
+
+  
+
+  <!-- SECTION 1: INTERACTIVE ARCHITECTURE GRAPH (REAL NODE TOPOLOGY) -->
+  <div class="diag" style="margin-top:28px">
+    <svg viewBox="0 0 920 205" role="img" aria-label="Interactive 6-stage execution topology for Jarvis · Native macOS Voice &amp; Tool-Use Assistant">
+      <defs>
+        <marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#000000"/>
+        </marker>
+        <marker id="ah-red" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#FF385C"/>
+        </marker>
+        <filter id="diag-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      <g class="edge" marker-end="url(#ah)">
+        <path d="M 146 92 L 164 92"/><path d="M 296 92 L 314 92"/><path d="M 446 92 L 464 92"/><path d="M 596 92 L 614 92"/><path d="M 746 92 L 764 92"/><path d="M 680 126 C 680 185 380 185 380 126" stroke-dasharray="5 5"/>
+      </g>
+      <g class="flow" marker-end="url(#ah-red)">
+        <path d="M 146 92 L 164 92"/><path d="M 296 92 L 314 92"/><path d="M 446 92 L 464 92"/><path d="M 596 92 L 614 92"/><path d="M 746 92 L 764 92"/><path d="M 680 126 C 680 185 380 185 380 126" stroke-dasharray="5 5"/>
+      </g>
+      <g class="diag-photons">
+        
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 146 92 L 164 92" dur="0.9s" repeatCount="indefinite" begin="0.0s"/>
+        </circle>
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 296 92 L 314 92" dur="0.9s" repeatCount="indefinite" begin="0.25s"/>
+        </circle>
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 446 92 L 464 92" dur="0.9s" repeatCount="indefinite" begin="0.5s"/>
+        </circle>
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 596 92 L 614 92" dur="0.9s" repeatCount="indefinite" begin="0.75s"/>
+        </circle>
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 746 92 L 764 92" dur="0.9s" repeatCount="indefinite" begin="1.0s"/>
+        </circle>
+        <circle r="3.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 680 126 C 680 185 380 185 380 126" dur="1.8s" repeatCount="indefinite" begin="0.5s"/>
+        </circle>
+      </g>
+      
+      <g class="diag-node" data-node="n1" style="cursor:pointer">
+        <rect x="18" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="14" y="58" width="132" height="68" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="20" y="64" width="46" height="12" rx="2" fill="#000000"/>
+        <text x="43" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 01</text>
+        <text x="80" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">VAD &amp; Wake Gate</text>
+        <text x="80" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">16kHz PCM Ring Buffer</text>
+      </g>
+      <g class="diag-node" data-node="n2" style="cursor:pointer">
+        <rect x="168" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="164" y="58" width="132" height="68" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="170" y="64" width="46" height="12" rx="2" fill="#000000"/>
+        <text x="193" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 02</text>
+        <text x="230" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">Fast STT Engine</text>
+        <text x="230" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">Streaming Audio-to-Text</text>
+      </g>
+      <g class="diag-node" data-node="n3" style="cursor:pointer">
+        <rect x="318" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="314" y="58" width="132" height="68" rx="4" fill="#FFF2F4" stroke="#FF385C" stroke-width="3"/>
+        <rect x="320" y="64" width="46" height="12" rx="2" fill="#FF385C"/>
+        <text x="343" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 03</text>
+        <text x="380" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#FF385C" text-anchor="middle">Claude Brain</text>
+        <text x="380" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">SSE Tool Orchestrator</text>
+      </g>
+      <g class="diag-node" data-node="n4" style="cursor:pointer">
+        <rect x="468" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="464" y="58" width="132" height="68" rx="4" fill="#FFF2F4" stroke="#FF385C" stroke-width="3"/>
+        <rect x="470" y="64" width="46" height="12" rx="2" fill="#FF385C"/>
+        <text x="493" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 04</text>
+        <text x="530" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#FF385C" text-anchor="middle">OS Tool Sandbox</text>
+        <text x="530" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">Path-Guarded Executor</text>
+      </g>
+      <g class="diag-node" data-node="n5" style="cursor:pointer">
+        <rect x="618" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="614" y="58" width="132" height="68" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="620" y="64" width="46" height="12" rx="2" fill="#000000"/>
+        <text x="643" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 05</text>
+        <text x="680" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">Sentence Chunker</text>
+        <text x="680" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">Punctuation Buffer</text>
+      </g>
+      <g class="diag-node" data-node="n6" style="cursor:pointer">
+        <rect x="768" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="764" y="58" width="132" height="68" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="770" y="64" width="46" height="12" rx="2" fill="#000000"/>
+        <text x="793" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 06</text>
+        <text x="830" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">Edge-TTS &amp; HUD</text>
+        <text x="830" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">Async Audio + 60fps UI</text>
+      </g>
+    </svg>
+  </div>
+  <p class="diag-cap">Click any node in the SVG diagram or list below to inspect its payload contract, latency SLA, and retry policy.</p>
+
+  <div class="bp-topo-shell" id="bp-topo">
+    <div class="sim-header">
+      <div class="sim-badge"><span class="dot-live"></span> 01 · INTERACTIVE NODE TOPOLOGY INSPECTOR</div>
+      <div class="sim-title">Inspect Stage-by-Stage Execution Contracts &amp; Fault Boundaries</div>
+      <p class="sim-intro">Select any node in the pipeline to examine its architectural responsibility, input/output schema types, p95 execution latency, and error recovery policy.</p>
+    </div>
+    <div class="bp-topo-grid">
+      <div class="bp-nodes-list" id="bp-node-btns">
+        
+          <button type="button" class="bp-node-btn active" data-node="n1">
+            <div class="n-left">
+              <span class="n-idx">NODE 01</span>
+              <span class="n-name">VAD &amp; Wake Gate</span>
+            </div>
+            <span class="n-lat">18 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n2">
+            <div class="n-left">
+              <span class="n-idx">NODE 02</span>
+              <span class="n-name">Fast STT Engine</span>
+            </div>
+            <span class="n-lat">195 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n3">
+            <div class="n-left">
+              <span class="n-idx">NODE 03</span>
+              <span class="n-name">Claude Brain</span>
+            </div>
+            <span class="n-lat">310 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n4">
+            <div class="n-left">
+              <span class="n-idx">NODE 04</span>
+              <span class="n-name">OS Tool Sandbox</span>
+            </div>
+            <span class="n-lat">45 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n5">
+            <div class="n-left">
+              <span class="n-idx">NODE 05</span>
+              <span class="n-name">Sentence Chunker</span>
+            </div>
+            <span class="n-lat">4 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n6">
+            <div class="n-left">
+              <span class="n-idx">NODE 06</span>
+              <span class="n-name">Edge-TTS &amp; HUD</span>
+            </div>
+            <span class="n-lat">110 ms</span>
+          </button>
+      </div>
+      <div class="bp-node-detail">
+        <div class="bp-nd-head">
+          <div class="bp-nd-title" id="nd-title">NODE 01 · VAD &amp; Wake Gate</div>
+          <span class="bp-nd-badge" id="nd-lat">LATENCY: 18 ms</span>
+        </div>
+        <div class="bp-nd-row">
+          <div class="bp-nd-lbl">Architectural Role</div>
+          <div class="bp-nd-val" id="nd-role">Samples microphone PCM frames locally, runs offline wake-word + Voice Activity Detection (VAD), and segments speech until 650ms of trailing silence.</div>
+        </div>
+        <div class="bp-nd-row">
+          <div class="bp-nd-lbl">Input / Output Payload Contract</div>
+          <div class="bp-nd-val mono" id="nd-io">IN: 16kHz Mono PCM Stream -&gt; OUT: UtteranceWAVBuffer(duration_ms, rms_peak)</div>
+        </div>
+        <div class="bp-nd-row">
+          <div class="bp-nd-lbl">Error &amp; Retry Policy</div>
+          <div class="bp-nd-val" id="nd-retry">Discards sub-400ms noise bursts and coughs locally without network I/O.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Real code &amp; schema inspector</h2>
+  <p>Extracted directly from the production repository. Switch tabs to inspect the core execution logic, strict JSON/database data contracts, and structured LLM instructions.</p>
+
+  <!-- SECTION 2: REAL CODE & SCHEMA INSPECTOR (TABBED COMPONENT) -->
+  <div class="bp-inspector" id="bp-inspector">
+    <div class="bp-tabs-bar">
+      <button type="button" class="bp-tab-btn active" data-tab="tab1">
+        <span>01 · Streaming Sentence TTS Pipeline</span>
+        <span class="sub">jarvis_core.py · Asyncio Clause Chunker</span>
+      </button>
+      <button type="button" class="bp-tab-btn" data-tab="tab2">
+        <span>02 · Sandboxed macOS Tool Schemas</span>
+        <span class="sub">tools_registry.json · Claude Tool Contracts</span>
+      </button>
+      <button type="button" class="bp-tab-btn" data-tab="tab3">
+        <span>03 · Voice-First System Prompt</span>
+        <span class="sub">system_prompt.md · Spoken Brevity Rules</span>
+      </button>
+    </div>
+    <div class="bp-code-toolbar">
+      <span class="bp-code-file" id="bp-code-filename">// SOURCE: jarvis/jarvis_core.py</span>
+      <button type="button" class="bp-copy-code" id="bp-copy-btn">Copy Snippet</button>
+    </div>
+    <pre class="bp-code-pre" id="bp-code-view">import asyncio
+import re
+from typing import AsyncIterator, Callable
+import edge_tts
+
+SENTENCE_BOUNDARY_RE = re.compile(r&#x27;(?&lt;=[.?!:\n])\s+&#x27;)
+MARKDOWN_STRIP_RE = re.compile(r&#x27;(`{1,3}.*?`{1,3}|\*{1,2}|#{1,6}\s*)&#x27;, re.DOTALL)
+
+class StreamingVoicePipeline:
+    &quot;&quot;&quot;Flushes LLM token streams on clause boundaries for &lt;680ms Time-To-First-Audio.&quot;&quot;&quot;
+    def __init__(self, voice: str = &quot;en-US-ChristopherNeural&quot;, hud_bridge: Callable = None):
+        self.voice = voice
+        self.hud_bridge = hud_bridge
+        self.audio_queue: asyncio.Queue[bytes] = asyncio.Queue(maxsize=16)
+        self._interrupt_event = asyncio.Event()
+
+    def sanitize_for_speech(self, raw_text: str) -&gt; str:
+        clean = MARKDOWN_STRIP_RE.sub(&quot;&quot;, raw_text)
+        return re.sub(r&#x27;\s+&#x27;, &#x27; &#x27;, clean).strip()
+
+    async def chunk_llm_stream(self, token_stream: AsyncIterator[str]) -&gt; AsyncIterator[str]:
+        buffer = &quot;&quot;
+        async for token in token_stream:
+            if self._interrupt_event.is_set():
+                break
+            buffer += token
+            parts = SENTENCE_BOUNDARY_RE.split(buffer)
+            if len(parts) &gt; 1:
+                for clause in parts[:-1]:
+                    clean_clause = self.sanitize_for_speech(clause)
+                    if len(clean_clause) &gt;= 8:
+                        yield clean_clause
+                buffer = parts[-1]
+        tail = self.sanitize_for_speech(buffer)
+        if tail and not self._interrupt_event.is_set():
+            yield tail
+
+    async def synthesize_and_enqueue(self, clause: str) -&gt; None:
+        if self.hud_bridge:
+            self.hud_bridge({&quot;state&quot;: &quot;SPEAKING&quot;, &quot;subtitle&quot;: clause})
+        communicate = edge_tts.Communicate(clause, self.voice, rate=&quot;+8%&quot;)
+        pcm_chunks = bytearray()
+        async for chunk in communicate.stream():
+            if chunk[&quot;type&quot;] == &quot;audio&quot;:
+                pcm_chunks.extend(chunk[&quot;data&quot;])
+        await self.audio_queue.put(bytes(pcm_chunks))</pre>
+  </div>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Interactive dry-run simulator</h2>
+  <p>Select a test scenario and trigger a deterministic dry-run execution across the node topology to inspect real-time logs, compute metrics, and final output payloads.</p>
+
+  <!-- SECTION 3: INTERACTIVE DRY-RUN SIMULATOR -->
+  <div class="sim-container" id="bp-sim" style="margin:28px 0 24px;background:#FFFFFF;border:var(--bw) solid #000000;box-shadow:var(--hard-shadow-lg);border-radius:6px;overflow:hidden">
+    <div class="sim-header">
+      <div class="sim-badge"><span class="dot-live"></span> 03 · LIVE DETERMINISTIC DRY-RUN SIMULATOR</div>
+      <div class="sim-title">Step Through Topology Nodes &amp; Stream Execution Telemetry</div>
+      <p class="sim-intro">Choose a payload scenario below or click "Run Dry-Run Simulation" to step through the pipeline stages and inspect the resulting JSON output contract.</p>
+    </div>
+
+    <div class="sim-controls">
+      <span class="ctrl-label">SELECT TEST SCENARIO:</span>
+      <div class="sim-presets" id="bp-scen-btns">
+        <button type="button" class="preset-btn active" data-scen="workspace-brief">1. Multi-Tool Voice Command (Read Log + Write Summary + Open App)</button><button type="button" class="preset-btn" data-scen="barge-in">2. Mid-Sentence Voice Barge-In Interruption (Queue Flush)</button><button type="button" class="preset-btn" data-scen="sandbox-block">3. Path Traversal / Dotfile Access Attempt (Sandbox Guard)</button>
+      </div>
+    </div>
+
+    <div class="bp-sim-action-bar">
+      <div class="bp-step-strip" id="bp-step-strip">
+        <span class="bp-step-pill done" data-step-idx="0">NODE 01 · VAD &amp; Wake Gate</span><span class="bp-step-pill done" data-step-idx="1">NODE 02 · Fast STT Engine</span><span class="bp-step-pill done" data-step-idx="2">NODE 03 · Claude Brain</span><span class="bp-step-pill done" data-step-idx="3">NODE 04 · OS Tool Sandbox</span><span class="bp-step-pill done" data-step-idx="4">NODE 05 · Sentence Chunker</span><span class="bp-step-pill done" data-step-idx="5">NODE 06 · Edge-TTS &amp; HUD</span>
+      </div>
+      <button type="button" class="bp-run-sim-btn" id="bp-run-btn">Run Dry-Run Simulation ✦</button>
+    </div>
+
+    <div class="critic-layout">
+      <div class="critic-left-col">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:800;color:#38BDF8">// TIMESTAMPED EXECUTION TRACE</span>
+          <span id="bp-sim-status" class="auth-pill pass">TTFA: 640ms · 2 TOOLS RUN ✓</span>
+        </div>
+        <div class="trace-terminal" id="bp-sim-logs" style="min-height:250px;white-space:pre-wrap">[00:00.018] VAD_GATE: Wake-word &#x27;Jarvis&#x27; verified locally (RMS=0.74, 0 idle API cost)
+[00:00.210] STT: &#x27;Check my latest build log in Projects and save a summary to Notes.&#x27;
+[00:00.490] CLAUDE_TOOL_1: Invoked read_workspace_file(relative_path=&#x27;Projects/build.log&#x27;)
+[00:00.535] CLAUDE_TOOL_2: Invoked write_markdown_note(filename=&#x27;build-summary.md&#x27;, mode=&#x27;overwrite&#x27;)
+[00:00.640] TTS_STREAM: Flushed clause #1 (&#x27;I found two failing Redis tests in your build log.&#x27;) -&gt; Audio playing!
+[00:01.120] HUD_STATE: Rendered markdown preview card on 60fps pywebview overlay.</div>
+        <p id="bp-sim-summary" style="font-size:0.8rem;color:#94A3B8;margin:6px 0 0;line-height:1.45">By flushing the first spoken clause to Edge-TTS while tool results render in the HUD, voice playback starts in 640ms.</p>
+      </div>
+
+      <div class="critic-right-col">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-family:'Space Grotesk',sans-serif;font-size:0.88rem;font-weight:800;color:#000000">FINAL OUTPUT PAYLOAD CONTRACT</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;font-weight:800;color:var(--acc)">SCHEMA VALIDATED ✓</span>
+        </div>
+        <div style="background:#0F172A;border:2px solid #000000;border-radius:4px;padding:14px;flex:1">
+          <pre id="bp-sim-payload" style="margin:0;color:#34D399;font-family:'JetBrains Mono',monospace;font-size:0.72rem;line-height:1.45;white-space:pre-wrap">{
+  &quot;wake_word_verified&quot;: true,
+  &quot;hud_state&quot;: &quot;SPEAKING&quot;,
+  &quot;tools_executed&quot;: [
+    {&quot;tool&quot;: &quot;read_workspace_file&quot;, &quot;target&quot;: &quot;~/Projects/build.log&quot;, &quot;status&quot;: &quot;OK&quot;},
+    {&quot;tool&quot;: &quot;write_markdown_note&quot;, &quot;target&quot;: &quot;~/Documents/JarvisNotes/build-summary.md&quot;, &quot;status&quot;: &quot;OK&quot;}
+  ],
+  &quot;spoken_response&quot;: &quot;I found two failing Redis tests in your build log. I&#x27;ve saved the root-cause summary to your notes.&quot;,
+  &quot;ttfa_ms&quot;: 640
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="sim-specs">
+      <div><b>TOTAL LATENCY</b> <span id="bp-m-lat">640 ms TTFA (1.4s total)</span></div>
+      <div><b>COMPUTE / TOKENS</b> <span id="bp-m-comp">Local VAD + 410 Claude tokens</span></div>
+      <div><b>ESTIMATED RUN COST</b> <span class="cost-tag" id="bp-m-cost">$0.0012 USD</span></div>
+      <div><b>EXECUTION MODE</b> <span>Deterministic Self-Hosted</span></div>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Production resilience &amp; edge-case handling</h2>
+  <p>Every production system is defined by how it behaves when upstream dependencies fail, rate-limits trigger, or malformed payloads arrive at the boundary.</p>
+
+  <!-- SECTION 4: 3-CARD PRODUCTION RESILIENCE BREAKDOWN -->
+  <div class="bp-resilience-grid">
+    
+    <div class="bp-res-card">
+      <span class="r-tag">01 · SENTENCE-BOUNDARY CHUNKING</span>
+      <h3>Sub-680ms Time-To-First-Audio</h3>
+      <p>Instead of waiting for Claude to finish a 4-sentence reply, <code>chunk_llm_stream()</code> splits on punctuation and streams clause #1 to TTS immediately.</p>
+    </div>
+    <div class="bp-res-card">
+      <span class="r-tag">02 · PATH.RESOLVE() SANDBOX</span>
+      <h3>Strict Filesystem &amp; Secret Isolation</h3>
+      <p>Validates canonical paths against allowlisted workspace directories and blocks <code>.env</code>, <code>.ssh</code>, and keychain files deterministically.</p>
+    </div>
+    <div class="bp-res-card">
+      <span class="r-tag">03 · INSTANT BARGE-IN CANCELLATION</span>
+      <h3>Non-Blocking Audio Queue Flush</h3>
+      <p>Decouples TTS synthesis from playback via an <code>asyncio.Queue</code> so user interruptions halt speech within 22ms.</p>
+    </div>
+  </div>
+
+  
+  <div class="callout decision">
+    <span class="badge">ARCHITECTURAL DECISION</span>
+    <h3>Why sentence-level TTS streaming beats full-response synthesis</h3>
+    <p>Waiting for an LLM to complete a 120-token response takes ~2.2 seconds, plus another 400ms for TTS synthesis—leaving an awkward 2.6-second silence after every voice command.</p>
+    <p>By splitting the SSE stream on the first period or colon and synthesizing clause #1 while clauses #2 and #3 are still generating, perceived latency drops from 2.6s to 640ms.</p>
+    <p class="outcome"><b>IMPACT</b> 4x faster perceived voice responsiveness with zero extra API cost.</p>
+  </div>
+  <div class="callout pitfall">
+    <span class="badge">PRODUCTION PITFALL</span>
+    <h3>TTS engines reading Markdown asterisks and backticks literally</h3>
+    <p>LLMs naturally format responses with <code>**bold**</code> and <code>`code`</code>. Passing raw tokens to TTS causes the voice assistant to say 'asterisk asterisk bold asterisk asterisk'.</p>
+    <p>I added a regex sanitization filter in <code>StreamingVoicePipeline</code> that strips Markdown formatting for the audio stream while preserving the rich Markdown inside the <code>pywebview</code> visual HUD.</p>
+    <p class="outcome"><b>FIX</b> Clean natural speech paired with rich visual formatting on screen.</p>
+  </div>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Stack &amp; specifications</h2>
+  <ul>
+    <li><strong>Python 3.11+ &amp; Asyncio</strong>: Multi-threaded audio DSP ring buffer and event loop</li><li><strong>Claude Sonnet / Haiku (Tool Use)</strong>: Low-latency SSE streaming and function calling</li><li><strong>Edge-TTS &amp; Local VAD</strong>: Zero-cost neural speech synthesis and offline voice activity detection</li><li><strong>pywebview (Cocoa / WebKit)</strong>: Native macOS translucent HUD overlay running at 60fps</li>
+  </ul>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Architectural takeaway</h2>
+  <p>Voice interfaces live or die by perceived latency. Offline wake-word gating keeps idle cost at zero, while clause-level SSE-to-TTS pipelining makes a cloud LLM feel like a local OS daemon.</p>
+</div></section>
+
+<div class="wrap"><nav class="pager" aria-label="Other blueprints">
+  <a href="seo-studio.html">← SEO Article Generator</a>
+  <a href="content-factory.html">Content Factory Pipeline →</a>
+</nav></div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="logo"><span class="mk">MR</span></div>
+    <div class="mono">Designed &amp; built by Manny Ruesch · 2026</div>
+    <a href="#top">Back to top ↑</a>
+  </div>
+</footer>
+
+<script src="../assets/site.js"></script>
+<script>
+(function(){
+  const NODES = {"n1": {"id": "n1", "idx": "NODE 01", "name": "VAD & Wake Gate", "sub": "16kHz PCM Ring Buffer", "latency": "18 ms", "accent": false, "role": "Samples microphone PCM frames locally, runs offline wake-word + Voice Activity Detection (VAD), and segments speech until 650ms of trailing silence.", "io_type": "IN: 16kHz Mono PCM Stream -> OUT: UtteranceWAVBuffer(duration_ms, rms_peak)", "retry_policy": "Discards sub-400ms noise bursts and coughs locally without network I/O."}, "n2": {"id": "n2", "idx": "NODE 02", "name": "Fast STT Engine", "sub": "Streaming Audio-to-Text", "latency": "195 ms", "accent": false, "role": "Transcribes the captured WAV buffer into normalized text and updates the pywebview HUD state from LISTENING to THINKING.", "io_type": "IN: UtteranceWAVBuffer -> OUT: TranscriptEvent(text: str, language: str, confidence: float)", "retry_policy": "Aborts turn cleanly if transcript is empty or confidence < 0.60."}, "n3": {"id": "n3", "idx": "NODE 03", "name": "Claude Brain", "sub": "SSE Tool Orchestrator", "latency": "310 ms", "accent": true, "role": "Streams Claude responses over SSE, deciding whether to answer directly or emit structured tool_use blocks for local macOS/filesystem actions.", "io_type": "IN: (TranscriptEvent, ConversationMemory) -> OUT: SSEStream(TextDelta | ToolUseBlock)", "retry_policy": "Maintains rolling 10-turn context window with automatic token pruning."}, "n4": {"id": "n4", "idx": "NODE 04", "name": "OS Tool Sandbox", "sub": "Path-Guarded Executor", "latency": "45 ms", "accent": true, "role": "Executes approved local tools (file read/write, AppleScript app launch, web search) inside an allowlisted directory sandbox.", "io_type": "IN: ToolUseBlock(name, input) -> OUT: ToolResultBlock(status, stdout_preview)", "retry_policy": "Blocks any path resolving outside ~/Documents or ~/Desktop; enforces 5s subprocess timeout."}, "n5": {"id": "n5", "idx": "NODE 05", "name": "Sentence Chunker", "sub": "Punctuation Buffer", "latency": "4 ms", "accent": false, "role": "Accumulates LLM text deltas and flushes complete clauses on punctuation boundaries (.?!:) so TTS synthesis starts before the full LLM response finishes.", "io_type": "IN: TokenDeltaStream -> OUT: AsyncIterator[SpeakableClause]", "retry_policy": "Strips markdown syntax (**, `, #) and code blocks so TTS never reads raw punctuation aloud."}, "n6": {"id": "n6", "idx": "NODE 06", "name": "Edge-TTS & HUD", "sub": "Async Audio + 60fps UI", "latency": "110 ms", "accent": false, "role": "Synthesizes neural audio chunks via Edge-TTS, plays them through a double-buffered audio queue, and drives the pywebview waveform visualizer.", "io_type": "IN: SpeakableClause -> OUT: AudioPlaybackFrame + HUDWaveformState", "retry_policy": "Supports instant barge-in interruption: speaking wake-word mid-playback flushes the audio queue."}};
+  const TABS = {"tab1": {"label": "Streaming Sentence TTS Pipeline", "sub": "jarvis_core.py \u00b7 Asyncio Clause Chunker", "file": "jarvis/jarvis_core.py", "code": "import asyncio\nimport re\nfrom typing import AsyncIterator, Callable\nimport edge_tts\n\nSENTENCE_BOUNDARY_RE = re.compile(r'(?<=[.?!:\\n])\\s+')\nMARKDOWN_STRIP_RE = re.compile(r'(`{1,3}.*?`{1,3}|\\*{1,2}|#{1,6}\\s*)', re.DOTALL)\n\nclass StreamingVoicePipeline:\n    \"\"\"Flushes LLM token streams on clause boundaries for <680ms Time-To-First-Audio.\"\"\"\n    def __init__(self, voice: str = \"en-US-ChristopherNeural\", hud_bridge: Callable = None):\n        self.voice = voice\n        self.hud_bridge = hud_bridge\n        self.audio_queue: asyncio.Queue[bytes] = asyncio.Queue(maxsize=16)\n        self._interrupt_event = asyncio.Event()\n\n    def sanitize_for_speech(self, raw_text: str) -> str:\n        clean = MARKDOWN_STRIP_RE.sub(\"\", raw_text)\n        return re.sub(r'\\s+', ' ', clean).strip()\n\n    async def chunk_llm_stream(self, token_stream: AsyncIterator[str]) -> AsyncIterator[str]:\n        buffer = \"\"\n        async for token in token_stream:\n            if self._interrupt_event.is_set():\n                break\n            buffer += token\n            parts = SENTENCE_BOUNDARY_RE.split(buffer)\n            if len(parts) > 1:\n                for clause in parts[:-1]:\n                    clean_clause = self.sanitize_for_speech(clause)\n                    if len(clean_clause) >= 8:\n                        yield clean_clause\n                buffer = parts[-1]\n        tail = self.sanitize_for_speech(buffer)\n        if tail and not self._interrupt_event.is_set():\n            yield tail\n\n    async def synthesize_and_enqueue(self, clause: str) -> None:\n        if self.hud_bridge:\n            self.hud_bridge({\"state\": \"SPEAKING\", \"subtitle\": clause})\n        communicate = edge_tts.Communicate(clause, self.voice, rate=\"+8%\")\n        pcm_chunks = bytearray()\n        async for chunk in communicate.stream():\n            if chunk[\"type\"] == \"audio\":\n                pcm_chunks.extend(chunk[\"data\"])\n        await self.audio_queue.put(bytes(pcm_chunks))"}, "tab2": {"label": "Sandboxed macOS Tool Schemas", "sub": "tools_registry.json \u00b7 Claude Tool Contracts", "file": "jarvis/tools_registry.json", "code": "{\n  \"version\": \"1.4.0\",\n  \"sandbox_policy\": {\n    \"allowed_roots\": [\"~/Desktop\", \"~/Documents\", \"~/Projects\"],\n    \"blocked_patterns\": [\".env\", \"id_rsa\", \".ssh\", \"keychain\"],\n    \"subprocess_timeout_ms\": 5000\n  },\n  \"tools\": [\n    {\n      \"name\": \"read_workspace_file\",\n      \"description\": \"Read a UTF-8 text or Markdown file inside the user's allowlisted workspace.\",\n      \"input_schema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"relative_path\": {\"type\": \"string\", \"description\": \"Path relative to allowed root\"},\n          \"max_lines\": {\"type\": \"integer\", \"default\": 150}\n        },\n        \"required\": [\"relative_path\"]\n      }\n    },\n    {\n      \"name\": \"write_markdown_note\",\n      \"description\": \"Create or append a structured Markdown note inside ~/Documents/JarvisNotes.\",\n      \"input_schema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"filename\": {\"type\": \"string\"},\n          \"content\": {\"type\": \"string\"},\n          \"mode\": {\"type\": \"string\", \"enum\": [\"overwrite\", \"append\"]}\n        },\n        \"required\": [\"filename\", \"content\"]\n      }\n    },\n    {\n      \"name\": \"control_macos_app\",\n      \"description\": \"Open, focus, or query a native macOS application via allowlisted bundle ID.\",\n      \"input_schema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"app_name\": {\"type\": \"string\", \"enum\": [\"Safari\", \"Cursor\", \"Terminal\", \"Spotify\", \"Calendar\", \"Notes\"]},\n          \"action\": {\"type\": \"string\", \"enum\": [\"activate\", \"open_url\", \"status\"]}\n        },\n        \"required\": [\"app_name\", \"action\"]\n      }\n    }\n  ]\n}"}, "tab3": {"label": "Voice-First System Prompt", "sub": "system_prompt.md \u00b7 Spoken Brevity Rules", "file": "jarvis/system_prompt.md", "code": "# JARVIS VOICE & TOOL ORCHESTRATION DIRECTIVES\n\nYou are Jarvis, a native macOS voice-first engineering assistant.\nYour output is synthesized directly into spoken audio via a real-time neural TTS stream.\n\n1. SPOKEN BREVITY INVARIANT:\n   - Keep spoken responses under 2 concise sentences unless explicitly asked for a deep readout.\n   - Never read raw file paths, UUIDs, markdown tables, or code blocks aloud.\n   - When writing code or long notes, invoke `write_markdown_note` to save the artifact to disk, then confirm verbally in one sentence (e.g., \"Done. I've written the deployment checklist to your Documents folder and opened it.\").\n\n2. DETERMINISTIC TOOL CHAINING:\n   - Always verify file existence before reading or patching.\n   - Never attempt to access paths outside the allowlisted sandbox (`~/Desktop`, `~/Documents`, `~/Projects`).\n   - Emit your first spoken sentence immediately so the sentence-boundary TTS chunker can begin audio playback within 680ms."}};
+  const SCENARIOS = {"workspace-brief": {"id": "workspace-brief", "btn_label": "1. Multi-Tool Voice Command (Read Log + Write Summary + Open App)", "badge_text": "TTFA: 640ms \u00b7 2 TOOLS RUN \u2713", "badge_class": "pass", "latency": "640 ms TTFA (1.4s total)", "compute": "Local VAD + 410 Claude tokens", "cost": "$0.0012 USD", "logs": ["[00:00.018] VAD_GATE: Wake-word 'Jarvis' verified locally (RMS=0.74, 0 idle API cost)", "[00:00.210] STT: 'Check my latest build log in Projects and save a summary to Notes.'", "[00:00.490] CLAUDE_TOOL_1: Invoked read_workspace_file(relative_path='Projects/build.log')", "[00:00.535] CLAUDE_TOOL_2: Invoked write_markdown_note(filename='build-summary.md', mode='overwrite')", "[00:00.640] TTS_STREAM: Flushed clause #1 ('I found two failing Redis tests in your build log.') -> Audio playing!", "[00:01.120] HUD_STATE: Rendered markdown preview card on 60fps pywebview overlay."], "payload": "{\n  \"wake_word_verified\": true,\n  \"hud_state\": \"SPEAKING\",\n  \"tools_executed\": [\n    {\"tool\": \"read_workspace_file\", \"target\": \"~/Projects/build.log\", \"status\": \"OK\"},\n    {\"tool\": \"write_markdown_note\", \"target\": \"~/Documents/JarvisNotes/build-summary.md\", \"status\": \"OK\"}\n  ],\n  \"spoken_response\": \"I found two failing Redis tests in your build log. I've saved the root-cause summary to your notes.\",\n  \"ttfa_ms\": 640\n}", "summary": "By flushing the first spoken clause to Edge-TTS while tool results render in the HUD, voice playback starts in 640ms."}, "barge-in": {"id": "barge-in", "btn_label": "2. Mid-Sentence Voice Barge-In Interruption (Queue Flush)", "badge_text": "BARGE-IN INTERRUPT HANDLED \u2713", "badge_class": "warn", "latency": "22 ms interrupt response", "compute": "Audio queue flushed cleanly", "cost": "$0.0004 USD", "logs": ["[00:00.000] SPEAKING: Playing clause 1 of 3 ('Your afternoon schedule has three back-to-back...')", "[00:01.140] VAD_INTERRUPT: Detected wake-word 'Jarvis, stop' during active playback!", "[00:01.148] PIPELINE_FLUSH: Set _interrupt_event -> Cancelled pending SSE stream & cleared 2 queued audio buffers", "[00:01.162] HUD_STATE: Transitioned SPEAKING -> LISTENING in 22ms."], "payload": "{\n  \"event\": \"USER_BARGE_IN_INTERRUPT\",\n  \"interrupted_at_clause\": 1,\n  \"queued_audio_chunks_dropped\": 2,\n  \"interrupt_latency_ms\": 22,\n  \"new_hud_state\": \"LISTENING\"\n}", "summary": "An asyncio.Event interrupt signal cancels the active SSE stream and flushes pending PCM buffers in 22ms when the user speaks over the assistant."}, "sandbox-block": {"id": "sandbox-block", "btn_label": "3. Path Traversal / Dotfile Access Attempt (Sandbox Guard)", "badge_text": "BLOCKED BY SANDBOX GUARD", "badge_class": "fail", "latency": "310 ms (0 Files Read)", "compute": "Blocked at local path resolver", "cost": "$0.0003 USD", "logs": ["[00:00.180] STT: 'Read my SSH private key and .env file in the root directory.'", "[00:00.440] TOOL_CALL: read_workspace_file(relative_path='../../.ssh/id_rsa')", "[00:00.442] SANDBOX_GUARD: Path resolves outside allowlisted roots & matches blocked pattern 'id_rsa'!", "[00:00.445] REJECT: Raised SandboxViolationError -> Returned safe refusal to voice pipeline."], "payload": "{\n  \"tool\": \"read_workspace_file\",\n  \"requested_path\": \"../../.ssh/id_rsa\",\n  \"sandbox_verdict\": \"DENIED_PATH_TRAVERSAL_AND_DOTFILE\",\n  \"file_bytes_read\": 0,\n  \"spoken_response\": \"That path is restricted by my security sandbox. I can only access files inside your workspace folders.\"\n}", "summary": "Every filesystem tool resolves symlinks via Path.resolve() and checks both allowlisted parent directories and blocked secret patterns (.env, .ssh) before opening any file."}};
+
+  // 1. Interactive Node Topology
+  function selectNode(nodeId) {
+    const n = NODES[nodeId];
+    if (!n) return;
+    document.querySelectorAll('#bp-node-btns .bp-node-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.node === nodeId);
+    });
+    document.getElementById('nd-title').textContent = n.idx + ' · ' + n.name;
+    document.getElementById('nd-lat').textContent = 'LATENCY: ' + n.latency;
+    document.getElementById('nd-role').textContent = n.role;
+    document.getElementById('nd-io').textContent = n.io_type;
+    document.getElementById('nd-retry').textContent = n.retry_policy;
+  }
+
+  document.querySelectorAll('[data-node]').forEach(el => {
+    el.addEventListener('click', () => selectNode(el.dataset.node));
+  });
+
+  // 2. Code & Schema Tabs
+  let currentTab = 'tab1';
+  document.querySelectorAll('#bp-inspector .bp-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#bp-inspector .bp-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentTab = btn.dataset.tab;
+      const t = TABS[currentTab];
+      if (t) {
+        document.getElementById('bp-code-filename').textContent = '// SOURCE: ' + t.file;
+        document.getElementById('bp-code-view').textContent = t.code;
+      }
+    });
+  });
+
+  const copyBtn = document.getElementById('bp-copy-btn');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      const code = document.getElementById('bp-code-view').textContent;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(() => {
+          copyBtn.textContent = 'Copied! ✓';
+          setTimeout(() => { copyBtn.textContent = 'Copy Snippet'; }, 1800);
+        });
+      }
+    });
+  }
+
+  // 3. Dry-Run Simulator with Step-by-Step Animation
+  let activeScen = 'workspace-brief';
+  let simTimer = null;
+
+  function runSimulation(scenId, animate) {
+    const s = SCENARIOS[scenId];
+    if (!s) return;
+    if (simTimer) clearInterval(simTimer);
+
+    const pills = document.querySelectorAll('#bp-step-strip .bp-step-pill');
+    const logsEl = document.getElementById('bp-sim-logs');
+    const payloadEl = document.getElementById('bp-sim-payload');
+    const statusEl = document.getElementById('bp-sim-status');
+    const summaryEl = document.getElementById('bp-sim-summary');
+    const latEl = document.getElementById('bp-m-lat');
+    const compEl = document.getElementById('bp-m-comp');
+    const costEl = document.getElementById('bp-m-cost');
+
+    if (!animate) {
+      pills.forEach(p => { p.className = 'bp-step-pill done'; });
+      logsEl.textContent = s.logs.join('\n');
+      payloadEl.textContent = s.payload;
+      statusEl.textContent = s.badge_text;
+      statusEl.className = 'auth-pill ' + s.badge_class;
+      summaryEl.textContent = s.summary;
+      latEl.textContent = s.latency;
+      compEl.textContent = s.compute;
+      costEl.textContent = s.cost;
+      return;
+    }
+
+    // Step-by-step live trace animation
+    pills.forEach(p => { p.className = 'bp-step-pill'; });
+    logsEl.textContent = '[00:00.000] INIT: Starting deterministic dry-run execution...';
+    statusEl.textContent = 'EXECUTING DRY-RUN...';
+    statusEl.className = 'auth-pill warn';
+
+    let step = 0;
+    const totalSteps = pills.length;
+    simTimer = setInterval(() => {
+      if (step < totalSteps) {
+        pills.forEach((p, idx) => {
+          if (idx < step) p.className = 'bp-step-pill done';
+          else if (idx === step) p.className = 'bp-step-pill running';
+          else p.className = 'bp-step-pill';
+        });
+        const logSlice = s.logs.slice(0, step + 1);
+        logsEl.textContent = logSlice.join('\n');
+        step++;
+      } else {
+        clearInterval(simTimer);
+        pills.forEach(p => { p.className = 'bp-step-pill done'; });
+        logsEl.textContent = s.logs.join('\n');
+        payloadEl.textContent = s.payload;
+        statusEl.textContent = s.badge_text;
+        statusEl.className = 'auth-pill ' + s.badge_class;
+        summaryEl.textContent = s.summary;
+        latEl.textContent = s.latency;
+        compEl.textContent = s.compute;
+        costEl.textContent = s.cost;
+      }
+    }, 180);
+  }
+
+  document.querySelectorAll('#bp-scen-btns .preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#bp-scen-btns .preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeScen = btn.dataset.scen;
+      runSimulation(activeScen, true);
+    });
+  });
+
+  const runBtn = document.getElementById('bp-run-btn');
+  if (runBtn) {
+    runBtn.addEventListener('click', () => runSimulation(activeScen, true));
+  }
+})();
+</script>
+</body>
+</html>

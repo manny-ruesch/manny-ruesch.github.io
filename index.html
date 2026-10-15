@@ -149,7 +149,7 @@ a.card:focus-visible{outline:3px solid #000000;outline-offset:3px}
 
 
 
-/* ---- PRODUCTION TOOLS SHOWROOM (FEATURED TOP 3) ---- */
+/* ---- ARCHITECTURE BLUEPRINTS SHOWCASE (FEATURED TOP 3) ---- */
 .tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(20px,2.5vw,28px);margin-top:20px}
 .tool-card{display:flex;flex-direction:column;background:#FFFFFF;border:var(--bw) solid #000000;box-shadow:var(--hard-shadow);border-radius:4px;overflow:hidden;transition:transform .15s var(--ease),box-shadow .15s var(--ease);opacity:1 !important;transform:none !important}
 .tool-card:hover{transform:translate(-3px,-3px) !important;box-shadow:var(--hard-shadow-lg)}
@@ -157,17 +157,15 @@ a.card:focus-visible{outline:3px solid #000000;outline-offset:3px}
 .tool-media img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s ease}
 .tool-card:hover .tool-media img{transform:scale(1.03)}
 .tool-badge-pill{position:absolute;top:12px;left:12px;background:#FFFFFF;color:var(--acc);border:2px solid #000000;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:800;border-radius:2px;box-shadow:var(--hard-shadow-sm);text-transform:uppercase}
-.tool-price-tag{position:absolute;top:12px;right:12px;background:#000000;color:#FFFFFF;border:2px solid #000000;padding:4px 10px;font-family:'JetBrains Mono',monospace;font-size:.82rem;font-weight:800;border-radius:3px;box-shadow:2px 2px 0px rgba(0,0,0,0.3)}
+.tool-metric-tag{position:absolute;top:12px;right:12px;background:#000000;color:#FFFFFF;border:2px solid #000000;padding:4px 10px;font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:800;border-radius:3px;box-shadow:2px 2px 0px rgba(0,0,0,0.3);letter-spacing:.03em;text-transform:uppercase}
 .tool-content{padding:22px;display:flex;flex-direction:column;flex:1}
 .tool-content h4{font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:1.15rem;line-height:1.25;letter-spacing:-.01em;color:#000000;margin-bottom:10px}
 .tool-content p{color:#444444;font-size:.9rem;line-height:1.5;margin-bottom:16px;flex:1}
 .tool-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
 .tool-tag{font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:700;color:#000000;background:#F0F0F0;border:1.5px solid #000000;border-radius:2px;padding:2px 8px}
-.tool-actions{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding-top:16px;border-top:1.5px solid #E5E5E5}
-.btn-gumroad{display:inline-flex;align-items:center;justify-content:center;background:var(--acc);color:#FFFFFF;border:2px solid #000000;padding:10px 14px;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:.85rem;letter-spacing:.02em;text-transform:uppercase;border-radius:3px;box-shadow:var(--hard-shadow-sm);transition:all .15s}
-.btn-gumroad:hover{background:#E02447;transform:translate(-1px,-1px);box-shadow:var(--hard-shadow);color:#FFFFFF}
-.btn-whop{display:inline-flex;align-items:center;justify-content:center;background:#000000;color:#FFFFFF;border:2px solid #000000;padding:10px 14px;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:.85rem;letter-spacing:.02em;text-transform:uppercase;border-radius:3px;box-shadow:var(--hard-shadow-sm);transition:all .15s}
-.btn-whop:hover{background:#222222;transform:translate(-1px,-1px);box-shadow:var(--hard-shadow);color:#FFFFFF}
+.tool-actions{display:grid;grid-template-columns:1fr;gap:10px;align-items:center;padding-top:16px;border-top:1.5px solid #E5E5E5}
+.btn-blueprint{display:inline-flex;align-items:center;justify-content:center;background:var(--acc);color:#FFFFFF;border:2px solid #000000;padding:11px 16px;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:.85rem;letter-spacing:.03em;text-transform:uppercase;border-radius:3px;box-shadow:var(--hard-shadow-sm);transition:all .15s}
+.btn-blueprint:hover{background:#000000;transform:translate(-2px,-2px);box-shadow:var(--hard-shadow);color:#FFFFFF}
 
 /* Tools CTA Bar */
 .tools-cta-bar{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;background:#FFFFFF;border:var(--bw) solid #000000;box-shadow:var(--hard-shadow);border-radius:4px;padding:22px 28px;margin-top:32px}
@@ -189,7 +187,7 @@ a.card:focus-visible{outline:3px solid #000000;outline-offset:3px}
     <a href="#top" class="logo"><span class="mk">MR</span><span>Manny Ruesch</span></a>
     <div class="navlinks">
       <a href="#work" class="hide-sm">Work</a>
-      <a href="tools.html" class="hide-sm">Tools</a>
+      <a href="tools.html" class="hide-sm">Blueprints</a>
       <a href="#stack" class="hide-sm">Stack</a>
       <a href="#contact" class="hide-sm">Contact</a>
       <a href="assets/cv-manny-ruesch.pdf" target="_blank" rel="noopener" class="hide-sm">CV ↗</a>
@@ -222,9 +220,9 @@ a.card:focus-visible{outline:3px solid #000000;outline-offset:3px}
       <div class="rv d1">
         <p class="body">Over the past months I built the automation &amp; AI stack for a fast-growing real-estate agency, from AI home-staging to a real-time marketing dashboard, while shipping my own products and personal tools on the side. I like owning a problem from first idea to production.</p>
         <div class="now">
-          <span>▸ now &nbsp; <b>marketing automation &amp; AI · freelance &amp; remote</b></span>
-          <span>▸ next &nbsp; <b>MSc Finance &amp; Data</b></span>
-          <span>▸ stack &nbsp; <b>n8n · Python · LLMs · APIs</b></span>
+          <span>▸ focus &nbsp; <b>AI &amp; automation systems · end-to-end architecture</b></span>
+          <span>▸ next &nbsp;&nbsp; <b>MSc Finance &amp; Data · quantitative &amp; data engineering</b></span>
+          <span>▸ stack &nbsp; <b>n8n · Python · FastAPI · LLMs · Multi-Agent Systems</b></span>
         </div>
       </div>
     </div>
@@ -345,18 +343,20 @@ a.card:focus-visible{outline:3px solid #000000;outline-offset:3px}
 
     <div class="grouphead rv"><h3>Personal builds</h3><span>// nights &amp; weekends</span></div>
     <div class="cards">
-      <div class="card rv">
+      <a class="card rv" href="work/jarvis.html">
+        <span class="badge" style="background:#FFF0F2;color:#FF385C;border-color:#FF385C">VOICE PIPELINE SIM ✦</span>
         <span class="idx">09</span>
         <h4>Jarvis · voice assistant</h4>
         <p>A native macOS assistant with a strict wake-word, a cinematic HUD, and a Claude "brain" that reads &amp; writes files, searches the web, and opens apps by voice.</p>
         <div class="tags"><span class="tag">Python</span><span class="tag">pywebview</span><span class="tag">Edge-TTS</span><span class="tag">Claude</span></div>
-      </div>
-      <div class="card rv d1">
+      </a>
+      <a class="card rv d1" href="work/content-factory.html">
+        <span class="badge" style="background:#FFF0F2;color:#FF385C;border-color:#FF385C">PIPELINE SIM ✦</span>
         <span class="idx">10</span>
         <h4>Content Factory</h4>
         <p>An automated B2B clip factory: pull long-form video, cut highlights, generate faceless clips with GPT-4o &amp; ElevenLabs, and auto-post to TikTok / YouTube / Meta.</p>
         <div class="tags"><span class="tag">FastAPI</span><span class="tag">Celery</span><span class="tag">ffmpeg</span><span class="tag">GPT-4o</span></div>
-      </div>
+      </a>
     </div>
 
     <div class="grouphead rv"><h3>Autonomous Agents &amp; Systems</h3><span>// hermes agent &amp; multi-agent architectures</span></div>
@@ -399,84 +399,84 @@ a.card:focus-visible{outline:3px solid #000000;outline-offset:3px}
 
 
 
-<!-- BEGIN STORE TOOLS SECTION -->
-<section id="tools">
+<!-- BEGIN ARCHITECTURE BLUEPRINTS SECTION -->
+<section id="blueprints">
   <div class="wrap">
-    <div class="eyebrow rv">03 / Production Tools</div>
+    <div class="eyebrow rv">03 / Architecture Blueprints</div>
     <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:12px;margin-bottom:12px">
-      <h2 class="sec-h rv">Featured Engines &amp; Workflows.</h2>
-      <span class="mono rv" style="font-size:.85rem;font-weight:700;color:var(--acc);background:#FFFFFF;border:2px solid #000000;padding:4px 10px;box-shadow:var(--hard-shadow-sm);border-radius:3px">ZERO SUBSCRIPTIONS · INSTANT ZIP</span>
+      <h2 class="sec-h rv">System Topologies &amp; Execution Engines.</h2>
+      <span class="mono rv" style="font-size:.85rem;font-weight:700;color:var(--acc);background:#FFFFFF;border:2px solid #000000;padding:4px 10px;box-shadow:var(--hard-shadow-sm);border-radius:3px">OPEN ARCHITECTURE · INTERACTIVE DRY-RUNS</span>
     </div>
     <p class="rv" style="color:#444444;font-size:1.05rem;max-width:64ch;margin-bottom:34px">
-      Flagship self-hosted automation systems, autonomous AI agents, and programmatic content engines. Download once, own the code forever.
+      Deep-dives into my most complex production architectures: multi-agent topologies, vector synchronization engines, strict data schemas, and fault-tolerant pipelines. Inspect the real code and run live execution simulations in the browser.
     </p>
 
     <div class="tools-grid">
 
       <div class="tool-card">
         <div class="tool-media">
-          <img src="assets/gumroad/ai-virtual-staging-n8n.png" alt="AI Virtual Home Staging Micro-SaaS & Agency Kit" loading="lazy">
-          <span class="tool-badge-pill">FLAGSHIP MICRO-SAAS</span>
-          <span class="tool-price-tag">39 €</span>
+          <img src="assets/blueprints/otel-llm-budget-enforcer-cost-fallback-proxy-20261012.png" alt="OTel LLM Budget Enforcer & Dynamic Cost-Fallback Proxy" loading="lazy">
+          <span class="tool-badge-pill">ASYNC PROXY GATEWAY</span>
+          <span class="tool-metric-tag">OTEL · &lt;4ms OVERHEAD</span>
         </div>
         <div class="tool-content">
-          <h4>AI Virtual Home Staging Micro-SaaS & Agency Kit</h4>
-          <p>Full production pipeline furnishing empty property photos in under 35 seconds. Complete with webhook API, custom presets, and architecture guide.</p>
-          <div class="tool-tags"><span class="tool-tag">n8n</span><span class="tool-tag">Nano Banana Pro</span><span class="tool-tag">Micro-SaaS</span><span class="tool-tag">Real Estate</span></div>
+          <h4>OTel LLM Budget Enforcer &amp; Cost-Fallback Proxy</h4>
+          <p>Multi-tenant async LLM gateway enforcing sliding-window token budgets, semantic vector caching (cosine &ge; 0.92), circuit breaking, and automatic cheaper-model failover with native OpenTelemetry spans.</p>
+          <div class="tool-tags"><span class="tool-tag">Python</span><span class="tool-tag">FastAPI</span><span class="tool-tag">OpenTelemetry</span><span class="tool-tag">Semantic Cache</span><span class="tool-tag">Token Bucket</span></div>
           <div class="tool-actions">
-            <a href="https://mannyverse767.gumroad.com/l/ai-virtual-staging-n8n" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
-            <a href="https://whop.com/mr-studio-7faa/ai-virtual-home-staging-micro-saas-agency-kit-n8n-gemini-workflow" target="_blank" rel="noopener" class="btn-whop">Whop ↗</a>
+            <a href="work/otel-llm-gateway.html" class="btn-blueprint">Inspect Blueprint &amp; Simulator →</a>
           </div>
         </div>
       </div>
+
       <div class="tool-card">
         <div class="tool-media">
-          <img src="assets/gumroad/ai-agent-memory-rag-sync-notion-airtable-n8n-20260929.png" alt="Autonomous AI Memory & RAG Sync (Notion + Airtable)" loading="lazy">
-          <span class="tool-badge-pill">AUTONOMOUS RAG</span>
-          <span class="tool-price-tag">19 €</span>
+          <img src="assets/blueprints/autonomous-cicd-log-triage-self-healing-pr-engine-20261007.png" alt="Autonomous CI/CD Log Triage & Self-Healing PR Engine" loading="lazy">
+          <span class="tool-badge-pill">SELF-HEALING CI/CD</span>
+          <span class="tool-metric-tag">DUCKDB · AST PARSER</span>
         </div>
         <div class="tool-content">
-          <h4>Autonomous AI Memory & RAG Sync (Notion + Airtable)</h4>
-          <p>Zero-maintenance continuous RAG sync engine between Notion databases, Airtable CRM, and Gemini embeddings for autonomous multi-agent systems.</p>
-          <div class="tool-tags"><span class="tool-tag">n8n</span><span class="tool-tag">RAG Sync</span><span class="tool-tag">Notion API</span><span class="tool-tag">Airtable</span><span class="tool-tag">Gemini</span></div>
+          <h4>Autonomous CI/CD Log Triage &amp; Self-Healing PR Engine</h4>
+          <p>Ingests multi-megabyte build logs into an in-memory DuckDB analytical engine, isolates stack trace frames via AST inspection, diagnoses root causes with structured LLM outputs, and opens verified healing PRs.</p>
+          <div class="tool-tags"><span class="tool-tag">Python</span><span class="tool-tag">DuckDB</span><span class="tool-tag">AST Parsing</span><span class="tool-tag">Structured Outputs</span><span class="tool-tag">Git Automation</span></div>
           <div class="tool-actions">
-            <a href="https://mannyverse767.gumroad.com/l/ai-agent-memory-rag-sync-notion-airtable-n8n-20260929" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
-            <a href="https://whop.com/mr-studio-7faa/autonomous-ai-memory-rag-sync-for-notion-airtable-n8n-engine" target="_blank" rel="noopener" class="btn-whop">Whop ↗</a>
+            <a href="work/cicd-self-healing.html" class="btn-blueprint">Inspect Blueprint &amp; Simulator →</a>
           </div>
         </div>
       </div>
+
       <div class="tool-card">
         <div class="tool-media">
-          <img src="assets/gumroad/autonomous-b2b-lead-enrichment-scoring-n8n-20260927.png" alt="Autonomous B2B Lead Enrichment & Scoring Agent" loading="lazy">
-          <span class="tool-badge-pill">B2B AGENT</span>
-          <span class="tool-price-tag">19 €</span>
+          <img src="assets/blueprints/ai-agent-memory-rag-sync-notion-airtable-n8n-20261001.png" alt="Autonomous AI Memory & Vector RAG Sync Engine" loading="lazy">
+          <span class="tool-badge-pill">VECTOR SYNC DAG</span>
+          <span class="tool-metric-tag">17 NODES · SHA-256 DEDUP</span>
         </div>
         <div class="tool-content">
-          <h4>Autonomous B2B Lead Enrichment & Scoring Agent</h4>
-          <p>High-throughput pipeline that scrapes ICP prospect domains, discovers verified professional emails via Hunter API, and scores lead intent with LLMs.</p>
-          <div class="tool-tags"><span class="tool-tag">n8n</span><span class="tool-tag">Lead Scoring</span><span class="tool-tag">Hunter.io</span><span class="tool-tag">Autonomous Agent</span></div>
+          <h4>Autonomous AI Memory &amp; Vector RAG Sync Engine</h4>
+          <p>Continuous bi-directional RAG synchronization between Notion databases and Airtable CRM into vector stores. Features recursive Markdown chunking, SHA-256 content-hash deduplication, and 768-dim vector embeddings.</p>
+          <div class="tool-tags"><span class="tool-tag">n8n</span><span class="tool-tag">Vector Embeddings</span><span class="tool-tag">SHA-256 Dedup</span><span class="tool-tag">Notion API</span><span class="tool-tag">Qdrant / Pinecone</span></div>
           <div class="tool-actions">
-            <a href="https://mannyverse767.gumroad.com/l/autonomous-b2b-lead-enrichment-scoring-n8n-20260927" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
-            <a href="https://whop.com/mr-studio-7faa/autonomous-b2b-lead-enrichment-scoring-agent-n8n-ai-workflow" target="_blank" rel="noopener" class="btn-whop">Whop ↗</a>
+            <a href="work/rag-memory-sync.html" class="btn-blueprint">Inspect Blueprint &amp; Simulator →</a>
           </div>
         </div>
       </div>
+
     </div>
 
     <div class="tools-cta-bar rv">
       <div>
-        <div class="cta-title">Looking for the full arsenal?</div>
-        <div class="cta-sub">Browse all 6 production-ready automation scripts, n8n workflows &amp; SEO engines.</div>
+        <div class="cta-title">Want to inspect the full engineering catalog?</div>
+        <div class="cta-sub">Explore the top system blueprints, node topologies, JSON schemas, and interactive execution simulators selected from my production builds.</div>
       </div>
-      <a href="tools.html" class="btn-explore-catalog">Explore Full Catalog (6 Tools) →</a>
+      <a href="tools.html" class="btn-explore-catalog">Explore All Engineering Blueprints →</a>
     </div>
   </div>
 </section>
-<!-- END STORE TOOLS SECTION -->
+<!-- END ARCHITECTURE BLUEPRINTS SECTION -->
 
 <section id="stack">
   <div class="wrap">
-    <div class="eyebrow rv">03 / Toolbox</div>
+    <div class="eyebrow rv">04 / Toolbox</div>
     <h2 class="sec-h rv" style="margin-bottom:clamp(34px,5vw,60px)">The stack I build with.</h2>
     <div class="stack">
       <div class="col rv"><h5>Automation</h5><ul><li><i></i>n8n</li><li><i></i>Make</li><li><i></i>Webhooks</li><li><i></i>REST APIs</li></ul></div>
@@ -489,13 +489,13 @@ a.card:focus-visible{outline:3px solid #000000;outline-offset:3px}
 
 <section id="contact" class="contact">
   <div class="wrap">
-    <div class="eyebrow rv" style="justify-content:center">04 / Contact</div>
+    <div class="eyebrow rv" style="justify-content:center">05 / Contact</div>
     <h2 class="big rv">Let's build <span class="g">something</span>.</h2>
     <p class="rv d1">Automation, an AI pipeline, or an internal tool that should just run itself? I'd love to hear about it.</p>
     <div class="actions rv d2" style="justify-content:center;display:flex;gap:14px;flex-wrap:wrap">
       <button class="btn primary mag" id="copy-email-btn" type="button" aria-label="Copy email address to clipboard" data-email="manny.ruesch@gmail.com">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-        <span id="copy-btn-text">Copy email</span>
+        <span id="copy-btn-text">manny.ruesch@gmail.com</span>
       </button>
       <a href="https://www.linkedin.com/in/manny-ruesch" target="_blank" rel="noopener" class="btn ghost mag">LinkedIn ↗</a>
       <a href="assets/cv-manny-ruesch.pdf" target="_blank" rel="noopener" class="btn ghost mag">Download CV (PDF) ↓</a>

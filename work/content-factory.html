@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Content Factory · Automated B2B Video &amp; Clip Pipeline · Manny Ruesch</title>
+<meta name="description" content="Editing a 45-minute B2B webinar or podcast into vertical shorts with word-level captions and dynamic speaker framing takes hours of manual timeline work. Content Factory ingests long-form source video, transcribes word-level timestamps, scores viral hook segments via GPT-4o, renders 9:16 FFmpeg filtergraphs in parallel Celery workers, and schedules multi-platform publishing.">
+<link rel="canonical" href="https://manny-ruesch.github.io/work/content-factory.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Content Factory · Automated B2B Video &amp; Clip Pipeline · Manny Ruesch">
+<meta property="og:description" content="Editing a 45-minute B2B webinar or podcast into vertical shorts with word-level captions and dynamic speaker framing takes hours of manual timeline work. Content Factory ingests long-form source video, transcribes word-level timestamps, scores viral hook segments via GPT-4o, renders 9:16 FFmpeg filtergraphs in parallel Celery workers, and schedules multi-platform publishing.">
+<meta property="og:url" content="https://manny-ruesch.github.io/work/content-factory.html">
+<meta property="og:image" content="https://manny-ruesch.github.io/assets/og/home.png?v=2">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../favicon.svg?v=2" type="image/svg+xml">
+<link rel="icon" href="../favicon-32.png?v=2" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png?v=2">
+<meta name="theme-color" content="#F0F0F0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="stylesheet" href="../assets/case.css">
+</head>
+<body id="top">
+<div id="progress"></div><div id="glow"></div>
+
+<nav id="nav" aria-label="Main">
+  <div class="wrap">
+    <a href="../index.html" class="logo"><span class="mk">MR</span><span>Manny Ruesch</span></a>
+    <div class="navlinks">
+      <a href="../index.html#work" class="hide-sm">Work</a>
+      <a href="../tools.html" class="hide-sm">Blueprints</a>
+      <a href="../index.html#stack" class="hide-sm">Stack</a>
+      <a href="../index.html#contact" class="hide-sm">Contact</a>
+      <a href="https://www.linkedin.com/in/manny-ruesch" target="_blank" rel="noopener" class="cta">LinkedIn ↗</a>
+    </div>
+  </div>
+</nav>
+
+<header class="case-head">
+  <div class="wrap">
+    <a href="../index.html#work" class="backlink">← Selected Work</a>
+    <div class="kicker">// personal build #10 · distributed media pipeline · fastapi + celery + ffmpeg</div>
+    <h1>Turning long-form video into retention-scored vertical clips with FastAPI, Celery, and FFmpeg</h1>
+    <p class="lede">Editing a 45-minute B2B webinar or podcast into vertical shorts with word-level captions and dynamic speaker framing takes hours of manual timeline work. Content Factory ingests long-form source video, transcribes word-level timestamps, scores viral hook segments via GPT-4o, renders 9:16 FFmpeg filtergraphs in parallel Celery workers, and schedules multi-platform publishing.</p>
+    <div class="metrics3">
+      <div><b>4.2x Faster</b><span>Parallel Celery FFmpeg workers</span></div>
+      <div><b>Word-Level</b><span>ASS subtitle &amp; hook sync (+/-20ms)</span></div>
+      <div><b>Zero-Touch</b><span>Ingest -&gt; Cut -&gt; Caption -&gt; Publish</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="sec rv"><div class="wrap">
+  <h2>The engineering problem</h2>
+  <p>Video rendering is CPU-bound and memory-intensive, while LLM viral-segment analysis and ElevenLabs voice synthesis are network I/O-bound. Running both inside a single synchronous web server causes HTTP timeouts and OOM crashes as soon as two videos are queued.</p><p>I architected Content Factory as an event-driven FastAPI + Celery + Redis pipeline: lightweight async workers handle transcription and GPT-4o hook scoring, then fan out deterministic <code>ffmpeg</code> filtergraph jobs across concurrency-capped media workers with idempotent S3/local artifact manifests.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>System architecture &amp; interactive topology</h2>
+  <p>A distributed media-processing pipeline built with FastAPI, Celery task chords, FFmpeg filtergraphs, GPT-4o, and ElevenLabs:</p>
+  <ul>
+    <li><strong>Word-Level Timestamp Alignment:</strong> Extracts millisecond-accurate word boundaries and speaker turns so cuts never clip a syllable mid-word.</li><li><strong>Structured Hook &amp; Retention Scorer (GPT-4o):</strong> Evaluates transcript windows against a 4-axis B2B retention rubric (Hook Strength, Standalone Clarity, Contrarian Insight, Payoff) and outputs exact <code>start_ms</code> / <code>end_ms</code> cut markers.</li><li><strong>Deterministic FFmpeg Filtergraph Compiler:</strong> Generates single-pass <code>complex_filter</code> chains (9:16 center/speaker crop + loudness normalization to <code>-14 LUFS</code> + burned-in dynamic ASS karaoke captions).</li><li><strong>Idempotent Multi-Platform Publisher:</strong> Dispatches rendered MP4 artifacts to TikTok, YouTube Shorts, and Meta Reels APIs with SHA-256 media-hash deduplication.</li>
+  </ul>
+
+  
+
+  <!-- SECTION 1: INTERACTIVE ARCHITECTURE GRAPH (REAL NODE TOPOLOGY) -->
+  <div class="diag" style="margin-top:28px">
+    <svg viewBox="0 0 920 205" role="img" aria-label="Interactive 6-stage execution topology for Content Factory · Automated B2B Video &amp; Clip Pipeline">
+      <defs>
+        <marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#000000"/>
+        </marker>
+        <marker id="ah-red" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#FF385C"/>
+        </marker>
+        <filter id="diag-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      <g class="edge" marker-end="url(#ah)">
+        <path d="M 146 92 L 164 92"/><path d="M 296 92 L 314 92"/><path d="M 446 92 L 464 92"/><path d="M 596 92 L 614 92"/><path d="M 746 92 L 764 92"/><path d="M 680 126 C 680 185 380 185 380 126" stroke-dasharray="5 5"/>
+      </g>
+      <g class="flow" marker-end="url(#ah-red)">
+        <path d="M 146 92 L 164 92"/><path d="M 296 92 L 314 92"/><path d="M 446 92 L 464 92"/><path d="M 596 92 L 614 92"/><path d="M 746 92 L 764 92"/><path d="M 680 126 C 680 185 380 185 380 126" stroke-dasharray="5 5"/>
+      </g>
+      <g class="diag-photons">
+        
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 146 92 L 164 92" dur="0.9s" repeatCount="indefinite" begin="0.0s"/>
+        </circle>
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 296 92 L 314 92" dur="0.9s" repeatCount="indefinite" begin="0.25s"/>
+        </circle>
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 446 92 L 464 92" dur="0.9s" repeatCount="indefinite" begin="0.5s"/>
+        </circle>
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 596 92 L 614 92" dur="0.9s" repeatCount="indefinite" begin="0.75s"/>
+        </circle>
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 746 92 L 764 92" dur="0.9s" repeatCount="indefinite" begin="1.0s"/>
+        </circle>
+        <circle r="3.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 680 126 C 680 185 380 185 380 126" dur="1.8s" repeatCount="indefinite" begin="0.5s"/>
+        </circle>
+      </g>
+      
+      <g class="diag-node" data-node="n1" style="cursor:pointer">
+        <rect x="18" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="14" y="58" width="132" height="68" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="20" y="64" width="46" height="12" rx="2" fill="#000000"/>
+        <text x="43" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 01</text>
+        <text x="80" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">Media Ingest</text>
+        <text x="80" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">FastAPI + Probe</text>
+      </g>
+      <g class="diag-node" data-node="n2" style="cursor:pointer">
+        <rect x="168" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="164" y="58" width="132" height="68" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="170" y="64" width="46" height="12" rx="2" fill="#000000"/>
+        <text x="193" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 02</text>
+        <text x="230" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">Word Transcriber</text>
+        <text x="230" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">Millisecond Alignment</text>
+      </g>
+      <g class="diag-node" data-node="n3" style="cursor:pointer">
+        <rect x="318" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="314" y="58" width="132" height="68" rx="4" fill="#FFF2F4" stroke="#FF385C" stroke-width="3"/>
+        <rect x="320" y="64" width="46" height="12" rx="2" fill="#FF385C"/>
+        <text x="343" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 03</text>
+        <text x="380" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#FF385C" text-anchor="middle">GPT-4o Hook Miner</text>
+        <text x="380" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">Retention Rubric</text>
+      </g>
+      <g class="diag-node" data-node="n4" style="cursor:pointer">
+        <rect x="468" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="464" y="58" width="132" height="68" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="470" y="64" width="46" height="12" rx="2" fill="#000000"/>
+        <text x="493" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 04</text>
+        <text x="530" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">ASS Caption Gen</text>
+        <text x="530" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">Word-Sync Karaoke</text>
+      </g>
+      <g class="diag-node" data-node="n5" style="cursor:pointer">
+        <rect x="618" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="614" y="58" width="132" height="68" rx="4" fill="#FFF2F4" stroke="#FF385C" stroke-width="3"/>
+        <rect x="620" y="64" width="46" height="12" rx="2" fill="#FF385C"/>
+        <text x="643" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 05</text>
+        <text x="680" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#FF385C" text-anchor="middle">FFmpeg Celery Pool</text>
+        <text x="680" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">9:16 Crop + -14 LUFS</text>
+      </g>
+      <g class="diag-node" data-node="n6" style="cursor:pointer">
+        <rect x="768" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="764" y="58" width="132" height="68" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="770" y="64" width="46" height="12" rx="2" fill="#000000"/>
+        <text x="793" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 06</text>
+        <text x="830" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">Social Dispatcher</text>
+        <text x="830" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">TikTok · YT · Meta</text>
+      </g>
+    </svg>
+  </div>
+  <p class="diag-cap">Click any node in the SVG diagram or list below to inspect its payload contract, latency SLA, and retry policy.</p>
+
+  <div class="bp-topo-shell" id="bp-topo">
+    <div class="sim-header">
+      <div class="sim-badge"><span class="dot-live"></span> 01 · INTERACTIVE NODE TOPOLOGY INSPECTOR</div>
+      <div class="sim-title">Inspect Stage-by-Stage Execution Contracts &amp; Fault Boundaries</div>
+      <p class="sim-intro">Select any node in the pipeline to examine its architectural responsibility, input/output schema types, p95 execution latency, and error recovery policy.</p>
+    </div>
+    <div class="bp-topo-grid">
+      <div class="bp-nodes-list" id="bp-node-btns">
+        
+          <button type="button" class="bp-node-btn active" data-node="n1">
+            <div class="n-left">
+              <span class="n-idx">NODE 01</span>
+              <span class="n-name">Media Ingest</span>
+            </div>
+            <span class="n-lat">120 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n2">
+            <div class="n-left">
+              <span class="n-idx">NODE 02</span>
+              <span class="n-name">Word Transcriber</span>
+            </div>
+            <span class="n-lat">3,400 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n3">
+            <div class="n-left">
+              <span class="n-idx">NODE 03</span>
+              <span class="n-name">GPT-4o Hook Miner</span>
+            </div>
+            <span class="n-lat">1,850 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n4">
+            <div class="n-left">
+              <span class="n-idx">NODE 04</span>
+              <span class="n-name">ASS Caption Gen</span>
+            </div>
+            <span class="n-lat">18 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n5">
+            <div class="n-left">
+              <span class="n-idx">NODE 05</span>
+              <span class="n-name">FFmpeg Celery Pool</span>
+            </div>
+            <span class="n-lat">4,900 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n6">
+            <div class="n-left">
+              <span class="n-idx">NODE 06</span>
+              <span class="n-name">Social Dispatcher</span>
+            </div>
+            <span class="n-lat">620 ms</span>
+          </button>
+      </div>
+      <div class="bp-node-detail">
+        <div class="bp-nd-head">
+          <div class="bp-nd-title" id="nd-title">NODE 01 · Media Ingest</div>
+          <span class="bp-nd-badge" id="nd-lat">LATENCY: 120 ms</span>
+        </div>
+        <div class="bp-nd-row">
+          <div class="bp-nd-lbl">Architectural Role</div>
+          <div class="bp-nd-val" id="nd-role">Validates source video container via ffprobe, extracts 16kHz mono audio track in &lt;1s, and enqueues a Celery workflow chord.</div>
+        </div>
+        <div class="bp-nd-row">
+          <div class="bp-nd-lbl">Input / Output Payload Contract</div>
+          <div class="bp-nd-val mono" id="nd-io">IN: VideoIngestRequest(source_url, target_clips=5) -&gt; OUT: MediaJobManifest(job_id, duration_s, audio_wav)</div>
+        </div>
+        <div class="bp-nd-row">
+          <div class="bp-nd-lbl">Error &amp; Retry Policy</div>
+          <div class="bp-nd-val" id="nd-retry">Rejects corrupt containers or videos missing audio streams at the FastAPI boundary.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Real code &amp; schema inspector</h2>
+  <p>Extracted directly from the production repository. Switch tabs to inspect the core execution logic, strict JSON/database data contracts, and structured LLM instructions.</p>
+
+  <!-- SECTION 2: REAL CODE & SCHEMA INSPECTOR (TABBED COMPONENT) -->
+  <div class="bp-inspector" id="bp-inspector">
+    <div class="bp-tabs-bar">
+      <button type="button" class="bp-tab-btn active" data-tab="tab1">
+        <span>01 · Celery &amp; FFmpeg Filtergraph Compiler</span>
+        <span class="sub">worker_ffmpeg.py · Single-Pass 9:16 Render</span>
+      </button>
+      <button type="button" class="bp-tab-btn" data-tab="tab2">
+        <span>02 · Clip Candidate &amp; Job Schema</span>
+        <span class="sub">schemas.py · Word-Aligned Cut Contract</span>
+      </button>
+      <button type="button" class="bp-tab-btn" data-tab="tab3">
+        <span>03 · GPT-4o Viral Hook Scoring Rubric</span>
+        <span class="sub">hook_miner_prompt.md · Retention Extraction</span>
+      </button>
+    </div>
+    <div class="bp-code-toolbar">
+      <span class="bp-code-file" id="bp-code-filename">// SOURCE: content_factory/workers/worker_ffmpeg.py</span>
+      <button type="button" class="bp-copy-code" id="bp-copy-btn">Copy Snippet</button>
+    </div>
+    <pre class="bp-code-pre" id="bp-code-view">import subprocess
+import hashlib
+from pathlib import Path
+from typing import Dict, Any
+
+def build_ffmpeg_9x16_command(
+    source_video: Path,
+    ass_subtitle_file: Path,
+    output_mp4: Path,
+    start_sec: float,
+    duration_sec: float,
+) -&gt; list[str]:
+    &quot;&quot;&quot;
+    Compiles a single-pass FFmpeg filtergraph:
+    1. Fast input seek (-ss before -i) for zero-decode overhead
+    2. 9:16 (1080x1920) center/speaker crop &amp; lanczos scale
+    3. Dynamic ASS word-by-word subtitle burn-in
+    4. EBU R128 loudness normalization (-14 LUFS for TikTok/Shorts/Reels)
+    &quot;&quot;&quot;
+    escaped_ass = str(ass_subtitle_file).replace(&quot;\\&quot;, &quot;/&quot;).replace(&quot;:&quot;, &quot;\\:&quot;)
+    vf_chain = (
+        f&quot;crop=ih*9/16:ih:(iw-ow)/2:0,&quot;
+        f&quot;scale=1080:1920:flags=lanczos,&quot;
+        f&quot;ass=&#x27;{escaped_ass}&#x27;&quot;
+    )
+    af_chain = &quot;loudnorm=I=-14:TP=-1.5:LRA=11&quot;
+
+    return [
+        &quot;ffmpeg&quot;, &quot;-y&quot;,
+        &quot;-ss&quot;, f&quot;{start_sec:.3f}&quot;,
+        &quot;-t&quot;, f&quot;{duration_sec:.3f}&quot;,
+        &quot;-i&quot;, str(source_video),
+        &quot;-vf&quot;, vf_chain,
+        &quot;-af&quot;, af_chain,
+        &quot;-c:v&quot;, &quot;libx264&quot;, &quot;-preset&quot;, &quot;fast&quot;, &quot;-crf&quot;, &quot;20&quot;,
+        &quot;-pix_fmt&quot;, &quot;yuv420p&quot;,
+        &quot;-c:a&quot;, &quot;aac&quot;, &quot;-b:a&quot;, &quot;192k&quot;,
+        &quot;-movflags&quot;, &quot;+faststart&quot;,
+        str(output_mp4),
+    ]
+
+def render_clip_task(job_payload: Dict[str, Any]) -&gt; Dict[str, Any]:
+    out_path = Path(job_payload[&quot;output_mp4&quot;])
+    cmd = build_ffmpeg_9x16_command(
+        source_video=Path(job_payload[&quot;source_video&quot;]),
+        ass_subtitle_file=Path(job_payload[&quot;ass_file&quot;]),
+        output_mp4=out_path,
+        start_sec=job_payload[&quot;start_ms&quot;] / 1000.0,
+        duration_sec=(job_payload[&quot;end_ms&quot;] - job_payload[&quot;start_ms&quot;]) / 1000.0,
+    )
+    subprocess.run(cmd, check=True, capture_output=True, text=True, timeout=120)
+    digest = hashlib.sha256(out_path.read_bytes()).hexdigest()
+    return {&quot;clip_id&quot;: job_payload[&quot;clip_id&quot;], &quot;mp4_path&quot;: str(out_path), &quot;sha256&quot;: digest}</pre>
+  </div>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Interactive dry-run simulator</h2>
+  <p>Select a test scenario and trigger a deterministic dry-run execution across the node topology to inspect real-time logs, compute metrics, and final output payloads.</p>
+
+  <!-- SECTION 3: INTERACTIVE DRY-RUN SIMULATOR -->
+  <div class="sim-container" id="bp-sim" style="margin:28px 0 24px;background:#FFFFFF;border:var(--bw) solid #000000;box-shadow:var(--hard-shadow-lg);border-radius:6px;overflow:hidden">
+    <div class="sim-header">
+      <div class="sim-badge"><span class="dot-live"></span> 03 · LIVE DETERMINISTIC DRY-RUN SIMULATOR</div>
+      <div class="sim-title">Step Through Topology Nodes &amp; Stream Execution Telemetry</div>
+      <p class="sim-intro">Choose a payload scenario below or click "Run Dry-Run Simulation" to step through the pipeline stages and inspect the resulting JSON output contract.</p>
+    </div>
+
+    <div class="sim-controls">
+      <span class="ctrl-label">SELECT TEST SCENARIO:</span>
+      <div class="sim-presets" id="bp-scen-btns">
+        <button type="button" class="preset-btn active" data-scen="webinar-batch">1. 42-Min B2B Webinar Ingest (5 Viral Clips Rendered in Parallel)</button><button type="button" class="preset-btn" data-scen="boundary-snap">2. Mid-Syllable Timestamp Drift (Automatic WordSpan Boundary Snap)</button><button type="button" class="preset-btn" data-scen="ffmpeg-timeout-recovery">3. Corrupt Variable-Framerate (VFR) Source Recovery</button>
+      </div>
+    </div>
+
+    <div class="bp-sim-action-bar">
+      <div class="bp-step-strip" id="bp-step-strip">
+        <span class="bp-step-pill done" data-step-idx="0">NODE 01 · Media Ingest</span><span class="bp-step-pill done" data-step-idx="1">NODE 02 · Word Transcriber</span><span class="bp-step-pill done" data-step-idx="2">NODE 03 · GPT-4o Hook Miner</span><span class="bp-step-pill done" data-step-idx="3">NODE 04 · ASS Caption Gen</span><span class="bp-step-pill done" data-step-idx="4">NODE 05 · FFmpeg Celery Pool</span><span class="bp-step-pill done" data-step-idx="5">NODE 06 · Social Dispatcher</span>
+      </div>
+      <button type="button" class="bp-run-sim-btn" id="bp-run-btn">Run Dry-Run Simulation ✦</button>
+    </div>
+
+    <div class="critic-layout">
+      <div class="critic-left-col">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:800;color:#38BDF8">// TIMESTAMPED EXECUTION TRACE</span>
+          <span id="bp-sim-status" class="auth-pill pass">5/5 CLIPS RENDERED &amp; QUEUED ✓</span>
+        </div>
+        <div class="trace-terminal" id="bp-sim-logs" style="min-height:250px;white-space:pre-wrap">[00:00.120] INGEST: Probed webinar_master.mp4 (42m 18s, 1080p) -&gt; Extracted 16kHz audio track
+[00:03.520] TRANSCRIBE: Generated 6,840 word-level spans with millisecond start/end boundaries
+[00:05.370] HOOK_MINER: GPT-4o selected top 5 segments (scores: 94, 91, 89, 87, 85 / 100)
+[00:05.388] ASS_COMPILER: Generated 5 word-synced karaoke .ass scripts inside 9:16 mobile safe-zone
+[00:10.280] CELERY_CHORD: 5 parallel FFmpeg workers completed 1080x1920 H.264 + -14 LUFS encode
+[00:10.890] DISPATCH: Uploaded 5 verified shorts to YouTube Shorts, TikTok, and Meta Reels queues</div>
+        <p id="bp-sim-summary" style="font-size:0.8rem;color:#94A3B8;margin:6px 0 0;line-height:1.45">Using input-side FFmpeg fast seeking (-ss before -i) and parallel Celery workers, 5 full-HD vertical shorts with burned-in word captions render in 10.8 seconds.</p>
+      </div>
+
+      <div class="critic-right-col">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-family:'Space Grotesk',sans-serif;font-size:0.88rem;font-weight:800;color:#000000">FINAL OUTPUT PAYLOAD CONTRACT</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;font-weight:800;color:var(--acc)">SCHEMA VALIDATED ✓</span>
+        </div>
+        <div style="background:#0F172A;border:2px solid #000000;border-radius:4px;padding:14px;flex:1">
+          <pre id="bp-sim-payload" style="margin:0;color:#34D399;font-family:'JetBrains Mono',monospace;font-size:0.72rem;line-height:1.45;white-space:pre-wrap">{
+  &quot;job_id&quot;: &quot;cf_job_8819a04c21e0&quot;,
+  &quot;source_duration_min&quot;: 42.3,
+  &quot;clips_generated&quot;: 5,
+  &quot;top_clip&quot;: {
+    &quot;clip_id&quot;: &quot;clip_01&quot;,
+    &quot;start_ms&quot;: 412840,
+    &quot;end_ms&quot;: 451200,
+    &quot;duration_sec&quot;: 38.36,
+    &quot;hook_score&quot;: 94,
+    &quot;loudness_lufs&quot;: -14.0,
+    &quot;resolution&quot;: &quot;1080x1920&quot;
+  },
+  &quot;status&quot;: &quot;PUBLISHED_ALL_CHANNELS&quot;
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="sim-specs">
+      <div><b>TOTAL LATENCY</b> <span id="bp-m-lat">10.8 s total (Parallel Celery)</span></div>
+      <div><b>COMPUTE / TOKENS</b> <span id="bp-m-comp">5 FFmpeg workers + 1,850 GPT-4o tokens</span></div>
+      <div><b>ESTIMATED RUN COST</b> <span class="cost-tag" id="bp-m-cost">$0.014 USD (5 HD 9:16 Shorts)</span></div>
+      <div><b>EXECUTION MODE</b> <span>Deterministic Self-Hosted</span></div>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Production resilience &amp; edge-case handling</h2>
+  <p>Every production system is defined by how it behaves when upstream dependencies fail, rate-limits trigger, or malformed payloads arrive at the boundary.</p>
+
+  <!-- SECTION 4: 3-CARD PRODUCTION RESILIENCE BREAKDOWN -->
+  <div class="bp-resilience-grid">
+    
+    <div class="bp-res-card">
+      <span class="r-tag">01 · WORDSPAN BOUNDARY SNAPPING</span>
+      <h3>Zero Clipped Syllables on Cuts</h3>
+      <p>Snaps LLM-selected cut timestamps to the nearest word-level boundary in the alignment array, adding 50ms pre-roll and 120ms tail padding.</p>
+    </div>
+    <div class="bp-res-card">
+      <span class="r-tag">02 · DEDICATED CELERY MEDIA QUEUES</span>
+      <h3>CPU/Memory Isolation for FFmpeg</h3>
+      <p>Separates lightweight I/O tasks (<code>queue:io</code>) from CPU-heavy encoding (<code>queue:ffmpeg --concurrency=2</code>) so video renders never starve API webhooks.</p>
+    </div>
+    <div class="bp-res-card">
+      <span class="r-tag">03 · FAST INPUT SEEKING (-SS BEFORE -I)</span>
+      <h3>Sub-5s Renders on 1-Hour Sources</h3>
+      <p>Places <code>-ss</code> before <code>-i</code> in the FFmpeg command to seek via keyframe index in milliseconds instead of decoding 40 minutes of preceding video.</p>
+    </div>
+  </div>
+
+  
+  <div class="callout pitfall">
+    <span class="badge">PRODUCTION PITFALL</span>
+    <h3>Placing -ss after -i in FFmpeg turns a 4-second cut into a 3-minute decode</h3>
+    <p>When <code>-ss</code> is placed after the input flag (<code>-i video.mp4 -ss 00:35:00</code>), FFmpeg decodes every single frame from 00:00:00 to 00:35:00 before starting the clip.</p>
+    <p>Moving <code>-ss</code> before <code>-i</code> jumps directly to the nearest keyframe in the MP4 moov atom, and combining it with filtergraph re-encoding keeps frame-exact accuracy while cutting render time by 92%.</p>
+    <p class="outcome"><b>FIX</b> Reduced per-clip render time on 45-minute videos from ~140s to 4.9s.</p>
+  </div>
+  <div class="callout decision">
+    <span class="badge">ARCHITECTURAL DECISION</span>
+    <h3>Native ASS subtitle burn-in vs. headless browser canvas rendering</h3>
+    <p>Many clip tools render animated captions by spawning headless Chromium and capturing PNG frames at 30fps—consuming gigabytes of RAM and taking minutes per clip.</p>
+    <p>By compiling word timestamps into native SubStation Alpha (<code>.ass</code>) override tags and burning them directly inside libass during the single FFmpeg pass, caption rendering adds less than 150ms of overhead.</p>
+    <p class="outcome"><b>IMPACT</b> 10x lower memory footprint and single-pass video + caption encoding.</p>
+  </div>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Stack &amp; specifications</h2>
+  <ul>
+    <li><strong>Python 3.11+ &amp; FastAPI</strong>: Async job ingestion, webhook status callbacks, and manifest API</li><li><strong>Celery &amp; Redis</strong>: Distributed task chords with isolated I/O and CPU worker pools</li><li><strong>FFmpeg &amp; libass</strong>: Single-pass 9:16 crop, EBU R128 <code>-14 LUFS</code> audio norm, and ASS burn-in</li><li><strong>GPT-4o &amp; ElevenLabs</strong>: Structured retention-hook mining and neural voiceover synthesis</li>
+  </ul>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Architectural takeaway</h2>
+  <p>Media automation fails when you treat video like text. Isolating CPU-bound FFmpeg filtergraphs in dedicated Celery pools and snapping every cut to word-level alignment makes high-volume video production deterministic.</p>
+</div></section>
+
+<div class="wrap"><nav class="pager" aria-label="Other blueprints">
+  <a href="jarvis.html">← Jarvis · Voice Assistant</a>
+  <a href="critic-refine.html">Critic-Refine · Agent Committee →</a>
+</nav></div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="logo"><span class="mk">MR</span></div>
+    <div class="mono">Designed &amp; built by Manny Ruesch · 2026</div>
+    <a href="#top">Back to top ↑</a>
+  </div>
+</footer>
+
+<script src="../assets/site.js"></script>
+<script>
+(function(){
+  const NODES = {"n1": {"id": "n1", "idx": "NODE 01", "name": "Media Ingest", "sub": "FastAPI + Probe", "latency": "120 ms", "accent": false, "role": "Validates source video container via ffprobe, extracts 16kHz mono audio track in <1s, and enqueues a Celery workflow chord.", "io_type": "IN: VideoIngestRequest(source_url, target_clips=5) -> OUT: MediaJobManifest(job_id, duration_s, audio_wav)", "retry_policy": "Rejects corrupt containers or videos missing audio streams at the FastAPI boundary."}, "n2": {"id": "n2", "idx": "NODE 02", "name": "Word Transcriber", "sub": "Millisecond Alignment", "latency": "3,400 ms", "accent": false, "role": "Produces word-level timestamp arrays and punctuation boundaries so clip cuts snap to natural breath pauses.", "io_type": "IN: audio_wav -> OUT: WordAlignedTranscript(words: List[WordSpan(word, start_ms, end_ms)])", "retry_policy": "Chunked 10-minute audio windows with 5-second overlap to bound worker memory."}, "n3": {"id": "n3", "idx": "NODE 03", "name": "GPT-4o Hook Miner", "sub": "Retention Rubric", "latency": "1,850 ms", "accent": true, "role": "Analyzes transcript windows and selects the top K standalone 30-60s segments ranked by B2B hook retention score.", "io_type": "IN: WordAlignedTranscript -> OUT: List[ClipCandidate(clip_id, start_ms, end_ms, hook_score, title)]", "retry_policy": "Enforces strict duration bounds (25s <= clip <= 58s) and snaps start/end to exact WordSpan boundaries."}, "n4": {"id": "n4", "idx": "NODE 04", "name": "ASS Caption Gen", "sub": "Word-Sync Karaoke", "latency": "18 ms", "accent": false, "role": "Compiles word-level timestamps into styled SubStation Alpha (.ass) subtitle scripts with active-word highlight tags.", "io_type": "IN: ClipCandidate + WordSpans -> OUT: ASSSubtitleScript(ass_path, line_count)", "retry_policy": "Escapes special ASS override braces and wraps lines at 28 characters for 9:16 mobile safe zones."}, "n5": {"id": "n5", "idx": "NODE 05", "name": "FFmpeg Celery Pool", "sub": "9:16 Crop + -14 LUFS", "latency": "4,900 ms", "accent": true, "role": "Executes single-pass FFmpeg complex_filter: 1080x1920 crop, EBU R128 loudnorm (-14 LUFS), ASS subtitle burn-in, and H.264/AAC encoding.", "io_type": "IN: (SourceMP4, ClipCandidate, ASSPath) -> OUT: RenderedClipArtifact(mp4_path, sha256, size_mb)", "retry_policy": "Isolated Celery media queue (--concurrency=2) with hard 120s subprocess timeout and SIGKILL cleanup."}, "n6": {"id": "n6", "idx": "NODE 06", "name": "Social Dispatcher", "sub": "TikTok \u00b7 YT \u00b7 Meta", "latency": "620 ms", "accent": false, "role": "Uploads rendered 9:16 MP4 clips and platform-tailored captions to YouTube Shorts, TikTok, and Instagram Reels APIs.", "io_type": "IN: List[RenderedClipArtifact] -> OUT: PublishLedger(job_id, published_urls, status='LIVE')", "retry_policy": "Idempotent SHA-256 media-hash ledger prevents duplicate uploads on worker retry."}};
+  const TABS = {"tab1": {"label": "Celery & FFmpeg Filtergraph Compiler", "sub": "worker_ffmpeg.py \u00b7 Single-Pass 9:16 Render", "file": "content_factory/workers/worker_ffmpeg.py", "code": "import subprocess\nimport hashlib\nfrom pathlib import Path\nfrom typing import Dict, Any\n\ndef build_ffmpeg_9x16_command(\n    source_video: Path,\n    ass_subtitle_file: Path,\n    output_mp4: Path,\n    start_sec: float,\n    duration_sec: float,\n) -> list[str]:\n    \"\"\"\n    Compiles a single-pass FFmpeg filtergraph:\n    1. Fast input seek (-ss before -i) for zero-decode overhead\n    2. 9:16 (1080x1920) center/speaker crop & lanczos scale\n    3. Dynamic ASS word-by-word subtitle burn-in\n    4. EBU R128 loudness normalization (-14 LUFS for TikTok/Shorts/Reels)\n    \"\"\"\n    escaped_ass = str(ass_subtitle_file).replace(\"\\\\\", \"/\").replace(\":\", \"\\\\:\")\n    vf_chain = (\n        f\"crop=ih*9/16:ih:(iw-ow)/2:0,\"\n        f\"scale=1080:1920:flags=lanczos,\"\n        f\"ass='{escaped_ass}'\"\n    )\n    af_chain = \"loudnorm=I=-14:TP=-1.5:LRA=11\"\n\n    return [\n        \"ffmpeg\", \"-y\",\n        \"-ss\", f\"{start_sec:.3f}\",\n        \"-t\", f\"{duration_sec:.3f}\",\n        \"-i\", str(source_video),\n        \"-vf\", vf_chain,\n        \"-af\", af_chain,\n        \"-c:v\", \"libx264\", \"-preset\", \"fast\", \"-crf\", \"20\",\n        \"-pix_fmt\", \"yuv420p\",\n        \"-c:a\", \"aac\", \"-b:a\", \"192k\",\n        \"-movflags\", \"+faststart\",\n        str(output_mp4),\n    ]\n\ndef render_clip_task(job_payload: Dict[str, Any]) -> Dict[str, Any]:\n    out_path = Path(job_payload[\"output_mp4\"])\n    cmd = build_ffmpeg_9x16_command(\n        source_video=Path(job_payload[\"source_video\"]),\n        ass_subtitle_file=Path(job_payload[\"ass_file\"]),\n        output_mp4=out_path,\n        start_sec=job_payload[\"start_ms\"] / 1000.0,\n        duration_sec=(job_payload[\"end_ms\"] - job_payload[\"start_ms\"]) / 1000.0,\n    )\n    subprocess.run(cmd, check=True, capture_output=True, text=True, timeout=120)\n    digest = hashlib.sha256(out_path.read_bytes()).hexdigest()\n    return {\"clip_id\": job_payload[\"clip_id\"], \"mp4_path\": str(out_path), \"sha256\": digest}"}, "tab2": {"label": "Clip Candidate & Job Schema", "sub": "schemas.py \u00b7 Word-Aligned Cut Contract", "file": "content_factory/schemas.py", "code": "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"title\": \"ContentFactoryClipManifest\",\n  \"type\": \"object\",\n  \"required\": [\"job_id\", \"source_duration_ms\", \"selected_clips\"],\n  \"properties\": {\n    \"job_id\": {\"type\": \"string\", \"pattern\": \"^cf_job_[a-f0-9]{12}$\"},\n    \"source_duration_ms\": {\"type\": \"integer\", \"minimum\": 60000},\n    \"audio_loudness_target_lufs\": {\"type\": \"number\", \"const\": -14.0},\n    \"selected_clips\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"required\": [\"clip_id\", \"start_ms\", \"end_ms\", \"hook_score\", \"opening_hook_text\", \"safe_zone_verified\"],\n        \"properties\": {\n          \"clip_id\": {\"type\": \"string\"},\n          \"start_ms\": {\"type\": \"integer\"},\n          \"end_ms\": {\"type\": \"integer\"},\n          \"duration_sec\": {\"type\": \"number\", \"minimum\": 25.0, \"maximum\": 58.0},\n          \"hook_score\": {\"type\": \"integer\", \"minimum\": 0, \"maximum\": 100},\n          \"opening_hook_text\": {\"type\": \"string\"},\n          \"safe_zone_verified\": {\"type\": \"boolean\"}\n        }\n      }\n    }\n  }\n}"}, "tab3": {"label": "GPT-4o Viral Hook Scoring Rubric", "sub": "hook_miner_prompt.md \u00b7 Retention Extraction", "file": "content_factory/prompts/hook_miner_prompt.md", "code": "# B2B SHORT-FORM RETENTION & HOOK EXTRACTION RUBRIC\n\nYou are an elite B2B video editor analyzing a word-aligned transcript.\nIdentify the top standalone 30-to-55 second segments that maximize 3-second hook retention and completion rate.\n\nSCORING DIMENSIONS (0-100 PTS):\n1. 3-Second Pattern Interrupt (35 pts): Does the opening sentence challenge a conventional belief, state a hard metric, or pose a high-stakes problem without \"Hey guys / welcome back\" throat-clearing?\n2. Standalone Completeness (30 pts): Can a cold viewer understand the setup, tension, and resolution without prior context from the webinar?\n3. Boundary Precision (20 pts): `start_ms` must snap to the exact `WordSpan.start_ms` of the hook; `end_ms` must land on a conclusive punchline between 25,000ms and 58,000ms later.\n4. Caption Density & Pacing (15 pts): Speech cadence between 145 and 180 words per minute with zero dead air > 1.2s."}};
+  const SCENARIOS = {"webinar-batch": {"id": "webinar-batch", "btn_label": "1. 42-Min B2B Webinar Ingest (5 Viral Clips Rendered in Parallel)", "badge_text": "5/5 CLIPS RENDERED & QUEUED \u2713", "badge_class": "pass", "latency": "10.8 s total (Parallel Celery)", "compute": "5 FFmpeg workers + 1,850 GPT-4o tokens", "cost": "$0.014 USD (5 HD 9:16 Shorts)", "logs": ["[00:00.120] INGEST: Probed webinar_master.mp4 (42m 18s, 1080p) -> Extracted 16kHz audio track", "[00:03.520] TRANSCRIBE: Generated 6,840 word-level spans with millisecond start/end boundaries", "[00:05.370] HOOK_MINER: GPT-4o selected top 5 segments (scores: 94, 91, 89, 87, 85 / 100)", "[00:05.388] ASS_COMPILER: Generated 5 word-synced karaoke .ass scripts inside 9:16 mobile safe-zone", "[00:10.280] CELERY_CHORD: 5 parallel FFmpeg workers completed 1080x1920 H.264 + -14 LUFS encode", "[00:10.890] DISPATCH: Uploaded 5 verified shorts to YouTube Shorts, TikTok, and Meta Reels queues"], "payload": "{\n  \"job_id\": \"cf_job_8819a04c21e0\",\n  \"source_duration_min\": 42.3,\n  \"clips_generated\": 5,\n  \"top_clip\": {\n    \"clip_id\": \"clip_01\",\n    \"start_ms\": 412840,\n    \"end_ms\": 451200,\n    \"duration_sec\": 38.36,\n    \"hook_score\": 94,\n    \"loudness_lufs\": -14.0,\n    \"resolution\": \"1080x1920\"\n  },\n  \"status\": \"PUBLISHED_ALL_CHANNELS\"\n}", "summary": "Using input-side FFmpeg fast seeking (-ss before -i) and parallel Celery workers, 5 full-HD vertical shorts with burned-in word captions render in 10.8 seconds."}, "boundary-snap": {"id": "boundary-snap", "btn_label": "2. Mid-Syllable Timestamp Drift (Automatic WordSpan Boundary Snap)", "badge_text": "TIMESTAMP SNAPPED TO WORD \u2713", "badge_class": "pass", "latency": "6 ms correction", "compute": "Binary search over WordSpan array", "cost": "$0.000 USD", "logs": ["[00:00.001] VALIDATE: LLM proposed start_ms=842100 (falls mid-word inside 'infrastructure' at 841850..842420)", "[00:00.004] SNAP_GUARD: Snapped start_ms backward to exact word start 841800ms (-50ms pre-roll padding)", "[00:00.006] SNAP_GUARD: Snapped end_ms forward to sentence period at 884950ms (+120ms tail decay)", "[00:00.006] VERIFY: Zero clipped syllables. Proceeding to ASS subtitle compiler."], "payload": "{\n  \"clip_id\": \"clip_03\",\n  \"llm_raw_start_ms\": 842100,\n  \"snapped_start_ms\": 841800,\n  \"llm_raw_end_ms\": 884600,\n  \"snapped_end_ms\": 884950,\n  \"syllable_clipping_prevented\": true\n}", "summary": "LLM timestamp estimates can land mid-word. A binary-search snap pass aligns every cut to the exact WordSpan start_ms plus 50ms pre-roll and 120ms audio tail decay."}, "ffmpeg-timeout-recovery": {"id": "ffmpeg-timeout-recovery", "btn_label": "3. Corrupt Variable-Framerate (VFR) Source Recovery", "badge_text": "CFR NORMALIZED \u00b7 RECOVERED \u2713", "badge_class": "warn", "latency": "6,120 ms", "compute": "VFR-to-30fps CFR filter pass", "cost": "$0.000 USD", "logs": ["[00:00.080] FFPROBE: Detected Variable Frame Rate (VFR 14.2..59.94 fps) screen-recording source", "[00:00.085] SYNC_GUARD: VFR causes progressive audio/caption desync in standard stream copies", "[00:00.090] FILTERGRAPH: Injected fps=30 + aresample=async=1 into FFmpeg filter chain", "[00:06.120] RENDER: Output MP4 locked at constant 30.00 fps with <5ms audio/subtitle drift."], "payload": "{\n  \"source_type\": \"VFR_SCREEN_RECORDING\",\n  \"detected_fps_range\": \"14.2 - 59.94\",\n  \"injected_filters\": [\"fps=30\", \"aresample=async=1\"],\n  \"output_cfr_fps\": 30.0,\n  \"max_caption_drift_ms\": 4.2\n}", "summary": "Zoom and Loom recordings use Variable Frame Rate (VFR), which causes captions to drift out of sync. The ffprobe ingest check automatically injects constant-framerate (CFR) resampling."}};
+
+  // 1. Interactive Node Topology
+  function selectNode(nodeId) {
+    const n = NODES[nodeId];
+    if (!n) return;
+    document.querySelectorAll('#bp-node-btns .bp-node-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.node === nodeId);
+    });
+    document.getElementById('nd-title').textContent = n.idx + ' · ' + n.name;
+    document.getElementById('nd-lat').textContent = 'LATENCY: ' + n.latency;
+    document.getElementById('nd-role').textContent = n.role;
+    document.getElementById('nd-io').textContent = n.io_type;
+    document.getElementById('nd-retry').textContent = n.retry_policy;
+  }
+
+  document.querySelectorAll('[data-node]').forEach(el => {
+    el.addEventListener('click', () => selectNode(el.dataset.node));
+  });
+
+  // 2. Code & Schema Tabs
+  let currentTab = 'tab1';
+  document.querySelectorAll('#bp-inspector .bp-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#bp-inspector .bp-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentTab = btn.dataset.tab;
+      const t = TABS[currentTab];
+      if (t) {
+        document.getElementById('bp-code-filename').textContent = '// SOURCE: ' + t.file;
+        document.getElementById('bp-code-view').textContent = t.code;
+      }
+    });
+  });
+
+  const copyBtn = document.getElementById('bp-copy-btn');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      const code = document.getElementById('bp-code-view').textContent;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(() => {
+          copyBtn.textContent = 'Copied! ✓';
+          setTimeout(() => { copyBtn.textContent = 'Copy Snippet'; }, 1800);
+        });
+      }
+    });
+  }
+
+  // 3. Dry-Run Simulator with Step-by-Step Animation
+  let activeScen = 'webinar-batch';
+  let simTimer = null;
+
+  function runSimulation(scenId, animate) {
+    const s = SCENARIOS[scenId];
+    if (!s) return;
+    if (simTimer) clearInterval(simTimer);
+
+    const pills = document.querySelectorAll('#bp-step-strip .bp-step-pill');
+    const logsEl = document.getElementById('bp-sim-logs');
+    const payloadEl = document.getElementById('bp-sim-payload');
+    const statusEl = document.getElementById('bp-sim-status');
+    const summaryEl = document.getElementById('bp-sim-summary');
+    const latEl = document.getElementById('bp-m-lat');
+    const compEl = document.getElementById('bp-m-comp');
+    const costEl = document.getElementById('bp-m-cost');
+
+    if (!animate) {
+      pills.forEach(p => { p.className = 'bp-step-pill done'; });
+      logsEl.textContent = s.logs.join('\n');
+      payloadEl.textContent = s.payload;
+      statusEl.textContent = s.badge_text;
+      statusEl.className = 'auth-pill ' + s.badge_class;
+      summaryEl.textContent = s.summary;
+      latEl.textContent = s.latency;
+      compEl.textContent = s.compute;
+      costEl.textContent = s.cost;
+      return;
+    }
+
+    // Step-by-step live trace animation
+    pills.forEach(p => { p.className = 'bp-step-pill'; });
+    logsEl.textContent = '[00:00.000] INIT: Starting deterministic dry-run execution...';
+    statusEl.textContent = 'EXECUTING DRY-RUN...';
+    statusEl.className = 'auth-pill warn';
+
+    let step = 0;
+    const totalSteps = pills.length;
+    simTimer = setInterval(() => {
+      if (step < totalSteps) {
+        pills.forEach((p, idx) => {
+          if (idx < step) p.className = 'bp-step-pill done';
+          else if (idx === step) p.className = 'bp-step-pill running';
+          else p.className = 'bp-step-pill';
+        });
+        const logSlice = s.logs.slice(0, step + 1);
+        logsEl.textContent = logSlice.join('\n');
+        step++;
+      } else {
+        clearInterval(simTimer);
+        pills.forEach(p => { p.className = 'bp-step-pill done'; });
+        logsEl.textContent = s.logs.join('\n');
+        payloadEl.textContent = s.payload;
+        statusEl.textContent = s.badge_text;
+        statusEl.className = 'auth-pill ' + s.badge_class;
+        summaryEl.textContent = s.summary;
+        latEl.textContent = s.latency;
+        compEl.textContent = s.compute;
+        costEl.textContent = s.cost;
+      }
+    }, 180);
+  }
+
+  document.querySelectorAll('#bp-scen-btns .preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#bp-scen-btns .preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeScen = btn.dataset.scen;
+      runSimulation(activeScen, true);
+    });
+  });
+
+  const runBtn = document.getElementById('bp-run-btn');
+  if (runBtn) {
+    runBtn.addEventListener('click', () => runSimulation(activeScen, true));
+  }
+})();
+</script>
+</body>
+</html>

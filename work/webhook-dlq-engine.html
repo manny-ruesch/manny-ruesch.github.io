@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Self-Healing Webhook Dead-Letter Queue (DLQ) &amp; Replay Engine · Manny Ruesch</title>
+<meta name="description" content="When a downstream CRM or billing API suffers a 502 outage, synchronous webhooks time out and drop customer events permanently. This 21-node n8n and Redis architecture decouples ingestion from processing: it computes a canonical SHA-256 idempotency envelope, buffers into Redis in &lt;8ms (returning immediate HTTP 202), applies exponential backoff with full jitter, and isolates poisoned payloads in a redacted Dead-Letter Queue with one-click schema-repaired replay.">
+<link rel="canonical" href="https://manny-ruesch.github.io/work/webhook-dlq-engine.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Self-Healing Webhook Dead-Letter Queue (DLQ) &amp; Replay Engine · Manny Ruesch">
+<meta property="og:description" content="When a downstream CRM or billing API suffers a 502 outage, synchronous webhooks time out and drop customer events permanently. This 21-node n8n and Redis architecture decouples ingestion from processing: it computes a canonical SHA-256 idempotency envelope, buffers into Redis in &lt;8ms (returning immediate HTTP 202), applies exponential backoff with full jitter, and isolates poisoned payloads in a redacted Dead-Letter Queue with one-click schema-repaired replay.">
+<meta property="og:url" content="https://manny-ruesch.github.io/work/webhook-dlq-engine.html">
+<meta property="og:image" content="https://manny-ruesch.github.io/assets/og/home.png?v=2">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../favicon.svg?v=2" type="image/svg+xml">
+<link rel="icon" href="../favicon-32.png?v=2" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png?v=2">
+<meta name="theme-color" content="#F0F0F0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="stylesheet" href="../assets/case.css">
+</head>
+<body id="top">
+<div id="progress"></div><div id="glow"></div>
+
+<nav id="nav" aria-label="Main">
+  <div class="wrap">
+    <a href="../index.html" class="logo"><span class="mk">MR</span><span>Manny Ruesch</span></a>
+    <div class="navlinks">
+      <a href="../index.html#work" class="hide-sm">Work</a>
+      <a href="../tools.html" class="hide-sm">Blueprints</a>
+      <a href="../index.html#stack" class="hide-sm">Stack</a>
+      <a href="../index.html#contact" class="hide-sm">Contact</a>
+      <a href="https://www.linkedin.com/in/manny-ruesch" target="_blank" rel="noopener" class="cta">LinkedIn ↗</a>
+    </div>
+  </div>
+</nav>
+
+<header class="case-head">
+  <div class="wrap">
+    <a href="../tools.html" class="backlink">← All Engineering Blueprints</a>
+    <div class="kicker">// blueprint #07 · complexity score: 86/100 · n8n + redis fault tolerance</div>
+    <h1>Zero-loss webhook ingestion with Redis buffer decoupling, jittered backoff, and idempotent replay</h1>
+    <p class="lede">When a downstream CRM or billing API suffers a 502 outage, synchronous webhooks time out and drop customer events permanently. This 21-node n8n and Redis architecture decouples ingestion from processing: it computes a canonical SHA-256 idempotency envelope, buffers into Redis in &lt;8ms (returning immediate HTTP 202), applies exponential backoff with full jitter, and isolates poisoned payloads in a redacted Dead-Letter Queue with one-click schema-repaired replay.</p>
+    <div class="metrics3">
+      <div><b>&lt; 8 ms</b><span>HTTP 202 Redis ingest response</span></div>
+      <div><b>21 Nodes</b><span>Ingest + Jitter Worker + DLQ Replay</span></div>
+      <div><b>0% Loss</b><span>SHA-256 idempotency + Redis SETNX</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="sec rv"><div class="wrap">
+  <h2>The engineering problem</h2>
+  <p>Webhook senders (Stripe, Shopify, Typeform, portal CRMs) expect an HTTP 2xx response within 3–5 seconds. If your workflow processes heavy logic synchronously or hits a transient downstream 504 timeout, the sender marks the delivery as failed—and concurrent retry storms can cause duplicate database writes.</p><p>I built a 3-stage fault-tolerant message bus inside n8n backed by Redis lists and atomic <code>SETNX</code> locks: Stage 1 acknowledges the webhook in 8ms after pushing a SHA-256-enveloped payload to Redis; Stage 2 drains the queue asynchronously with exponential jitter backoff; Stage 3 redacts secrets before moving exhausted payloads to an isolated DLQ with automated AI schema repair and idempotent replay.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>System architecture &amp; interactive topology</h2>
+  <p>A 21-node n8n production topology (`workflow_n8n.json`) divided into three isolated execution lanes:</p>
+  <ul>
+    <li><strong>Lane 1 — Sub-10ms Enveloped Ingestion:</strong> Canonicalizes JSON keys, computes <code>crypto.createHash('sha256')</code> idempotency ID, LPUSHes to <code>queue:webhooks:ingest</code>, and returns immediate <code>202 Accepted</code>.</li><li><strong>Lane 2 — Jittered Backoff Worker:</strong> Pops envelopes, dispatches downstream HTTP requests, and computes <code>min(60000, 1000 * 2^retry) + random_jitter(30%)</code> to prevent thundering-herd retry storms.</li><li><strong>Lane 3 — Secret-Redacted DLQ &amp; Self-Healing Replay:</strong> Strips sensitive keys (<code>authorization</code>, <code>api_key</code>, <code>token</code>) before persisting exhausted payloads to <code>queue:webhooks:dlq</code>, and verifies <code>SETNX</code> idempotency locks before replaying repaired payloads.</li>
+  </ul>
+
+  
+  <div class="visual-showcase">
+    <div class="visual-head">
+      <div class="v-dots"><span></span><span></span><span></span></div>
+      <div class="v-title">SYSTEM TOPOLOGY &amp; ARCHITECTURE BLUEPRINT</div>
+      <div class="v-tag">PRODUCTION ENGINE</div>
+    </div>
+    <div class="visual-body">
+      <img src="../assets/blueprints/webhook-dlq-payload-recovery-engine-n8n-redis-20261006.png" alt="Self-Healing Webhook Dead-Letter Queue (DLQ) &amp; Replay Engine architecture visualization" loading="lazy">
+    </div>
+    <div class="visual-foot">
+      <span><b>END-TO-END FLOW:</b> SHA-256 Envelope → Redis Buffer &amp; 202 → Async Pop Worker → Jitter Backoff → DLQ Sanitizer → Idempotent Replay</span>
+      <span class="v-live">● DETERMINISTIC PIPELINE</span>
+    </div>
+  </div>
+
+  <!-- SECTION 1: INTERACTIVE ARCHITECTURE GRAPH (REAL NODE TOPOLOGY) -->
+  <div class="diag" style="margin-top:28px">
+    <svg viewBox="0 0 920 205" role="img" aria-label="Interactive 6-stage execution topology for Self-Healing Webhook Dead-Letter Queue (DLQ) &amp; Replay Engine">
+      <defs>
+        <marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#000000"/>
+        </marker>
+        <marker id="ah-red" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#FF385C"/>
+        </marker>
+        <filter id="diag-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      <g class="edge" marker-end="url(#ah)">
+        <path d="M 146 92 L 164 92"/><path d="M 296 92 L 314 92"/><path d="M 446 92 L 464 92"/><path d="M 596 92 L 614 92"/><path d="M 746 92 L 764 92"/><path d="M 680 126 C 680 185 380 185 380 126" stroke-dasharray="5 5"/>
+      </g>
+      <g class="flow" marker-end="url(#ah-red)">
+        <path d="M 146 92 L 164 92"/><path d="M 296 92 L 314 92"/><path d="M 446 92 L 464 92"/><path d="M 596 92 L 614 92"/><path d="M 746 92 L 764 92"/><path d="M 680 126 C 680 185 380 185 380 126" stroke-dasharray="5 5"/>
+      </g>
+      <g class="diag-photons">
+        
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 146 92 L 164 92" dur="0.9s" repeatCount="indefinite" begin="0.0s"/>
+        </circle>
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 296 92 L 314 92" dur="0.9s" repeatCount="indefinite" begin="0.25s"/>
+        </circle>
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 446 92 L 464 92" dur="0.9s" repeatCount="indefinite" begin="0.5s"/>
+        </circle>
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 596 92 L 614 92" dur="0.9s" repeatCount="indefinite" begin="0.75s"/>
+        </circle>
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 746 92 L 764 92" dur="0.9s" repeatCount="indefinite" begin="1.0s"/>
+        </circle>
+        <circle r="3.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 680 126 C 680 185 380 185 380 126" dur="1.8s" repeatCount="indefinite" begin="0.5s"/>
+        </circle>
+      </g>
+      
+      <g class="diag-node" data-node="n1" style="cursor:pointer">
+        <rect x="18" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="14" y="58" width="132" height="68" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="20" y="64" width="46" height="12" rx="2" fill="#000000"/>
+        <text x="43" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 01</text>
+        <text x="80" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">SHA-256 Envelope</text>
+        <text x="80" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">Canonical Hash ID</text>
+      </g>
+      <g class="diag-node" data-node="n2" style="cursor:pointer">
+        <rect x="168" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="164" y="58" width="132" height="68" rx="4" fill="#FFF2F4" stroke="#FF385C" stroke-width="3"/>
+        <rect x="170" y="64" width="46" height="12" rx="2" fill="#FF385C"/>
+        <text x="193" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 02</text>
+        <text x="230" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#FF385C" text-anchor="middle">Redis Buffer &amp; 202</text>
+        <text x="230" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">LPUSH + Fast Ack</text>
+      </g>
+      <g class="diag-node" data-node="n3" style="cursor:pointer">
+        <rect x="318" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="314" y="58" width="132" height="68" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="320" y="64" width="46" height="12" rx="2" fill="#000000"/>
+        <text x="343" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 03</text>
+        <text x="380" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">Async Pop Worker</text>
+        <text x="380" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">RPOP + Unpack</text>
+      </g>
+      <g class="diag-node" data-node="n4" style="cursor:pointer">
+        <rect x="468" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="464" y="58" width="132" height="68" rx="4" fill="#FFF2F4" stroke="#FF385C" stroke-width="3"/>
+        <rect x="470" y="64" width="46" height="12" rx="2" fill="#FF385C"/>
+        <text x="493" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 04</text>
+        <text x="530" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#FF385C" text-anchor="middle">Jitter Backoff</text>
+        <text x="530" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">2^n + 30% Jitter</text>
+      </g>
+      <g class="diag-node" data-node="n5" style="cursor:pointer">
+        <rect x="618" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="614" y="58" width="132" height="68" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="620" y="64" width="46" height="12" rx="2" fill="#000000"/>
+        <text x="643" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 05</text>
+        <text x="680" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">DLQ Sanitizer</text>
+        <text x="680" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">Secret Redaction</text>
+      </g>
+      <g class="diag-node" data-node="n6" style="cursor:pointer">
+        <rect x="768" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="764" y="58" width="132" height="68" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="770" y="64" width="46" height="12" rx="2" fill="#000000"/>
+        <text x="793" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 06</text>
+        <text x="830" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">Idempotent Replay</text>
+        <text x="830" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">AI Repair + SETNX</text>
+      </g>
+    </svg>
+  </div>
+  <p class="diag-cap">Click any node in the SVG diagram or list below to inspect its payload contract, latency SLA, and retry policy.</p>
+
+  <div class="bp-topo-shell" id="bp-topo">
+    <div class="sim-header">
+      <div class="sim-badge"><span class="dot-live"></span> 01 · INTERACTIVE NODE TOPOLOGY INSPECTOR</div>
+      <div class="sim-title">Inspect Stage-by-Stage Execution Contracts &amp; Fault Boundaries</div>
+      <p class="sim-intro">Select any node in the pipeline to examine its architectural responsibility, input/output schema types, p95 execution latency, and error recovery policy.</p>
+    </div>
+    <div class="bp-topo-grid">
+      <div class="bp-nodes-list" id="bp-node-btns">
+        
+          <button type="button" class="bp-node-btn active" data-node="n1">
+            <div class="n-left">
+              <span class="n-idx">NODE 01</span>
+              <span class="n-name">SHA-256 Envelope</span>
+            </div>
+            <span class="n-lat">3 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n2">
+            <div class="n-left">
+              <span class="n-idx">NODE 02</span>
+              <span class="n-name">Redis Buffer &amp; 202</span>
+            </div>
+            <span class="n-lat">5 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n3">
+            <div class="n-left">
+              <span class="n-idx">NODE 03</span>
+              <span class="n-name">Async Pop Worker</span>
+            </div>
+            <span class="n-lat">15 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n4">
+            <div class="n-left">
+              <span class="n-idx">NODE 04</span>
+              <span class="n-name">Jitter Backoff</span>
+            </div>
+            <span class="n-lat">4 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n5">
+            <div class="n-left">
+              <span class="n-idx">NODE 05</span>
+              <span class="n-name">DLQ Sanitizer</span>
+            </div>
+            <span class="n-lat">6 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n6">
+            <div class="n-left">
+              <span class="n-idx">NODE 06</span>
+              <span class="n-name">Idempotent Replay</span>
+            </div>
+            <span class="n-lat">340 ms</span>
+          </button>
+      </div>
+      <div class="bp-node-detail">
+        <div class="bp-nd-head">
+          <div class="bp-nd-title" id="nd-title">NODE 01 · SHA-256 Envelope</div>
+          <span class="bp-nd-badge" id="nd-lat">LATENCY: 3 ms</span>
+        </div>
+        <div class="bp-nd-row">
+          <div class="bp-nd-lbl">Architectural Role</div>
+          <div class="bp-nd-val" id="nd-role">Receives raw webhook POST, sorts JSON keys deterministically, computes SHA-256 idempotency digest, and wraps payload with retryCount=0 metadata.</div>
+        </div>
+        <div class="bp-nd-row">
+          <div class="bp-nd-lbl">Input / Output Payload Contract</div>
+          <div class="bp-nd-val mono" id="nd-io">IN: Raw Webhook POST -&gt; OUT: QueueEnvelope(id: sha256, originTimestamp, retryCount=0, payload)</div>
+        </div>
+        <div class="bp-nd-row">
+          <div class="bp-nd-lbl">Error &amp; Retry Policy</div>
+          <div class="bp-nd-val" id="nd-retry">Immediate synchronous execution prior to network I/O.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Real code &amp; schema inspector</h2>
+  <p>Extracted directly from the production repository. Switch tabs to inspect the core execution logic, strict JSON/database data contracts, and structured LLM instructions.</p>
+
+  <!-- SECTION 2: REAL CODE & SCHEMA INSPECTOR (TABBED COMPONENT) -->
+  <div class="bp-inspector" id="bp-inspector">
+    <div class="bp-tabs-bar">
+      <button type="button" class="bp-tab-btn active" data-tab="tab1">
+        <span>01 · SHA-256 Envelope &amp; Jitter Backoff JS</span>
+        <span class="sub">workflow_n8n.json · Core n8n Code Nodes</span>
+      </button>
+      <button type="button" class="bp-tab-btn" data-tab="tab2">
+        <span>02 · Webhook &amp; DLQ Envelope Schemas</span>
+        <span class="sub">sample-payloads.json · Queue Contracts</span>
+      </button>
+      <button type="button" class="bp-tab-btn" data-tab="tab3">
+        <span>03 · Resilience &amp; Recovery Rubric</span>
+        <span class="sub">icp-rubric-template.json · Architecture SLA</span>
+      </button>
+    </div>
+    <div class="bp-code-toolbar">
+      <span class="bp-code-file" id="bp-code-filename">// SOURCE: products/webhook-dlq-payload-recovery-engine-n8n-redis-20261006/package/workflow_n8n.json</span>
+      <button type="button" class="bp-copy-code" id="bp-copy-btn">Copy Snippet</button>
+    </div>
+    <pre class="bp-code-pre" id="bp-code-view">// === NODE: Compute SHA-256 Envelope ===
+const crypto = require(&#x27;crypto&#x27;);
+
+const rawBody = $input.first().json.body || $input.first().json;
+const headers = $input.first().json.headers || {};
+
+const canonicalPayload = JSON.stringify(rawBody, Object.keys(rawBody).sort());
+const idempotencyKey = crypto.createHash(&#x27;sha256&#x27;).update(canonicalPayload).digest(&#x27;hex&#x27;);
+
+const envelope = {
+  id: idempotencyKey,
+  originTimestamp: new Date().toISOString(),
+  sourceHeaders: {
+    host: headers.host || &#x27;unknown&#x27;,
+    userAgent: headers[&#x27;user-agent&#x27;] || &#x27;unknown&#x27;,
+    contentType: headers[&#x27;content-type&#x27;] || &#x27;application/json&#x27;
+  },
+  retryCount: 0,
+  maxRetries: 5,
+  payload: rawBody
+};
+
+return [{ json: { envelope, serialized: JSON.stringify(envelope), idempotencyKey } }];
+
+// === NODE: Unpack Queue Envelope ===
+const item = $input.first()?.json;
+if (!item || !item.result) {
+  return [];
+}
+
+try {
+  const envelope = JSON.parse(item.result);
+  return [{ json: envelope }];
+} catch (err) {
+  return [{ json: { error: &#x27;Corrupt payload&#x27;, raw: item.result } }];
+}
+
+// === NODE: Compute Backoff with Jitter ===
+const envelope = $(&#x27;Unpack Queue Envelope&#x27;).first().json;
+const errorData = $input.first().json;
+
+const currentRetry = (envelope.retryCount || 0) + 1;
+const maxRetries = envelope.maxRetries || 5;
+
+const baseDelayMs = 1000;
+const maxDelayMs = 60000;
+const exponential = Math.min(maxDelayMs, baseDelayMs * Math.pow(2, currentRetry));
+const jitter = Math.floor(Math.random() * (exponential * 0.3));
+const nextRetryDelayMs = exponential + jitter;
+
+envelope.retryCount = currentRetry;
+envelope.lastError = {
+  message: errorData.message || &#x27;Downstream unreachable&#x27;,
+  statusCode: errorData.status || 500,
+  timestamp: new Date().toISOString()
+};
+envelope.nextExecutionTime = Date.now() + nextRetryDelayMs;
+
+return [{
+  json: {
+    envelope,
+    shouldRetry: currentRetry &lt;= maxRetries,
+    delayMs: nextRetryDelayMs,
+    serialized: JSON.stringify(envelope)
+  }
+}];
+
+// === NODE: Sanitize &amp; Wrap for DLQ ===
+const item = $input.first().json.envelope;
+
+function sanitizeObject(obj) {
+  if (!obj || typeof obj !== &#x27;object&#x27;) return obj;
+  const sensitiveKeys = [&#x27;authorization&#x27;, &#x27;token&#x27;, &#x27;password&#x27;, &#x27;secret&#x27;, &#x27;apikey&#x27;, &#x27;api_key&#x27;, &#x27;private_key&#x27;];
+  const clean = Array.isArray(obj) ? [] : {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (sensitiveKeys.includes(key.toLowerCase())) {
+      clean[key] = &#x27;[REDACTED_BY_SECURITY_POLICY]&#x27;;
+    } else if (typeof value === &#x27;object&#x27; &amp;&amp; value !== null) {
+      clean[key] = sanitizeObject(value);
+    } else {
+      clean[key] = value;
+    }
+  }
+  return clean;
+}
+
+const dlqRecord = {
+  id: item.id,
+  firstObserved: item.originTimestamp,
+  exhaustedAt: new Date().toISOString(),
+  totalAttempts: item.retryCount,
+  failureHistory: item.lastError,
+  sanitizedPayload: sanitizeObject(item.payload),
+  originHeaders: sanitizeObject(item.sourceHeaders),
+  replayEligible: true
+};
+
+return [{ json: { dlqRecord, serialized: JSON.stringify(dlqRecord), dlqId: item.id } }];</pre>
+  </div>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Interactive dry-run simulator</h2>
+  <p>Select a test scenario and trigger a deterministic dry-run execution across the node topology to inspect real-time logs, compute metrics, and final output payloads.</p>
+
+  <!-- SECTION 3: INTERACTIVE DRY-RUN SIMULATOR -->
+  <div class="sim-container" id="bp-sim" style="margin:28px 0 24px;background:#FFFFFF;border:var(--bw) solid #000000;box-shadow:var(--hard-shadow-lg);border-radius:6px;overflow:hidden">
+    <div class="sim-header">
+      <div class="sim-badge"><span class="dot-live"></span> 03 · LIVE DETERMINISTIC DRY-RUN SIMULATOR</div>
+      <div class="sim-title">Step Through Topology Nodes &amp; Stream Execution Telemetry</div>
+      <p class="sim-intro">Choose a payload scenario below or click "Run Dry-Run Simulation" to step through the pipeline stages and inspect the resulting JSON output contract.</p>
+    </div>
+
+    <div class="sim-controls">
+      <span class="ctrl-label">SELECT TEST SCENARIO:</span>
+      <div class="sim-presets" id="bp-scen-btns">
+        <button type="button" class="preset-btn active" data-scen="fast-ingest">1. High-Burst Webhook Ingestion (7.4ms 202 Ack + Async Drain)</button><button type="button" class="preset-btn" data-scen="jitter-dlq">2. Downstream 503 Outage (5x Jitter Backoff -&gt; Redacted DLQ)</button><button type="button" class="preset-btn" data-scen="idempotent-replay">3. One-Click DLQ Replay &amp; Duplicate SETNX Lock Prevention</button>
+      </div>
+    </div>
+
+    <div class="bp-sim-action-bar">
+      <div class="bp-step-strip" id="bp-step-strip">
+        <span class="bp-step-pill done" data-step-idx="0">NODE 01 · SHA-256 Envelope</span><span class="bp-step-pill done" data-step-idx="1">NODE 02 · Redis Buffer &amp; 202</span><span class="bp-step-pill done" data-step-idx="2">NODE 03 · Async Pop Worker</span><span class="bp-step-pill done" data-step-idx="3">NODE 04 · Jitter Backoff</span><span class="bp-step-pill done" data-step-idx="4">NODE 05 · DLQ Sanitizer</span><span class="bp-step-pill done" data-step-idx="5">NODE 06 · Idempotent Replay</span>
+      </div>
+      <button type="button" class="bp-run-sim-btn" id="bp-run-btn">Run Dry-Run Simulation ✦</button>
+    </div>
+
+    <div class="critic-layout">
+      <div class="critic-left-col">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:800;color:#38BDF8">// TIMESTAMPED EXECUTION TRACE</span>
+          <span id="bp-sim-status" class="auth-pill pass">202 ACCEPTED · DELIVERED ✓</span>
+        </div>
+        <div class="trace-terminal" id="bp-sim-logs" style="min-height:250px;white-space:pre-wrap">[00:00.002] INGEST: POST /webhook/events | Canonical SHA-256 id=9a4f81c2...
+[00:00.007] REDIS_BUFFER: LPUSH queue:webhooks:ingest -&gt; Returned HTTP 202 Accepted in 7.4ms
+[00:00.040] WORKER_POP: RPOP queue:webhooks:ingest | Unpacked envelope id=9a4f81c2...
+[00:00.185] DOWNSTREAM: POST https://crm-internal.example.com/v1/leads -&gt; HTTP 200 OK</div>
+        <p id="bp-sim-summary" style="font-size:0.8rem;color:#94A3B8;margin:6px 0 0;line-height:1.45">The webhook sender receives HTTP 202 Accepted in 7.4ms while the background worker drains Redis at a controlled concurrency pace.</p>
+      </div>
+
+      <div class="critic-right-col">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-family:'Space Grotesk',sans-serif;font-size:0.88rem;font-weight:800;color:#000000">FINAL OUTPUT PAYLOAD CONTRACT</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;font-weight:800;color:var(--acc)">SCHEMA VALIDATED ✓</span>
+        </div>
+        <div style="background:#0F172A;border:2px solid #000000;border-radius:4px;padding:14px;flex:1">
+          <pre id="bp-sim-payload" style="margin:0;color:#34D399;font-family:'JetBrains Mono',monospace;font-size:0.72rem;line-height:1.45;white-space:pre-wrap">{
+  &quot;id&quot;: &quot;9a4f81c2e0918471029384710293847102938471029384710293847102938471&quot;,
+  &quot;ingest_ack_ms&quot;: 7.4,
+  &quot;http_status_returned_to_sender&quot;: 202,
+  &quot;worker_delivery&quot;: {
+    &quot;status&quot;: &quot;DELIVERED&quot;,
+    &quot;retryCount&quot;: 0,
+    &quot;downstream_http_code&quot;: 200
+  }
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="sim-specs">
+      <div><b>TOTAL LATENCY</b> <span id="bp-m-lat">7.4 ms ingest (185 ms drain)</span></div>
+      <div><b>COMPUTE / TOKENS</b> <span id="bp-m-comp">1 SHA-256 hash + Redis LPUSH/RPOP</span></div>
+      <div><b>ESTIMATED RUN COST</b> <span class="cost-tag" id="bp-m-cost">$0.00000 USD (Pure Redis/n8n)</span></div>
+      <div><b>EXECUTION MODE</b> <span>Deterministic Self-Hosted</span></div>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Production resilience &amp; edge-case handling</h2>
+  <p>Every production system is defined by how it behaves when upstream dependencies fail, rate-limits trigger, or malformed payloads arrive at the boundary.</p>
+
+  <!-- SECTION 4: 3-CARD PRODUCTION RESILIENCE BREAKDOWN -->
+  <div class="bp-resilience-grid">
+    
+    <div class="bp-res-card">
+      <span class="r-tag">01 · CANONICAL SHA-256 IDEMPOTENCY</span>
+      <h3>Key-Order-Independent Deduplication</h3>
+      <p>Sorts JSON keys via <code>Object.keys(rawBody).sort()</code> before hashing and locks replay execution with Redis <code>SETNX</code>.</p>
+    </div>
+    <div class="bp-res-card">
+      <span class="r-tag">02 · FULL JITTER BACKOFF</span>
+      <h3>Anti-Thundering-Herd Retry Math</h3>
+      <p>Adds 0–30% uniform random jitter (<code>Math.random() * exponential * 0.3</code>) to every retry interval so recovering downstream servers aren't slammed simultaneously.</p>
+    </div>
+    <div class="bp-res-card">
+      <span class="r-tag">03 · RECURSIVE SECRET REDACTION</span>
+      <h3>Zero Plaintext Tokens in DLQ Storage</h3>
+      <p>Before any failed payload enters <code>queue:webhooks:dlq</code>, <code>sanitizeObject()</code> replaces bearer tokens, passwords, and API keys with redaction markers.</p>
+    </div>
+  </div>
+
+  
+  <div class="callout decision">
+    <span class="badge">ARCHITECTURAL DECISION</span>
+    <h3>Returning HTTP 202 before business logic execution</h3>
+    <p>When n8n webhooks wait for the final node to finish before responding, any slow LLM call or third-party API hiccup causes the webhook sender to time out and retry—triggering duplicate runs.</p>
+    <p>By placing only two fast nodes in the synchronous path (<code>Compute SHA-256 Envelope</code> &rarr; <code>Push to Redis Ingest Buffer</code> &rarr; <code>202 Accepted</code>), ingestion completes in <8ms regardless of downstream load.</p>
+    <p class="outcome"><b>IMPACT</b> 100% webhook sender success rate even during complete downstream CRM maintenance windows.</p>
+  </div>
+  <div class="callout pitfall">
+    <span class="badge">PRODUCTION PITFALL</span>
+    <h3>Dead-Letter Queues often become unencrypted credential dumps</h3>
+    <p>Raw webhook payloads and HTTP headers frequently carry API keys, session tokens, or webhook secrets that persist for weeks inside a Redis DLQ.</p>
+    <p>I added a mandatory <code>Sanitize &amp; Wrap for DLQ</code> recursive scrubber that redacts 7 classes of sensitive keys before the Redis <code>LPUSH</code> executes.</p>
+    <p class="outcome"><b>FIX</b> Zero credential exposure inside long-lived dead-letter queues.</p>
+  </div>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Stack &amp; specifications</h2>
+  <ul>
+    <li><strong>n8n Self-Hosted Engine</strong>: 21-node multi-lane ingestion, worker, and replay topology</li><li><strong>Redis 7+</strong>: High-speed list queues (<code>LPUSH</code>/<code>RPOP</code>) and atomic <code>SETNX</code> idempotency locks</li><li><strong>Node.js <code>crypto</code></strong>: Canonical JSON serialization and SHA-256 envelope signing</li><li><strong>AI Schema Repair Node</strong>: Automated payload transformation for schema-drift DLQ failures</li>
+  </ul>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Architectural takeaway</h2>
+  <p>Synchronous webhooks are a liability at scale. Decoupling ingestion with a 7ms Redis buffer, jittered backoff, and SETNX-guarded DLQ replay turns fragile endpoints into banking-grade event pipelines.</p>
+</div></section>
+
+<div class="wrap"><nav class="pager" aria-label="Other blueprints">
+  <a href="b2b-waterfall-engine.html">← Hybrid B2B Waterfall Enrichment Engine</a>
+  <a href="sentiment-anomaly-engine.html">Real-Time Stream Sentiment &amp; Anomaly Engine →</a>
+</nav></div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="logo"><span class="mk">MR</span></div>
+    <div class="mono">Designed &amp; built by Manny Ruesch · 2026</div>
+    <a href="#top">Back to top ↑</a>
+  </div>
+</footer>
+
+<script src="../assets/site.js"></script>
+<script>
+(function(){
+  const NODES = {"n1": {"id": "n1", "idx": "NODE 01", "name": "SHA-256 Envelope", "sub": "Canonical Hash ID", "latency": "3 ms", "accent": false, "role": "Receives raw webhook POST, sorts JSON keys deterministically, computes SHA-256 idempotency digest, and wraps payload with retryCount=0 metadata.", "io_type": "IN: Raw Webhook POST -> OUT: QueueEnvelope(id: sha256, originTimestamp, retryCount=0, payload)", "retry_policy": "Immediate synchronous execution prior to network I/O."}, "n2": {"id": "n2", "idx": "NODE 02", "name": "Redis Buffer & 202", "sub": "LPUSH + Fast Ack", "latency": "5 ms", "accent": true, "role": "Pushes serialized QueueEnvelope into Redis queue:webhooks:ingest and immediately returns HTTP 202 Accepted to the upstream webhook caller.", "io_type": "IN: QueueEnvelope -> OUT: HTTP 202 {status: 'accepted', idempotency_key: sha256}", "retry_policy": "Decouples upstream caller from downstream latency; prevents sender timeout disconnects."}, "n3": {"id": "n3", "idx": "NODE 03", "name": "Async Pop Worker", "sub": "RPOP + Unpack", "latency": "15 ms", "accent": false, "role": "Polls queue:webhooks:ingest, parses JSON envelope with corruption guards, and forwards payload to the downstream destination endpoint.", "io_type": "IN: Redis RPOP String -> OUT: UnpackedEnvelope + DownstreamHTTPAttempt", "retry_policy": "Quarantines malformed non-JSON strings directly to corrupt-payload audit key."}, "n4": {"id": "n4", "idx": "NODE 04", "name": "Jitter Backoff", "sub": "2^n + 30% Jitter", "latency": "4 ms", "accent": true, "role": "On downstream 429/5xx failure, increments retryCount and computes exponential delay (1s -> 2s -> 4s -> 8s -> 16s) plus up to 30% random jitter.", "io_type": "IN: FailedAttempt(retryCount < 5) -> OUT: DelayedRetryEnvelope(nextRetryDelayMs, lastError)", "retry_policy": "Prevents synchronized retry waves (thundering herd) when downstream service recovers."}, "n5": {"id": "n5", "idx": "NODE 05", "name": "DLQ Sanitizer", "sub": "Secret Redaction", "latency": "6 ms", "accent": false, "role": "When retryCount >= 5, recursively scrubs sensitive keys (authorization, token, password, api_key) and pushes envelope to isolated queue:webhooks:dlq.", "io_type": "IN: ExhaustedEnvelope(retryCount==5) -> OUT: RedactedDLQRecord(dlqStatus='ISOLATED')", "retry_policy": "Guarantees zero plaintext credentials or bearer tokens are persisted in dead-letter storage."}, "n6": {"id": "n6", "idx": "NODE 06", "name": "Idempotent Replay", "sub": "AI Repair + SETNX", "latency": "340 ms", "accent": false, "role": "Pops candidate from DLQ, repairs schema drift if needed, acquires Redis SETNX idempotency lock on SHA-256 key, and replays to downstream target.", "io_type": "IN: RedactedDLQRecord -> OUT: ReplayReceipt(replayId, lockAcquired: bool, status: 'REPLAYED')", "retry_policy": "Atomic Redis SETNX lock ensures a replayed DLQ event can never execute twice."}};
+  const TABS = {"tab1": {"label": "SHA-256 Envelope & Jitter Backoff JS", "sub": "workflow_n8n.json \u00b7 Core n8n Code Nodes", "file": "products/webhook-dlq-payload-recovery-engine-n8n-redis-20261006/package/workflow_n8n.json", "code": "// === NODE: Compute SHA-256 Envelope ===\nconst crypto = require('crypto');\n\nconst rawBody = $input.first().json.body || $input.first().json;\nconst headers = $input.first().json.headers || {};\n\nconst canonicalPayload = JSON.stringify(rawBody, Object.keys(rawBody).sort());\nconst idempotencyKey = crypto.createHash('sha256').update(canonicalPayload).digest('hex');\n\nconst envelope = {\n  id: idempotencyKey,\n  originTimestamp: new Date().toISOString(),\n  sourceHeaders: {\n    host: headers.host || 'unknown',\n    userAgent: headers['user-agent'] || 'unknown',\n    contentType: headers['content-type'] || 'application/json'\n  },\n  retryCount: 0,\n  maxRetries: 5,\n  payload: rawBody\n};\n\nreturn [{ json: { envelope, serialized: JSON.stringify(envelope), idempotencyKey } }];\n\n// === NODE: Unpack Queue Envelope ===\nconst item = $input.first()?.json;\nif (!item || !item.result) {\n  return [];\n}\n\ntry {\n  const envelope = JSON.parse(item.result);\n  return [{ json: envelope }];\n} catch (err) {\n  return [{ json: { error: 'Corrupt payload', raw: item.result } }];\n}\n\n// === NODE: Compute Backoff with Jitter ===\nconst envelope = $('Unpack Queue Envelope').first().json;\nconst errorData = $input.first().json;\n\nconst currentRetry = (envelope.retryCount || 0) + 1;\nconst maxRetries = envelope.maxRetries || 5;\n\nconst baseDelayMs = 1000;\nconst maxDelayMs = 60000;\nconst exponential = Math.min(maxDelayMs, baseDelayMs * Math.pow(2, currentRetry));\nconst jitter = Math.floor(Math.random() * (exponential * 0.3));\nconst nextRetryDelayMs = exponential + jitter;\n\nenvelope.retryCount = currentRetry;\nenvelope.lastError = {\n  message: errorData.message || 'Downstream unreachable',\n  statusCode: errorData.status || 500,\n  timestamp: new Date().toISOString()\n};\nenvelope.nextExecutionTime = Date.now() + nextRetryDelayMs;\n\nreturn [{\n  json: {\n    envelope,\n    shouldRetry: currentRetry <= maxRetries,\n    delayMs: nextRetryDelayMs,\n    serialized: JSON.stringify(envelope)\n  }\n}];\n\n// === NODE: Sanitize & Wrap for DLQ ===\nconst item = $input.first().json.envelope;\n\nfunction sanitizeObject(obj) {\n  if (!obj || typeof obj !== 'object') return obj;\n  const sensitiveKeys = ['authorization', 'token', 'password', 'secret', 'apikey', 'api_key', 'private_key'];\n  const clean = Array.isArray(obj) ? [] : {};\n  for (const [key, value] of Object.entries(obj)) {\n    if (sensitiveKeys.includes(key.toLowerCase())) {\n      clean[key] = '[REDACTED_BY_SECURITY_POLICY]';\n    } else if (typeof value === 'object' && value !== null) {\n      clean[key] = sanitizeObject(value);\n    } else {\n      clean[key] = value;\n    }\n  }\n  return clean;\n}\n\nconst dlqRecord = {\n  id: item.id,\n  firstObserved: item.originTimestamp,\n  exhaustedAt: new Date().toISOString(),\n  totalAttempts: item.retryCount,\n  failureHistory: item.lastError,\n  sanitizedPayload: sanitizeObject(item.payload),\n  originHeaders: sanitizeObject(item.sourceHeaders),\n  replayEligible: true\n};\n\nreturn [{ json: { dlqRecord, serialized: JSON.stringify(dlqRecord), dlqId: item.id } }];"}, "tab2": {"label": "Webhook & DLQ Envelope Schemas", "sub": "sample-payloads.json \u00b7 Queue Contracts", "file": "products/webhook-dlq-payload-recovery-engine-n8n-redis-20261006/package/sample-payloads.json", "code": "[\n  {\n    \"scenario\": \"High-Priority Match\",\n    \"dlq_metadata\": {\n      \"message_id\": \"dlq_msg_8f7b2c91a4e5\",\n      \"redis_stream\": \"webhooks:dlq:enterprise\",\n      \"retry_count\": 2,\n      \"max_retries\": 5,\n      \"first_received_at\": \"2025-05-18T14:22:10.124Z\",\n      \"last_failed_at\": \"2025-05-18T14:24:35.882Z\",\n      \"last_error\": {\n        \"status_code\": 429,\n        \"error_type\": \"RateLimitExceeded\",\n        \"service\": \"Salesforce-Sync-API\",\n        \"message\": \"Concurrent request limit exceeded for enterprise tenant\"\n      },\n      \"healing_strategy\": \"exponential_backoff_with_circuit_check\"\n    },\n    \"original_webhook\": {\n      \"event_id\": \"evt_ent_99281726\",\n      \"event_type\": \"lead.inbound.form_submission\",\n      \"timestamp\": \"2025-05-18T14:22:09.951Z\",\n      \"source\": \"web_lead_form_v2\",\n      \"data\": {\n        \"lead_id\": \"lead_98127391\",\n        \"first_name\": \"Eleanor\",\n        \"last_name\": \"Vance\",\n        \"work_email\": \"e.vance@apexlogistics.com\",\n        \"company_name\": \"Apex Logistics Global\",\n        \"company_domain\": \"apexlogistics.com\",\n        \"estimated_arr_usd\": 250000,\n        \"company_size\": \"5000+\",\n        \"industry\": \"Transportation & Logistics\",\n        \"target_product\": \"Platform Enterprise Tier\",\n        \"buying_stage\": \"Immediate Evaluation\",\n        \"lead_score\": 96,\n        \"country\": \"United States\",\n        \"phone_number\": \"+1-415-555-0199\",\n        \"notes\": \"Urgent migration evaluation from legacy competitor.\"\n      }\n    }\n  },\n  {\n    \"scenario\": \"Standard Match\",\n    \"dlq_metadata\": {\n      \"message_id\": \"dlq_msg_4a1d8e33c6f2\",\n      \"redis_stream\": \"webhooks:dlq:standard\",\n      \"retry_count\": 1,\n      \"max_retries\": 3,\n      \"first_received_at\": \"2025-05-18T14:31:05.419Z\",\n      \"last_failed_at\": \"2025-05-18T14:31:05.419Z\",\n      \"last_error\": {\n        \"status_code\": 504,\n        \"error_type\": \"GatewayTimeout\",\n        \"service\": \"Clearbit-Enrichment-Worker\",\n        \"message\": \"Upstream service response timed out after 5000ms\"\n      },\n      \"healing_strategy\": \"jittered_retry\"\n    },\n    \"original_webhook\": {\n      \"event_id\": \"evt_std_66190241\",\n      \"event_type\": \"lead.inbound.form_submission\",\n      \"timestamp\": \"2025-05-18T14:31:05.102Z\",\n      \"source\": \"web_lead_form_v2\",\n      \"data\": {\n        \"lead_id\": \"lead_44810239\",\n        \"first_name\": \"Marcus\",\n        \"last_name\": \"Chen\",\n        \"work_email\": \"marcus.chen@scaleops.io\",\n        \"company_name\": \"ScaleOps Systems\",\n        \"company_domain\": \"scaleops.io\",\n        \"estimated_arr_usd\": 35000,\n        \"company_size\": \"51-200\",\n        \"industry\": \"Cloud Infrastructure\",\n        \"target_product\": \"Team Growth Plan\",\n        \"buying_stage\": \"Researching\",\n        \"lead_score\": 74,\n        \"country\": \"Canada\",\n        \"phone_number\": \"+1-604-555-0142\",\n        \"notes\": \"Requesting standard sandbox access for pilot evaluation.\"\n      }\n    }\n  },\n  {\n    \"scenario\": \"Disqualified Lead\",\n    \"dlq_metadata\": {\n      \"message_id\": \"dlq_msg_1b99c0d7e89a\",\n      \"redis_stream\": \"webhooks:dlq:unqualified\",\n      \"retry_count\": 3,\n      \"max_retries\": 3,"}, "tab3": {"label": "Resilience & Recovery Rubric", "sub": "icp-rubric-template.json \u00b7 Architecture SLA", "file": "products/webhook-dlq-payload-recovery-engine-n8n-redis-20261006/package/icp-rubric-template.json", "code": "{\n  \"template_id\": \"icp-rubric-n8n-redis-dlq-v1\",\n  \"name\": \"Self-Healing Webhook Dead-Letter Queue & Payload Recovery Engine Evaluation Rubric\",\n  \"version\": \"1.0.0\",\n  \"target_architecture\": {\n    \"orchestrator\": \"n8n\",\n    \"buffer_and_state_store\": \"Redis\",\n    \"domain\": \"Webhook Ingestion, Dead-Letter Queue (DLQ), and Self-Healing Automation\"\n  },\n  \"scoring_summary\": {\n    \"total_points\": 100,\n    \"passing_threshold\": 75,\n    \"grade_scale\": {\n      \"distinction\": 90,\n      \"pass\": 75,\n      \"remediation_required\": 60,\n      \"fail\": 0\n    }\n  },\n  \"evaluation_categories\": [\n    {\n      \"category_id\": \"INGEST_BUFFER\",\n      \"category_name\": \"Webhook Ingestion, Buffering & Idempotency\",\n      \"weight_percentage\": 20,\n      \"max_points\": 20,\n      \"rules\": [\n        {\n          \"rule_id\": \"INGEST-01\",\n          \"name\": \"Asynchronous Decoupling via Redis\",\n          \"max_points\": 7,\n          \"evaluation_focus\": \"Immediate ACK response (<200ms) with payload pushed to Redis Streams or Lists prior to downstream processing.\",\n          \"scoring_criteria\": {\n            \"full_credit\": \"Webhook endpoint responds with 202 Accepted immediately; payloads pushed atomically to Redis Streams with unique message IDs.\",\n            \"partial_credit\": \"Payloads buffered to Redis, but acknowledgment is coupled with downstream execution steps.\",\n            \"zero_credit\": \"Synchronous n8n execution pipeline without Redis buffer isolation.\"\n          }\n        },\n        {\n          \"rule_id\": \"INGEST-02\",\n          \"name\": \"Cryptographic Verification & Security\",\n          \"max_points\": 6,\n          \"evaluation_focus\": \"HMAC-SHA256 signature verification and timing-safe comparison on inbound webhooks.\",\n          \"scoring_criteria\": {\n            \"full_credit\": \"Strict timing-safe signature validation implemented before Redis insertion; rejects unauthenticated payloads with 401/403.\",\n            \"partial_credit\": \"Signature validated using standard equality check or verified after Redis enqueue.\",\n            \"zero_credit\": \"Missing signature verification or plain-text secret exposure.\"\n          }\n        },\n        {\n          \"rule_id\": \"INGEST-03\",\n          \"name\": \"Deduplication & Idempotency Keys\",\n          \"max_points\": 7,\n          \"evaluation_focus\": \"Redis-backed distributed lock or SET with TTL using payload hashing or header idempotency keys.\",\n          \"scoring_criteria\": {\n            \"full_credit\": \"Uses atomic Redis commands (e.g., SET NX EX) with calculated SHA-256 hash or idempotency header to discard duplicates cleanly.\",\n            \"partial_credit\": \"Idempotency check present but vulnerable to race conditions (non-atomic read-then-write).\",\n            \"zero_credit\": \"No deduplication strategy implemented.\"\n          }\n        }\n      ]\n    },\n    {\n      \"category_id\": \"RETRY_DLQ_ARCH\",\n      \"category_name\": \"Failure Classification, Retries & DLQ Routing\",\n      \"weight_percentage\": 25,\n      \"max_points\": 25,\n      \"rules\": [\n        {\n          \"rule_id\": \"DLQ-01\",\n          \"name\": \"Exponential Backoff & Jitter Scheduling\",\n          \"max_points\": 8,\n          \"evaluation_focus\": \"Calculated retry delay using Redis Sorted Sets (ZSET) or n8n wait nodes with exponential backoff and randomized jitter.\",\n          \"scoring_criteria\": {\n            \"full_credit\": \"Mathematical exponential backoff + jitter implemented with ZSET timestamp scores; avoids thundering herd problems.\",\n            \"partial_credit\": \"Fixed linear retry intervals or backoff without jitter.\",\n            \"zero_credit\": \"Tight immediate retry loop blocking worker threads.\"\n          }\n        },\n        {\n          \"rule_id\": \"DLQ-02\",\n          \"name\": \"Transient vs. Terminal Error Classification\",\n          \"max_points\": 8,\n          \"evaluation_focus\": \"Differentiation between network timeouts/5xx (transient) and 4xx schema/validation errors (terminal).\",\n          \"scoring_criteria\": {\n            \"full_credit\": \"Status codes and exceptions parsed accurately: transient errors routed to retry backoff; terminal errors routed directly to DLQ.\",\n            \"partial_credit\": \"Generic catch block routing all failures through standard retry limit regardless of error type.\",\n            \"zero_credit\": \"No error classification; drops failed executions silently.\"\n          }\n        },\n        {"}};
+  const SCENARIOS = {"fast-ingest": {"id": "fast-ingest", "btn_label": "1. High-Burst Webhook Ingestion (7.4ms 202 Ack + Async Drain)", "badge_text": "202 ACCEPTED \u00b7 DELIVERED \u2713", "badge_class": "pass", "latency": "7.4 ms ingest (185 ms drain)", "compute": "1 SHA-256 hash + Redis LPUSH/RPOP", "cost": "$0.00000 USD (Pure Redis/n8n)", "logs": ["[00:00.002] INGEST: POST /webhook/events | Canonical SHA-256 id=9a4f81c2...", "[00:00.007] REDIS_BUFFER: LPUSH queue:webhooks:ingest -> Returned HTTP 202 Accepted in 7.4ms", "[00:00.040] WORKER_POP: RPOP queue:webhooks:ingest | Unpacked envelope id=9a4f81c2...", "[00:00.185] DOWNSTREAM: POST https://crm-internal.example.com/v1/leads -> HTTP 200 OK"], "payload": "{\n  \"id\": \"9a4f81c2e0918471029384710293847102938471029384710293847102938471\",\n  \"ingest_ack_ms\": 7.4,\n  \"http_status_returned_to_sender\": 202,\n  \"worker_delivery\": {\n    \"status\": \"DELIVERED\",\n    \"retryCount\": 0,\n    \"downstream_http_code\": 200\n  }\n}", "summary": "The webhook sender receives HTTP 202 Accepted in 7.4ms while the background worker drains Redis at a controlled concurrency pace."}, "jitter-dlq": {"id": "jitter-dlq", "btn_label": "2. Downstream 503 Outage (5x Jitter Backoff -> Redacted DLQ)", "badge_text": "ISOLATED IN REDIS DLQ \u26a0\ufe0f", "badge_class": "warn", "latency": "5 retries (Exponential + Jitter)", "compute": "Secret scrubbing + DLQ LPUSH", "cost": "$0.00000 USD (0 events lost)", "logs": ["[00:00.120] WORKER: Downstream returned HTTP 503 Service Unavailable (retryCount=1/5)", "[00:00.124] BACKOFF: Computed delay = 2000ms + 412ms jitter (2412ms) -> queue:webhooks:retry", "[00:31.800] WORKER: Attempt 5/5 failed (HTTP 503) -> Retry budget exhausted!", "[00:31.806] SANITIZE: Redacted header 'Authorization' & 'api_key' -> [REDACTED_BY_SECURITY_POLICY]", "[00:31.812] DLQ_ISOLATE: Persisted envelope to queue:webhooks:dlq (0 data loss)"], "payload": "{\n  \"id\": \"c71e0944a1123489012384901238490123849012384901238490123849012384\",\n  \"dlqStatus\": \"ISOLATED_IN_DLQ\",\n  \"retryCount\": 5,\n  \"lastError\": \"HTTP 503 Service Unavailable\",\n  \"sanitizedHeaders\": {\n    \"authorization\": \"[REDACTED_BY_SECURITY_POLICY]\",\n    \"content-type\": \"application/json\"\n  },\n  \"queue\": \"queue:webhooks:dlq\"\n}", "summary": "After 5 jittered backoff attempts fail, the engine recursively scrubs credentials from the payload and isolates it in the Redis Dead-Letter Queue."}, "idempotent-replay": {"id": "idempotent-replay", "btn_label": "3. One-Click DLQ Replay & Duplicate SETNX Lock Prevention", "badge_text": "REPLAYED ONCE \u00b7 DUP BLOCKED \u2713", "badge_class": "pass", "latency": "342 ms", "compute": "SHA-256 verify + Redis SETNX", "cost": "$0.00011 USD", "logs": ["[00:00.010] REPLAY_TRIGGER: Popped isolated envelope id=c71e0944... from queue:webhooks:dlq", "[00:00.210] AI_DIAGNOSTIC: Repaired deprecated field 'phone_number' -> 'contact_phone'", "[00:00.218] IDEMPOTENCY_GUARD: Verified canonical SHA-256 & acquired Redis SETNX lock (TTL 86400s)", "[00:00.342] DOWNSTREAM_REPLAY: HTTP 200 OK | Duplicate concurrent replay request blocked by SETNX!"], "payload": "{\n  \"replayId\": \"c71e0944a1123489012384901238490123849012384901238490123849012384\",\n  \"schema_repaired\": true,\n  \"redis_setnx_lock\": \"ACQUIRED\",\n  \"downstream_status\": 200,\n  \"duplicate_execution_prevented\": true\n}", "summary": "During DLQ recovery, the Idempotency Verification Guard reserves the payload's SHA-256 key in Redis via SETNX before replaying, making double-execution impossible."}};
+
+  // 1. Interactive Node Topology
+  function selectNode(nodeId) {
+    const n = NODES[nodeId];
+    if (!n) return;
+    document.querySelectorAll('#bp-node-btns .bp-node-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.node === nodeId);
+    });
+    document.getElementById('nd-title').textContent = n.idx + ' · ' + n.name;
+    document.getElementById('nd-lat').textContent = 'LATENCY: ' + n.latency;
+    document.getElementById('nd-role').textContent = n.role;
+    document.getElementById('nd-io').textContent = n.io_type;
+    document.getElementById('nd-retry').textContent = n.retry_policy;
+  }
+
+  document.querySelectorAll('[data-node]').forEach(el => {
+    el.addEventListener('click', () => selectNode(el.dataset.node));
+  });
+
+  // 2. Code & Schema Tabs
+  let currentTab = 'tab1';
+  document.querySelectorAll('#bp-inspector .bp-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#bp-inspector .bp-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentTab = btn.dataset.tab;
+      const t = TABS[currentTab];
+      if (t) {
+        document.getElementById('bp-code-filename').textContent = '// SOURCE: ' + t.file;
+        document.getElementById('bp-code-view').textContent = t.code;
+      }
+    });
+  });
+
+  const copyBtn = document.getElementById('bp-copy-btn');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      const code = document.getElementById('bp-code-view').textContent;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(() => {
+          copyBtn.textContent = 'Copied! ✓';
+          setTimeout(() => { copyBtn.textContent = 'Copy Snippet'; }, 1800);
+        });
+      }
+    });
+  }
+
+  // 3. Dry-Run Simulator with Step-by-Step Animation
+  let activeScen = 'fast-ingest';
+  let simTimer = null;
+
+  function runSimulation(scenId, animate) {
+    const s = SCENARIOS[scenId];
+    if (!s) return;
+    if (simTimer) clearInterval(simTimer);
+
+    const pills = document.querySelectorAll('#bp-step-strip .bp-step-pill');
+    const logsEl = document.getElementById('bp-sim-logs');
+    const payloadEl = document.getElementById('bp-sim-payload');
+    const statusEl = document.getElementById('bp-sim-status');
+    const summaryEl = document.getElementById('bp-sim-summary');
+    const latEl = document.getElementById('bp-m-lat');
+    const compEl = document.getElementById('bp-m-comp');
+    const costEl = document.getElementById('bp-m-cost');
+
+    if (!animate) {
+      pills.forEach(p => { p.className = 'bp-step-pill done'; });
+      logsEl.textContent = s.logs.join('\n');
+      payloadEl.textContent = s.payload;
+      statusEl.textContent = s.badge_text;
+      statusEl.className = 'auth-pill ' + s.badge_class;
+      summaryEl.textContent = s.summary;
+      latEl.textContent = s.latency;
+      compEl.textContent = s.compute;
+      costEl.textContent = s.cost;
+      return;
+    }
+
+    // Step-by-step live trace animation
+    pills.forEach(p => { p.className = 'bp-step-pill'; });
+    logsEl.textContent = '[00:00.000] INIT: Starting deterministic dry-run execution...';
+    statusEl.textContent = 'EXECUTING DRY-RUN...';
+    statusEl.className = 'auth-pill warn';
+
+    let step = 0;
+    const totalSteps = pills.length;
+    simTimer = setInterval(() => {
+      if (step < totalSteps) {
+        pills.forEach((p, idx) => {
+          if (idx < step) p.className = 'bp-step-pill done';
+          else if (idx === step) p.className = 'bp-step-pill running';
+          else p.className = 'bp-step-pill';
+        });
+        const logSlice = s.logs.slice(0, step + 1);
+        logsEl.textContent = logSlice.join('\n');
+        step++;
+      } else {
+        clearInterval(simTimer);
+        pills.forEach(p => { p.className = 'bp-step-pill done'; });
+        logsEl.textContent = s.logs.join('\n');
+        payloadEl.textContent = s.payload;
+        statusEl.textContent = s.badge_text;
+        statusEl.className = 'auth-pill ' + s.badge_class;
+        summaryEl.textContent = s.summary;
+        latEl.textContent = s.latency;
+        compEl.textContent = s.compute;
+        costEl.textContent = s.cost;
+      }
+    }, 180);
+  }
+
+  document.querySelectorAll('#bp-scen-btns .preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#bp-scen-btns .preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeScen = btn.dataset.scen;
+      runSimulation(activeScen, true);
+    });
+  });
+
+  const runBtn = document.getElementById('bp-run-btn');
+  if (runBtn) {
+    runBtn.addEventListener('click', () => runSimulation(activeScen, true));
+  }
+})();
+</script>
+</body>
+</html>

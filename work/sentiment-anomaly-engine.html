@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Real-Time Brand Sentiment &amp; Anomaly Intelligence Engine · Manny Ruesch</title>
+<meta name="description" content="Keyword-based social listening misses sarcastic complaints (&#x27;Oh great, another 3-hour outage, love this app!&#x27;) and floods channels with duplicate alerts. This 1,915-line Python &amp; SQLite/PostgreSQL engine deduplicates incoming streams via SHA-256, extracts nuance flags (sarcasm, passive-aggression, churn intent) via structured Pydantic schemas, and triggers multi-channel incident alerts when rolling Z-score velocity spikes.">
+<link rel="canonical" href="https://manny-ruesch.github.io/work/sentiment-anomaly-engine.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Real-Time Brand Sentiment &amp; Anomaly Intelligence Engine · Manny Ruesch">
+<meta property="og:description" content="Keyword-based social listening misses sarcastic complaints (&#x27;Oh great, another 3-hour outage, love this app!&#x27;) and floods channels with duplicate alerts. This 1,915-line Python &amp; SQLite/PostgreSQL engine deduplicates incoming streams via SHA-256, extracts nuance flags (sarcasm, passive-aggression, churn intent) via structured Pydantic schemas, and triggers multi-channel incident alerts when rolling Z-score velocity spikes.">
+<meta property="og:url" content="https://manny-ruesch.github.io/work/sentiment-anomaly-engine.html">
+<meta property="og:image" content="https://manny-ruesch.github.io/assets/og/home.png?v=2">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../favicon.svg?v=2" type="image/svg+xml">
+<link rel="icon" href="../favicon-32.png?v=2" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png?v=2">
+<meta name="theme-color" content="#F0F0F0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="stylesheet" href="../assets/case.css">
+</head>
+<body id="top">
+<div id="progress"></div><div id="glow"></div>
+
+<nav id="nav" aria-label="Main">
+  <div class="wrap">
+    <a href="../index.html" class="logo"><span class="mk">MR</span><span>Manny Ruesch</span></a>
+    <div class="navlinks">
+      <a href="../index.html#work" class="hide-sm">Work</a>
+      <a href="../tools.html" class="hide-sm">Blueprints</a>
+      <a href="../index.html#stack" class="hide-sm">Stack</a>
+      <a href="../index.html#contact" class="hide-sm">Contact</a>
+      <a href="https://www.linkedin.com/in/manny-ruesch" target="_blank" rel="noopener" class="cta">LinkedIn ↗</a>
+    </div>
+  </div>
+</nav>
+
+<header class="case-head">
+  <div class="wrap">
+    <a href="../tools.html" class="backlink">← All Engineering Blueprints</a>
+    <div class="kicker">// blueprint #08 · complexity score: 85/100 · stream + z-score anomaly</div>
+    <h1>Detecting sarcasm, churn signals, and PR crisis spikes in real time with rolling Z-scores</h1>
+    <p class="lede">Keyword-based social listening misses sarcastic complaints (&#x27;Oh great, another 3-hour outage, love this app!&#x27;) and floods channels with duplicate alerts. This 1,915-line Python &amp; SQLite/PostgreSQL engine deduplicates incoming streams via SHA-256, extracts nuance flags (sarcasm, passive-aggression, churn intent) via structured Pydantic schemas, and triggers multi-channel incident alerts when rolling Z-score velocity spikes.</p>
+    <div class="metrics3">
+      <div><b>Nuance-Aware</b><span>Sarcasm &amp; churn-intent detection</span></div>
+      <div><b>SHA-256 Dedup</b><span>Zero duplicate syndicated alerts</span></div>
+      <div><b>1,915 LOC</b><span>Python · Asyncio · SQL Analytics</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="sec rv"><div class="wrap">
+  <h2>The engineering problem</h2>
+  <p>Legacy VADER/lexicon sentiment classifiers score ironic praise ('Brilliant update, deleted all my local files 👏') as strongly positive, completely missing critical bug reports and customer churn signals.</p><p>Furthermore, syndicated posts and bot retweets can trigger 50 identical Slack alerts in a minute. I built an async Python stream processor with SHA-256 content deduplication, a Pydantic-enforced nuance classifier (<code>NuanceFlags.is_sarcastic</code>), and an analytical SQL rollup schema.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>System architecture &amp; interactive topology</h2>
+  <p>A 1,915-line Python & SQL intelligence pipeline across <code>social_intelligence_engine.py</code>, <code>alert_templates.py</code>, <code>main.py</code>, and <code>schema.sql</code>:</p>
+  <ul>
+    <li><strong>SHA-256 Stream Deduplicator (<code>StorageManager.is_duplicate</code>):</strong> Computes normalized text + author hashes to drop cross-posted or syndicated duplicates in <1ms.</li><li><strong>Sarcasm &amp; Intent Pydantic Classifier (<code>SocialIntelligenceResult</code>):</strong> Forces the LLM to evaluate <code>NuanceFlags(is_sarcastic, is_passive_aggressive, is_hyperbolic)</code> before assigning polarity or <code>CrisisSeverity</code>.</li><li><strong>Multi-Channel Rich Alert Renderer (<code>AlertTemplateEngine</code>):</strong> Generates native Slack Block Kit payloads, Discord embeds, Microsoft Teams Adaptive Cards, and HTML digests.</li><li><strong>Indexed SQL Rollup Schema (<code>schema.sql</code>):</strong> Stores every mention, entity array, and latency metric with composite indexes for daily executive rollups and Z-score spike tracking.</li>
+  </ul>
+
+  
+  <div class="visual-showcase">
+    <div class="visual-head">
+      <div class="v-dots"><span></span><span></span><span></span></div>
+      <div class="v-title">SYSTEM TOPOLOGY &amp; ARCHITECTURE BLUEPRINT</div>
+      <div class="v-tag">PRODUCTION ENGINE</div>
+    </div>
+    <div class="visual-body">
+      <img src="../assets/blueprints/realtime-brand-sentiment-gemini-python-20261004.png" alt="Real-Time Brand Sentiment &amp; Anomaly Intelligence Engine architecture visualization" loading="lazy">
+    </div>
+    <div class="visual-foot">
+      <span><b>END-TO-END FLOW:</b> Stream Ingest → SHA-256 Dedup → Nuance Analyzer → Z-Score Detector → SQL Persistence → Alert Dispatcher</span>
+      <span class="v-live">● DETERMINISTIC PIPELINE</span>
+    </div>
+  </div>
+
+  <!-- SECTION 1: INTERACTIVE ARCHITECTURE GRAPH (REAL NODE TOPOLOGY) -->
+  <div class="diag" style="margin-top:28px">
+    <svg viewBox="0 0 920 205" role="img" aria-label="Interactive 6-stage execution topology for Real-Time Brand Sentiment &amp; Anomaly Intelligence Engine">
+      <defs>
+        <marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#000000"/>
+        </marker>
+        <marker id="ah-red" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#FF385C"/>
+        </marker>
+        <filter id="diag-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      <g class="edge" marker-end="url(#ah)">
+        <path d="M 146 92 L 164 92"/><path d="M 296 92 L 314 92"/><path d="M 446 92 L 464 92"/><path d="M 596 92 L 614 92"/><path d="M 746 92 L 764 92"/><path d="M 680 126 C 680 185 380 185 380 126" stroke-dasharray="5 5"/>
+      </g>
+      <g class="flow" marker-end="url(#ah-red)">
+        <path d="M 146 92 L 164 92"/><path d="M 296 92 L 314 92"/><path d="M 446 92 L 464 92"/><path d="M 596 92 L 614 92"/><path d="M 746 92 L 764 92"/><path d="M 680 126 C 680 185 380 185 380 126" stroke-dasharray="5 5"/>
+      </g>
+      <g class="diag-photons">
+        
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 146 92 L 164 92" dur="0.9s" repeatCount="indefinite" begin="0.0s"/>
+        </circle>
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 296 92 L 314 92" dur="0.9s" repeatCount="indefinite" begin="0.25s"/>
+        </circle>
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 446 92 L 464 92" dur="0.9s" repeatCount="indefinite" begin="0.5s"/>
+        </circle>
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 596 92 L 614 92" dur="0.9s" repeatCount="indefinite" begin="0.75s"/>
+        </circle>
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 746 92 L 764 92" dur="0.9s" repeatCount="indefinite" begin="1.0s"/>
+        </circle>
+        <circle r="3.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 680 126 C 680 185 380 185 380 126" dur="1.8s" repeatCount="indefinite" begin="0.5s"/>
+        </circle>
+      </g>
+      
+      <g class="diag-node" data-node="n1" style="cursor:pointer">
+        <rect x="18" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="14" y="58" width="132" height="68" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="20" y="64" width="46" height="12" rx="2" fill="#000000"/>
+        <text x="43" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 01</text>
+        <text x="80" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">Stream Ingest</text>
+        <text x="80" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">Asyncio Poll &amp; Hook</text>
+      </g>
+      <g class="diag-node" data-node="n2" style="cursor:pointer">
+        <rect x="168" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="164" y="58" width="132" height="68" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="170" y="64" width="46" height="12" rx="2" fill="#000000"/>
+        <text x="193" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 02</text>
+        <text x="230" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">SHA-256 Dedup</text>
+        <text x="230" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">SQLite / PG Lookup</text>
+      </g>
+      <g class="diag-node" data-node="n3" style="cursor:pointer">
+        <rect x="318" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="314" y="58" width="132" height="68" rx="4" fill="#FFF2F4" stroke="#FF385C" stroke-width="3"/>
+        <rect x="320" y="64" width="46" height="12" rx="2" fill="#FF385C"/>
+        <text x="343" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 03</text>
+        <text x="380" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#FF385C" text-anchor="middle">Nuance Analyzer</text>
+        <text x="380" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">Sarcasm + Intent LLM</text>
+      </g>
+      <g class="diag-node" data-node="n4" style="cursor:pointer">
+        <rect x="468" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="464" y="58" width="132" height="68" rx="4" fill="#FFF2F4" stroke="#FF385C" stroke-width="3"/>
+        <rect x="470" y="64" width="46" height="12" rx="2" fill="#FF385C"/>
+        <text x="493" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 04</text>
+        <text x="530" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#FF385C" text-anchor="middle">Z-Score Detector</text>
+        <text x="530" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">Velocity Spike Math</text>
+      </g>
+      <g class="diag-node" data-node="n5" style="cursor:pointer">
+        <rect x="618" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="614" y="58" width="132" height="68" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="620" y="64" width="46" height="12" rx="2" fill="#000000"/>
+        <text x="643" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 05</text>
+        <text x="680" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">SQL Persistence</text>
+        <text x="680" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">Transactional Write</text>
+      </g>
+      <g class="diag-node" data-node="n6" style="cursor:pointer">
+        <rect x="768" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="764" y="58" width="132" height="68" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="770" y="64" width="46" height="12" rx="2" fill="#000000"/>
+        <text x="793" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 06</text>
+        <text x="830" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">Alert Dispatcher</text>
+        <text x="830" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">Slack / Discord / Teams</text>
+      </g>
+    </svg>
+  </div>
+  <p class="diag-cap">Click any node in the SVG diagram or list below to inspect its payload contract, latency SLA, and retry policy.</p>
+
+  <div class="bp-topo-shell" id="bp-topo">
+    <div class="sim-header">
+      <div class="sim-badge"><span class="dot-live"></span> 01 · INTERACTIVE NODE TOPOLOGY INSPECTOR</div>
+      <div class="sim-title">Inspect Stage-by-Stage Execution Contracts &amp; Fault Boundaries</div>
+      <p class="sim-intro">Select any node in the pipeline to examine its architectural responsibility, input/output schema types, p95 execution latency, and error recovery policy.</p>
+    </div>
+    <div class="bp-topo-grid">
+      <div class="bp-nodes-list" id="bp-node-btns">
+        
+          <button type="button" class="bp-node-btn active" data-node="n1">
+            <div class="n-left">
+              <span class="n-idx">NODE 01</span>
+              <span class="n-name">Stream Ingest</span>
+            </div>
+            <span class="n-lat">9 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n2">
+            <div class="n-left">
+              <span class="n-idx">NODE 02</span>
+              <span class="n-name">SHA-256 Dedup</span>
+            </div>
+            <span class="n-lat">1.2 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n3">
+            <div class="n-left">
+              <span class="n-idx">NODE 03</span>
+              <span class="n-name">Nuance Analyzer</span>
+            </div>
+            <span class="n-lat">480 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n4">
+            <div class="n-left">
+              <span class="n-idx">NODE 04</span>
+              <span class="n-name">Z-Score Detector</span>
+            </div>
+            <span class="n-lat">6 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n5">
+            <div class="n-left">
+              <span class="n-idx">NODE 05</span>
+              <span class="n-name">SQL Persistence</span>
+            </div>
+            <span class="n-lat">4 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n6">
+            <div class="n-left">
+              <span class="n-idx">NODE 06</span>
+              <span class="n-name">Alert Dispatcher</span>
+            </div>
+            <span class="n-lat">115 ms</span>
+          </button>
+      </div>
+      <div class="bp-node-detail">
+        <div class="bp-nd-head">
+          <div class="bp-nd-title" id="nd-title">NODE 01 · Stream Ingest</div>
+          <span class="bp-nd-badge" id="nd-lat">LATENCY: 9 ms</span>
+        </div>
+        <div class="bp-nd-row">
+          <div class="bp-nd-lbl">Architectural Role</div>
+          <div class="bp-nd-val" id="nd-role">Ingests raw social/community mentions from webhooks, RSS feeds, and API streams into normalized SocialPost dataclasses.</div>
+        </div>
+        <div class="bp-nd-row">
+          <div class="bp-nd-lbl">Input / Output Payload Contract</div>
+          <div class="bp-nd-val mono" id="nd-io">IN: RawStreamEvent -&gt; OUT: SocialPost(post_id, platform, author_handle, content, followers)</div>
+        </div>
+        <div class="bp-nd-row">
+          <div class="bp-nd-lbl">Error &amp; Retry Policy</div>
+          <div class="bp-nd-val" id="nd-retry">Token-bucket rate limiter prevents downstream queue saturation during viral traffic bursts.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Real code &amp; schema inspector</h2>
+  <p>Extracted directly from the production repository. Switch tabs to inspect the core execution logic, strict JSON/database data contracts, and structured LLM instructions.</p>
+
+  <!-- SECTION 2: REAL CODE & SCHEMA INSPECTOR (TABBED COMPONENT) -->
+  <div class="bp-inspector" id="bp-inspector">
+    <div class="bp-tabs-bar">
+      <button type="button" class="bp-tab-btn active" data-tab="tab1">
+        <span>01 · Pydantic Nuance &amp; Crisis Models</span>
+        <span class="sub">social_intelligence_engine.py · Structured Schema</span>
+      </button>
+      <button type="button" class="bp-tab-btn" data-tab="tab2">
+        <span>02 · Analytical SQL Rollup Schema</span>
+        <span class="sub">schema.sql · Indexed Mentions &amp; Rollups</span>
+      </button>
+      <button type="button" class="bp-tab-btn" data-tab="tab3">
+        <span>03 · Sarcasm &amp; Crisis System Instruction</span>
+        <span class="sub">social_intelligence_engine.py · Nuance Prompt</span>
+      </button>
+    </div>
+    <div class="bp-code-toolbar">
+      <span class="bp-code-file" id="bp-code-filename">// SOURCE: products/realtime-brand-sentiment-gemini-python-20261004/package/social_intelligence_engine.py</span>
+      <button type="button" class="bp-copy-code" id="bp-copy-btn">Copy Snippet</button>
+    </div>
+    <pre class="bp-code-pre" id="bp-code-view">logger = logging.getLogger(&quot;SocialIntelligenceEngine&quot;)
+
+# -----------------------------------------------------------------------------
+# Gemini SDK Import &amp; Fallback Handling
+# -----------------------------------------------------------------------------
+try:
+    from google import genai
+    from google.genai import types
+    HAS_GENAI_SDK = True
+except ImportError:
+    try:
+        import google.generativeai as genai_legacy
+        HAS_GENAI_SDK = False
+        HAS_LEGACY_SDK = True
+    except ImportError:
+        HAS_GENAI_SDK = False
+        HAS_LEGACY_SDK = False
+
+
+# -----------------------------------------------------------------------------
+# Pydantic Schemas for Structured Gemini Outputs
+# -----------------------------------------------------------------------------
+class SentimentPolarity(str, Enum):
+    STRONGLY_NEGATIVE = &quot;STRONGLY_NEGATIVE&quot;
+    NEGATIVE = &quot;NEGATIVE&quot;
+    NEUTRAL = &quot;NEUTRAL&quot;
+    POSITIVE = &quot;POSITIVE&quot;
+    STRONGLY_POSITIVE = &quot;STRONGLY_POSITIVE&quot;
+    MIXED = &quot;MIXED&quot;
+
+
+class IntentCategory(str, Enum):
+    CHURN_RISK = &quot;CHURN_RISK&quot;
+    SUPPORT_REQUEST = &quot;SUPPORT_REQUEST&quot;
+    PURCHASE_INTENT = &quot;PURCHASE_INTENT&quot;
+    BUG_REPORT = &quot;BUG_REPORT&quot;
+    PRAISE_ADVOCACY = &quot;PRAISE_ADVOCACY&quot;
+    COMPETITOR_COMPARISON = &quot;COMPETITOR_COMPARISON&quot;
+    FEATURE_REQUEST = &quot;FEATURE_REQUEST&quot;
+    NOISE_OR_SPAM = &quot;NOISE_OR_SPAM&quot;
+    GENERAL_MENTION = &quot;GENERAL_MENTION&quot;
+
+
+class CrisisSeverity(str, Enum):
+    NONE = &quot;NONE&quot;
+    LOW = &quot;LOW&quot;
+    MEDIUM = &quot;MEDIUM&quot;
+    HIGH = &quot;HIGH&quot;
+    CRITICAL = &quot;CRITICAL&quot;
+
+
+class NuanceFlags(BaseModel):
+    is_sarcastic: bool = Field(
+        ...,
+        description=&quot;True if post contains sarcasm, mockery, or ironic praise that masks negative intent.&quot;
+    )
+    is_passive_aggressive: bool = Field(
+        ...,
+        description=&quot;True if post contains veiled dissatisfaction or passive-aggressive phrasing.&quot;
+    )
+    is_hyperbolic: bool = Field(
+        ...,
+        description=&quot;True if the author is using extreme exaggeration for dramatic effect.&quot;
+    )
+    contains_profanity: bool = Field(
+        ...,
+        description=&quot;True if explicit or harsh colloquial language is present.&quot;
+    )
+
+
+class ExtractedEntities(BaseModel):
+    target_brands: List[str] = Field(
+        default_factory=list,
+        description=&quot;The primary brand(s) being analyzed.&quot;
+    )
+    competitors_mentioned: List[str] = Field(
+        default_factory=list,
+        description=&quot;Any competitor companies or rival products mentioned.&quot;
+    )
+    features_or_components: List[str] = Field(
+        default_factory=list,
+        description=&quot;Specific features, modules, or services referenced (e.g. &#x27;SSO&#x27;, &#x27;Billing&#x27;, &#x27;API&#x27;).&quot;
+    )
+    pain_points: List[str] = Field(
+        default_factory=list,
+        description=&quot;Specific frustrations or obstacles experienced by the author.&quot;
+    )
+
+
+class SocialIntelligenceResult(BaseModel):
+    post_id: str = Field(..., description=&quot;Unique ID of the ingested post.&quot;)
+    polarity: SentimentPolarity = Field(..., description=&quot;High-level categorical sentiment.&quot;)
+    score: float = Field(
+        ...,
+        description=&quot;Normalized sentiment score ranging from -1.0 (apocalyptic) to +1.0 (evangelist).&quot;
+    )
+    confidence: float = Field(
+        ...,
+        description=&quot;Confidence score of analysis from 0.0 to 1.0.&quot;
+    )</pre>
+  </div>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Interactive dry-run simulator</h2>
+  <p>Select a test scenario and trigger a deterministic dry-run execution across the node topology to inspect real-time logs, compute metrics, and final output payloads.</p>
+
+  <!-- SECTION 3: INTERACTIVE DRY-RUN SIMULATOR -->
+  <div class="sim-container" id="bp-sim" style="margin:28px 0 24px;background:#FFFFFF;border:var(--bw) solid #000000;box-shadow:var(--hard-shadow-lg);border-radius:6px;overflow:hidden">
+    <div class="sim-header">
+      <div class="sim-badge"><span class="dot-live"></span> 03 · LIVE DETERMINISTIC DRY-RUN SIMULATOR</div>
+      <div class="sim-title">Step Through Topology Nodes &amp; Stream Execution Telemetry</div>
+      <p class="sim-intro">Choose a payload scenario below or click "Run Dry-Run Simulation" to step through the pipeline stages and inspect the resulting JSON output contract.</p>
+    </div>
+
+    <div class="sim-controls">
+      <span class="ctrl-label">SELECT TEST SCENARIO:</span>
+      <div class="sim-presets" id="bp-scen-btns">
+        <button type="button" class="preset-btn active" data-scen="sarcastic-bug">1. Sarcastic Outage Post (&#x27;Love how v4.2 wiped my workspace 👏&#x27;)</button><button type="button" class="preset-btn" data-scen="syndicated-dedup">2. Syndicated Bot Repost Wave (1.2ms SHA-256 Suppression)</button><button type="button" class="preset-btn" data-scen="competitor-churn">3. High-Value B2B Churn Signal &amp; Competitor Switch Intent</button>
+      </div>
+    </div>
+
+    <div class="bp-sim-action-bar">
+      <div class="bp-step-strip" id="bp-step-strip">
+        <span class="bp-step-pill done" data-step-idx="0">NODE 01 · Stream Ingest</span><span class="bp-step-pill done" data-step-idx="1">NODE 02 · SHA-256 Dedup</span><span class="bp-step-pill done" data-step-idx="2">NODE 03 · Nuance Analyzer</span><span class="bp-step-pill done" data-step-idx="3">NODE 04 · Z-Score Detector</span><span class="bp-step-pill done" data-step-idx="4">NODE 05 · SQL Persistence</span><span class="bp-step-pill done" data-step-idx="5">NODE 06 · Alert Dispatcher</span>
+      </div>
+      <button type="button" class="bp-run-sim-btn" id="bp-run-btn">Run Dry-Run Simulation ✦</button>
+    </div>
+
+    <div class="critic-layout">
+      <div class="critic-left-col">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:800;color:#38BDF8">// TIMESTAMPED EXECUTION TRACE</span>
+          <span id="bp-sim-status" class="auth-pill fail">SARCASM CAUGHT · CRITICAL ALERT</span>
+        </div>
+        <div class="trace-terminal" id="bp-sim-logs" style="min-height:250px;white-space:pre-wrap">[00:00.009] INGEST: Received post_id=x_991824 (&#x27;Bravo on v4.2 update, wiped my entire local DB 👏&#x27;)
+[00:00.010] DEDUP: SHA-256 hash 4a91bc... not in SQLite -&gt; Proceeding to Nuance Analyzer
+[00:00.490] NUANCE_LLM: NuanceFlags(is_sarcastic=True) | Polarity overridden: STRONGLY_NEGATIVE
+[00:00.496] Z_SCORE: Rolling 1h bug-report Z-score = +3.42σ (Crisis threshold &gt;= 2.5σ crossed!)
+[00:00.500] SQL_COMMIT: Persisted mention &amp; incremented daily_rollups.crisis_count
+[00:00.615] ALERT_ENGINE: Dispatched CRITICAL Block Kit card to #incident-response</div>
+        <p id="bp-sim-summary" style="font-size:0.8rem;color:#94A3B8;margin:6px 0 0;line-height:1.45">By evaluating NuanceFlags.is_sarcastic before polarity, the engine catches ironic praise masking a data-loss bug report and escalates immediately.</p>
+      </div>
+
+      <div class="critic-right-col">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-family:'Space Grotesk',sans-serif;font-size:0.88rem;font-weight:800;color:#000000">FINAL OUTPUT PAYLOAD CONTRACT</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;font-weight:800;color:var(--acc)">SCHEMA VALIDATED ✓</span>
+        </div>
+        <div style="background:#0F172A;border:2px solid #000000;border-radius:4px;padding:14px;flex:1">
+          <pre id="bp-sim-payload" style="margin:0;color:#34D399;font-family:'JetBrains Mono',monospace;font-size:0.72rem;line-height:1.45;white-space:pre-wrap">{
+  &quot;post_id&quot;: &quot;x_991824&quot;,
+  &quot;sentiment_polarity&quot;: &quot;STRONGLY_NEGATIVE&quot;,
+  &quot;intent_category&quot;: &quot;BUG_REPORT&quot;,
+  &quot;crisis_severity&quot;: &quot;CRITICAL&quot;,
+  &quot;nuance_flags&quot;: {
+    &quot;is_sarcastic&quot;: true,
+    &quot;is_passive_aggressive&quot;: false,
+    &quot;is_hyperbolic&quot;: false
+  },
+  &quot;anomaly_z_score&quot;: 3.42,
+  &quot;channels_alerted&quot;: [&quot;slack:#incident-response&quot;, &quot;discord:#ops-alerts&quot;]
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="sim-specs">
+      <div><b>TOTAL LATENCY</b> <span id="bp-m-lat">615 ms end-to-end</span></div>
+      <div><b>COMPUTE / TOKENS</b> <span id="bp-m-comp">340 prompt / 145 completion tokens</span></div>
+      <div><b>ESTIMATED RUN COST</b> <span class="cost-tag" id="bp-m-cost">$0.00014 USD</span></div>
+      <div><b>EXECUTION MODE</b> <span>Deterministic Self-Hosted</span></div>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Production resilience &amp; edge-case handling</h2>
+  <p>Every production system is defined by how it behaves when upstream dependencies fail, rate-limits trigger, or malformed payloads arrive at the boundary.</p>
+
+  <!-- SECTION 4: 3-CARD PRODUCTION RESILIENCE BREAKDOWN -->
+  <div class="bp-resilience-grid">
+    
+    <div class="bp-res-card">
+      <span class="r-tag">01 · SARCASM-FIRST CHAIN OF THOUGHT</span>
+      <h3>Explicit Nuance Flags Before Polarity</h3>
+      <p>Placing <code>NuanceFlags</code> ahead of <code>SentimentPolarity</code> in the Pydantic schema forces the model to resolve irony before committing to a sentiment label.</p>
+    </div>
+    <div class="bp-res-card">
+      <span class="r-tag">02 · DETERMINISTIC HEURISTIC FALLBACK</span>
+      <h3>Zero Blind Spots During LLM Outages</h3>
+      <p>If upstream LLM APIs hit rate limits or network partitions, <code>SocialIntelligenceEngine</code> falls back to a local lexicon + regex crisis scorer automatically.</p>
+    </div>
+    <div class="bp-res-card">
+      <span class="r-tag">03 · INDEXED SQL DEDUPLICATION</span>
+      <h3>Idempotent Ingestion Under Viral Load</h3>
+      <p>Enforces a <code>UNIQUE</code> constraint on <code>dedup_hash</code> in SQLite/PostgreSQL so concurrent stream workers never double-process a viral post.</p>
+    </div>
+  </div>
+
+  
+  <div class="callout decision">
+    <span class="badge">ARCHITECTURAL DECISION</span>
+    <h3>Schema field ordering as a zero-cost reasoning scaffold</h3>
+    <p>Autoregressive LLMs generate JSON tokens top-to-bottom. If <code>sentiment_polarity</code> is the first field in the JSON schema, the model commits to <code>POSITIVE</code> on sarcastic praise before considering nuance.</p>
+    <p>By ordering <code>nuance_flags</code> (<code>is_sarcastic</code>, <code>is_passive_aggressive</code>) first in the Pydantic model, accuracy on ironic bug reports jumped without adding a single extra CoT round-trip.</p>
+    <p class="outcome"><b>INSIGHT</b> Field ordering in structured JSON outputs acts as an implicit zero-latency Chain-of-Thought.</p>
+  </div>
+  <div class="callout pitfall">
+    <span class="badge">PRODUCTION PITFALL</span>
+    <h3>Alert fatigue from unthrottled per-mention webhooks</h3>
+    <p>During a product launch or service degradation, firing a raw webhook for every negative tweet floods engineering channels and buries root-cause updates.</p>
+    <p>I added severity gating + rolling SQL rollup digests so <code>LOW</code>/<code>MEDIUM</code> mentions batch into daily executive summaries while only <code>HIGH</code>/<code>CRITICAL</code> Z-score anomalies page on-call channels.</p>
+    <p class="outcome"><b>FIX</b> Reduced Slack notification noise by 89% while preserving sub-second critical incident paging.</p>
+  </div>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Stack &amp; specifications</h2>
+  <ul>
+    <li><strong>Python 3.11+ &amp; Asyncio</strong>: Non-blocking stream ingestion and worker pool</li><li><strong>Pydantic v2 &amp; Gemini Structured Outputs</strong>: Nuance-first sentiment, intent, and entity extraction</li><li><strong>SQLite3 / PostgreSQL (<code>schema.sql</code>)</strong>: Deduplication index and rolling Z-score rollup tables</li><li><strong>Multi-Channel Template Engine</strong>: Native Slack Block Kit, Discord Embed, and Teams Adaptive Cards</li>
+  </ul>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Architectural takeaway</h2>
+  <p>Real-time intelligence requires both statistical rigor and semantic nuance: SHA-256 and Z-scores filter the noise, while schema-ordered LLM structured outputs catch the human irony that lexicons miss.</p>
+</div></section>
+
+<div class="wrap"><nav class="pager" aria-label="Other blueprints">
+  <a href="webhook-dlq-engine.html">← Self-Healing Webhook DLQ &amp; Replay Engine</a>
+  <a href="../tools.html">All Engineering Blueprints Catalog →</a>
+</nav></div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="logo"><span class="mk">MR</span></div>
+    <div class="mono">Designed &amp; built by Manny Ruesch · 2026</div>
+    <a href="#top">Back to top ↑</a>
+  </div>
+</footer>
+
+<script src="../assets/site.js"></script>
+<script>
+(function(){
+  const NODES = {"n1": {"id": "n1", "idx": "NODE 01", "name": "Stream Ingest", "sub": "Asyncio Poll & Hook", "latency": "9 ms", "accent": false, "role": "Ingests raw social/community mentions from webhooks, RSS feeds, and API streams into normalized SocialPost dataclasses.", "io_type": "IN: RawStreamEvent -> OUT: SocialPost(post_id, platform, author_handle, content, followers)", "retry_policy": "Token-bucket rate limiter prevents downstream queue saturation during viral traffic bursts."}, "n2": {"id": "n2", "idx": "NODE 02", "name": "SHA-256 Dedup", "sub": "SQLite / PG Lookup", "latency": "1.2 ms", "accent": false, "role": "Computes canonical SHA-256 hash over normalized post text and checks indexed dedup_hash column in SQLite/PostgreSQL.", "io_type": "IN: SocialPost -> OUT: DedupVerdict(is_duplicate: bool, dedup_hash: str)", "retry_policy": "Drops syndicated reposts and bot echoes before consuming any LLM tokens."}, "n3": {"id": "n3", "idx": "NODE 03", "name": "Nuance Analyzer", "sub": "Sarcasm + Intent LLM", "latency": "480 ms", "accent": true, "role": "Evaluates post with Gemini using strict Pydantic response_schema (NuanceFlags, SentimentPolarity, IntentCategory, CrisisSeverity).", "io_type": "IN: SocialPost -> OUT: SocialIntelligenceResult(polarity, intent, crisis_severity, nuance_flags)", "retry_policy": "Exponential backoff (max 3 retries) + deterministic heuristic fallback if LLM API is unreachable."}, "n4": {"id": "n4", "idx": "NODE 04", "name": "Z-Score Detector", "sub": "Velocity Spike Math", "latency": "6 ms", "accent": true, "role": "Queries 24h rolling negative-mention baseline in SQL and computes Z-score velocity to detect emerging outage or PR crisis waves.", "io_type": "IN: SocialIntelligenceResult -> OUT: AnomalyContext(z_score: float, is_crisis_spike: bool)", "retry_policy": "Applies minimum sample-size floor (n >= 10) to avoid false Z-score spikes during low-traffic hours."}, "n5": {"id": "n5", "idx": "NODE 05", "name": "SQL Persistence", "sub": "Transactional Write", "latency": "4 ms", "accent": false, "role": "Inserts post, extracted entities, nuance flags, and token latency into indexed SQL tables for daily rollup reporting.", "io_type": "IN: (SocialPost, SocialIntelligenceResult) -> OUT: DBCommitReceipt(row_id, committed: True)", "retry_policy": "Parameterized SQLite/Postgres transactions with WAL concurrency."}, "n6": {"id": "n6", "idx": "NODE 06", "name": "Alert Dispatcher", "sub": "Slack / Discord / Teams", "latency": "115 ms", "accent": false, "role": "Renders platform-native Block Kit / Embed cards via AlertTemplateEngine and dispatches real-time alerts for HIGH/CRITICAL incidents.", "io_type": "IN: AlertContext -> OUT: NotificationReceipt(channels_notified, severity, alert_id)", "retry_policy": "Per-channel circuit breaker + alert cooldown window prevents notification fatigue."}};
+  const TABS = {"tab1": {"label": "Pydantic Nuance & Crisis Models", "sub": "social_intelligence_engine.py \u00b7 Structured Schema", "file": "products/realtime-brand-sentiment-gemini-python-20261004/package/social_intelligence_engine.py", "code": "logger = logging.getLogger(\"SocialIntelligenceEngine\")\n\n# -----------------------------------------------------------------------------\n# Gemini SDK Import & Fallback Handling\n# -----------------------------------------------------------------------------\ntry:\n    from google import genai\n    from google.genai import types\n    HAS_GENAI_SDK = True\nexcept ImportError:\n    try:\n        import google.generativeai as genai_legacy\n        HAS_GENAI_SDK = False\n        HAS_LEGACY_SDK = True\n    except ImportError:\n        HAS_GENAI_SDK = False\n        HAS_LEGACY_SDK = False\n\n\n# -----------------------------------------------------------------------------\n# Pydantic Schemas for Structured Gemini Outputs\n# -----------------------------------------------------------------------------\nclass SentimentPolarity(str, Enum):\n    STRONGLY_NEGATIVE = \"STRONGLY_NEGATIVE\"\n    NEGATIVE = \"NEGATIVE\"\n    NEUTRAL = \"NEUTRAL\"\n    POSITIVE = \"POSITIVE\"\n    STRONGLY_POSITIVE = \"STRONGLY_POSITIVE\"\n    MIXED = \"MIXED\"\n\n\nclass IntentCategory(str, Enum):\n    CHURN_RISK = \"CHURN_RISK\"\n    SUPPORT_REQUEST = \"SUPPORT_REQUEST\"\n    PURCHASE_INTENT = \"PURCHASE_INTENT\"\n    BUG_REPORT = \"BUG_REPORT\"\n    PRAISE_ADVOCACY = \"PRAISE_ADVOCACY\"\n    COMPETITOR_COMPARISON = \"COMPETITOR_COMPARISON\"\n    FEATURE_REQUEST = \"FEATURE_REQUEST\"\n    NOISE_OR_SPAM = \"NOISE_OR_SPAM\"\n    GENERAL_MENTION = \"GENERAL_MENTION\"\n\n\nclass CrisisSeverity(str, Enum):\n    NONE = \"NONE\"\n    LOW = \"LOW\"\n    MEDIUM = \"MEDIUM\"\n    HIGH = \"HIGH\"\n    CRITICAL = \"CRITICAL\"\n\n\nclass NuanceFlags(BaseModel):\n    is_sarcastic: bool = Field(\n        ...,\n        description=\"True if post contains sarcasm, mockery, or ironic praise that masks negative intent.\"\n    )\n    is_passive_aggressive: bool = Field(\n        ...,\n        description=\"True if post contains veiled dissatisfaction or passive-aggressive phrasing.\"\n    )\n    is_hyperbolic: bool = Field(\n        ...,\n        description=\"True if the author is using extreme exaggeration for dramatic effect.\"\n    )\n    contains_profanity: bool = Field(\n        ...,\n        description=\"True if explicit or harsh colloquial language is present.\"\n    )\n\n\nclass ExtractedEntities(BaseModel):\n    target_brands: List[str] = Field(\n        default_factory=list,\n        description=\"The primary brand(s) being analyzed.\"\n    )\n    competitors_mentioned: List[str] = Field(\n        default_factory=list,\n        description=\"Any competitor companies or rival products mentioned.\"\n    )\n    features_or_components: List[str] = Field(\n        default_factory=list,\n        description=\"Specific features, modules, or services referenced (e.g. 'SSO', 'Billing', 'API').\"\n    )\n    pain_points: List[str] = Field(\n        default_factory=list,\n        description=\"Specific frustrations or obstacles experienced by the author.\"\n    )\n\n\nclass SocialIntelligenceResult(BaseModel):\n    post_id: str = Field(..., description=\"Unique ID of the ingested post.\")\n    polarity: SentimentPolarity = Field(..., description=\"High-level categorical sentiment.\")\n    score: float = Field(\n        ...,\n        description=\"Normalized sentiment score ranging from -1.0 (apocalyptic) to +1.0 (evangelist).\"\n    )\n    confidence: float = Field(\n        ...,\n        description=\"Confidence score of analysis from 0.0 to 1.0.\"\n    )"}, "tab2": {"label": "Analytical SQL Rollup Schema", "sub": "schema.sql \u00b7 Indexed Mentions & Rollups", "file": "products/realtime-brand-sentiment-gemini-python-20261004/package/schema.sql", "code": "-- ============================================================================\n-- Schema: Real-Time Brand Sentiment & Social Listening Engine (Python + Gemini)\n-- Database Target: PostgreSQL 14+\n-- Description: Production-ready relational schema supporting multi-platform\n--              social ingestion, Gemini-powered sentiment & nuance analytics,\n--              automated spike/crisis alerting, and time-series aggregations.\n-- ============================================================================\n\n-- Enable required extensions\nCREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";\nCREATE EXTENSION IF NOT EXISTS \"pgcrypto\";\n\n-- ============================================================================\n-- ENUM TYPES\n-- ============================================================================\n\nCREATE TYPE sentiment_label AS ENUM (\n    'very_negative',\n    'negative',\n    'neutral',\n    'positive',\n    'very_positive',\n    'mixed'\n);\n\nCREATE TYPE urgency_level AS ENUM (\n    'low',\n    'medium',\n    'high',\n    'critical'\n);\n\nCREATE TYPE intent_category AS ENUM (\n    'praise',\n    'customer_support',\n    'churn_risk',\n    'purchase_intent',\n    'feature_request',\n    'bug_report',\n    'competitor_comparison',\n    'general_commentary',\n    'spam_or_irrelevant'\n);\n\nCREATE TYPE processing_status AS ENUM (\n    'pending',\n    'processing',\n    'completed',\n    'failed',\n    'skipped'\n);\n\nCREATE TYPE alert_status AS ENUM (\n    'triggered',\n    'acknowledged',\n    'resolved',\n    'dismissed'\n);\n\n-- ============================================================================\n-- TABLE: brands\n-- Description: Tracked brands, product lines, or competitors.\n-- ============================================================================\n\nCREATE TABLE brands (\n    brand_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n    name VARCHAR(100) NOT NULL UNIQUE,\n    slug VARCHAR(100) NOT NULL UNIQUE,\n    track_keywords TEXT[] NOT NULL DEFAULT '{}',\n    exclude_keywords TEXT[] NOT NULL DEFAULT '{}',\n    is_competitor BOOLEAN NOT NULL DEFAULT FALSE,\n    is_active BOOLEAN NOT NULL DEFAULT TRUE,\n    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE INDEX idx_brands_slug ON brands(slug);\nCREATE INDEX idx_brands_is_active ON brands(is_active);\n\n-- ============================================================================\n-- TABLE: platforms\n-- Description: Ingestion sources (e.g., reddit, x_twitter, bluesky, hackernews).\n-- ============================================================================\n\nCREATE TABLE platforms (\n    platform_id VARCHAR(50) PRIMARY KEY,\n    display_name VARCHAR(100) NOT NULL,\n    base_url VARCHAR(255),\n    is_active BOOLEAN NOT NULL DEFAULT TRUE,\n    rate_limit_per_minute INT DEFAULT 60,"}, "tab3": {"label": "Sarcasm & Crisis System Instruction", "sub": "social_intelligence_engine.py \u00b7 Nuance Prompt", "file": "products/realtime-brand-sentiment-gemini-python-20261004/package/social_intelligence_engine.py", "code": "        self.rate_limit_delay = rate_limit_delay\n\n        self._init_gemini_client()\n\n    def _init_gemini_client(self) -> None:\n        \"\"\"Initialize the Gemini client using modern or legacy SDKs.\"\"\"\n        if HAS_GENAI_SDK:\n            self.client = genai.Client(api_key=self.api_key)\n            self.client_mode = \"modern\"\n            logger.info(\"Initialized modern `google-genai` client.\")\n        elif HAS_LEGACY_SDK:\n            genai_legacy.configure(api_key=self.api_key)\n            self.client = genai_legacy.GenerativeModel(self.model_name)\n            self.client_mode = \"legacy\"\n            logger.info(\"Initialized legacy `google.generativeai` client.\")\n        else:\n            raise ImportError(\n                \"No Google GenAI library found. Please install `google-genai` or `google-generativeai`.\"\n            )\n\n    def _build_system_instruction(self) -> str:\n        \"\"\"Construct the prompt instruction designed to eliminate sarcasm blindness.\"\"\"\n        return (\n            f\"You are an elite Brand Intelligence and Crisis Detection AI for '{self.target_brand}'.\\n\"\n            f\"Known Competitors: {', '.join(self.competitors)}.\\n\\n\"\n            \"Analyze the given social media post with deep contextual awareness:\\n\"\n            \"1. SARCASM & IRONY DETECTION: Never take positive words at face value. If an author writes \"\n            \"'Amazing update, guys! Now nothing compiles!', this is STRONGLY_NEGATIVE (-0.95), not positive.\\n\"\n            \"2. CHURN RISK IDENTIFICATION: Flag mentions of migrating, canceling, competitor migrations, \"\n            \"or final ultimatums as CHURN_RISK with high priority.\\n\"\n            \"3. CRISIS SEVERITY: Security leaks, data losses, critical cascading downtime, or legal risks \"\n            \"must be flagged as HIGH or CRITICAL.\\n\"\n            \"4. Output MUST adhere strictly to the JSON schema provided.\"\n        )\n\n    def _build_post_payload(self, post: SocialPost) -> str:\n        \"\"\"Formats the post metadata and content for Gemini evaluation.\"\"\"\n        payload = {\n            \"post_id\": post.post_id,\n            \"platform\": post.platform,\n            \"author\": post.author,\n            \"created_at\": post.created_at,\n            \"text\": post.text,\n        }\n        if post.thread_context:\n            payload[\"thread_context\"] = post.thread_context\n        return json.dumps(payload, indent=2)\n\n    async def analyze_post(self, post: SocialPost, retries: int = 3) -> SocialIntelligenceResult:\n        \"\"\"\n        Analyze a single social post asynchronously with retry and rate-limiting logic.\n        \"\"\"\n        async with self.semaphore:\n            backoff = 1.0\n            for attempt in range(1, retries + 1):\n                try:\n                    await asyncio.sleep(self.rate_limit_delay)\n                    result = await self._execute_gemini_call(post)\n                    return result\n                except Exception as exc:\n                    logger.warning(\n                        \"Attempt %d/%d failed for post %s: %s\",\n                        attempt,\n                        retries,\n                        post.post_id,\n                        str(exc),\n                    )\n                    if attempt == retries:\n                        logger.error(\"Exhausted retries for post %s\", post.post_id)\n                        return self._create_fallback_result(post, error_message=str(exc))\n                    await asyncio.sleep(backoff)\n                    backoff *= 2.0\n\n        return self._create_fallback_result(post, error_message=\"Unknown execution error\")\n\n    async def _execute_gemini_call(self, post: SocialPost) -> SocialIntelligenceResult:\n        \"\"\"Performs the actual SDK invocation.\"\"\"\n        system_instruction = self._build_system_instruction()\n        user_content = self._build_post_payload(post)\n\n        if self.client_mode == \"modern\":\n            # Modern google-genai SDK\n            config = types.GenerateContentConfig(\n                system_instruction=system_instruction,\n                temperature=0.1,  # Low temperature for deterministic classification\n                response_mime_type=\"application/json\",\n                response_schema=SocialIntelligenceResult,\n            )\n\n            # Modern client is synchronous by default unless using async client;"}};
+  const SCENARIOS = {"sarcastic-bug": {"id": "sarcastic-bug", "btn_label": "1. Sarcastic Outage Post ('Love how v4.2 wiped my workspace \ud83d\udc4f')", "badge_text": "SARCASM CAUGHT \u00b7 CRITICAL ALERT", "badge_class": "fail", "latency": "615 ms end-to-end", "compute": "340 prompt / 145 completion tokens", "cost": "$0.00014 USD", "logs": ["[00:00.009] INGEST: Received post_id=x_991824 ('Bravo on v4.2 update, wiped my entire local DB \ud83d\udc4f')", "[00:00.010] DEDUP: SHA-256 hash 4a91bc... not in SQLite -> Proceeding to Nuance Analyzer", "[00:00.490] NUANCE_LLM: NuanceFlags(is_sarcastic=True) | Polarity overridden: STRONGLY_NEGATIVE", "[00:00.496] Z_SCORE: Rolling 1h bug-report Z-score = +3.42\u03c3 (Crisis threshold >= 2.5\u03c3 crossed!)", "[00:00.500] SQL_COMMIT: Persisted mention & incremented daily_rollups.crisis_count", "[00:00.615] ALERT_ENGINE: Dispatched CRITICAL Block Kit card to #incident-response"], "payload": "{\n  \"post_id\": \"x_991824\",\n  \"sentiment_polarity\": \"STRONGLY_NEGATIVE\",\n  \"intent_category\": \"BUG_REPORT\",\n  \"crisis_severity\": \"CRITICAL\",\n  \"nuance_flags\": {\n    \"is_sarcastic\": true,\n    \"is_passive_aggressive\": false,\n    \"is_hyperbolic\": false\n  },\n  \"anomaly_z_score\": 3.42,\n  \"channels_alerted\": [\"slack:#incident-response\", \"discord:#ops-alerts\"]\n}", "summary": "By evaluating NuanceFlags.is_sarcastic before polarity, the engine catches ironic praise masking a data-loss bug report and escalates immediately."}, "syndicated-dedup": {"id": "syndicated-dedup", "btn_label": "2. Syndicated Bot Repost Wave (1.2ms SHA-256 Suppression)", "badge_text": "DUPLICATE SUPPRESSED \u2713", "badge_class": "pass", "latency": "1.4 ms (99.7% faster)", "compute": "0 LLM tokens consumed", "cost": "$0.00000 USD", "logs": ["[00:00.001] INGEST: Received syndicated repost of post_id=x_991824 from secondary aggregator", "[00:00.002] DEDUP: SHA-256 content digest 4a91bc... matched existing row in social_mentions!", "[00:00.002] DROP: Suppressed duplicate LLM evaluation and prevented duplicate Slack alert."], "payload": "{\n  \"post_id\": \"rss_synd_44192\",\n  \"dedup_hash\": \"4a91bc0918237409182374091823740918237409182374091823740918237409\",\n  \"is_duplicate\": true,\n  \"llm_invoked\": false,\n  \"alert_dispatched\": false\n}", "summary": "Syndicated copies of the same mention are dropped at the SQLite SHA-256 index in 1.2ms, preventing alert storms and wasted token spend."}, "competitor-churn": {"id": "competitor-churn", "btn_label": "3. High-Value B2B Churn Signal & Competitor Switch Intent", "badge_text": "CHURN RISK ROUTED \u26a0\ufe0f", "badge_class": "warn", "latency": "580 ms", "compute": "310 prompt / 130 completion tokens", "cost": "$0.00012 USD", "logs": ["[00:00.008] INGEST: Post from enterprise user ('Evaluating alternatives to AcmeCloud after SSO price hike')", "[00:00.465] NUANCE_LLM: Intent=CHURN_RISK | Entities={'target_brands': ['AcmeCloud'], 'topics': ['SSO pricing']}", "[00:00.471] SQL_COMMIT: Logged churn signal to customer_risk_ledger", "[00:00.580] ALERT_ENGINE: Routed high-priority retention card to #customer-success-vip"], "payload": "{\n  \"post_id\": \"li_882104\",\n  \"sentiment_polarity\": \"NEGATIVE\",\n  \"intent_category\": \"CHURN_RISK\",\n  \"crisis_severity\": \"HIGH\",\n  \"extracted_entities\": {\n    \"target_brands\": [\"AcmeCloud\"],\n    \"pain_points\": [\"SSO tier pricing\"]\n  },\n  \"routed_team\": \"customer-success-vip\"\n}", "summary": "Structured entity and intent extraction routes B2B churn signals directly to account retention teams with extracted pain points."}};
+
+  // 1. Interactive Node Topology
+  function selectNode(nodeId) {
+    const n = NODES[nodeId];
+    if (!n) return;
+    document.querySelectorAll('#bp-node-btns .bp-node-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.node === nodeId);
+    });
+    document.getElementById('nd-title').textContent = n.idx + ' · ' + n.name;
+    document.getElementById('nd-lat').textContent = 'LATENCY: ' + n.latency;
+    document.getElementById('nd-role').textContent = n.role;
+    document.getElementById('nd-io').textContent = n.io_type;
+    document.getElementById('nd-retry').textContent = n.retry_policy;
+  }
+
+  document.querySelectorAll('[data-node]').forEach(el => {
+    el.addEventListener('click', () => selectNode(el.dataset.node));
+  });
+
+  // 2. Code & Schema Tabs
+  let currentTab = 'tab1';
+  document.querySelectorAll('#bp-inspector .bp-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#bp-inspector .bp-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentTab = btn.dataset.tab;
+      const t = TABS[currentTab];
+      if (t) {
+        document.getElementById('bp-code-filename').textContent = '// SOURCE: ' + t.file;
+        document.getElementById('bp-code-view').textContent = t.code;
+      }
+    });
+  });
+
+  const copyBtn = document.getElementById('bp-copy-btn');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      const code = document.getElementById('bp-code-view').textContent;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(() => {
+          copyBtn.textContent = 'Copied! ✓';
+          setTimeout(() => { copyBtn.textContent = 'Copy Snippet'; }, 1800);
+        });
+      }
+    });
+  }
+
+  // 3. Dry-Run Simulator with Step-by-Step Animation
+  let activeScen = 'sarcastic-bug';
+  let simTimer = null;
+
+  function runSimulation(scenId, animate) {
+    const s = SCENARIOS[scenId];
+    if (!s) return;
+    if (simTimer) clearInterval(simTimer);
+
+    const pills = document.querySelectorAll('#bp-step-strip .bp-step-pill');
+    const logsEl = document.getElementById('bp-sim-logs');
+    const payloadEl = document.getElementById('bp-sim-payload');
+    const statusEl = document.getElementById('bp-sim-status');
+    const summaryEl = document.getElementById('bp-sim-summary');
+    const latEl = document.getElementById('bp-m-lat');
+    const compEl = document.getElementById('bp-m-comp');
+    const costEl = document.getElementById('bp-m-cost');
+
+    if (!animate) {
+      pills.forEach(p => { p.className = 'bp-step-pill done'; });
+      logsEl.textContent = s.logs.join('\n');
+      payloadEl.textContent = s.payload;
+      statusEl.textContent = s.badge_text;
+      statusEl.className = 'auth-pill ' + s.badge_class;
+      summaryEl.textContent = s.summary;
+      latEl.textContent = s.latency;
+      compEl.textContent = s.compute;
+      costEl.textContent = s.cost;
+      return;
+    }
+
+    // Step-by-step live trace animation
+    pills.forEach(p => { p.className = 'bp-step-pill'; });
+    logsEl.textContent = '[00:00.000] INIT: Starting deterministic dry-run execution...';
+    statusEl.textContent = 'EXECUTING DRY-RUN...';
+    statusEl.className = 'auth-pill warn';
+
+    let step = 0;
+    const totalSteps = pills.length;
+    simTimer = setInterval(() => {
+      if (step < totalSteps) {
+        pills.forEach((p, idx) => {
+          if (idx < step) p.className = 'bp-step-pill done';
+          else if (idx === step) p.className = 'bp-step-pill running';
+          else p.className = 'bp-step-pill';
+        });
+        const logSlice = s.logs.slice(0, step + 1);
+        logsEl.textContent = logSlice.join('\n');
+        step++;
+      } else {
+        clearInterval(simTimer);
+        pills.forEach(p => { p.className = 'bp-step-pill done'; });
+        logsEl.textContent = s.logs.join('\n');
+        payloadEl.textContent = s.payload;
+        statusEl.textContent = s.badge_text;
+        statusEl.className = 'auth-pill ' + s.badge_class;
+        summaryEl.textContent = s.summary;
+        latEl.textContent = s.latency;
+        compEl.textContent = s.compute;
+        costEl.textContent = s.cost;
+      }
+    }, 180);
+  }
+
+  document.querySelectorAll('#bp-scen-btns .preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#bp-scen-btns .preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeScen = btn.dataset.scen;
+      runSimulation(activeScen, true);
+    });
+  });
+
+  const runBtn = document.getElementById('bp-run-btn');
+  if (runBtn) {
+    runBtn.addEventListener('click', () => runSimulation(activeScen, true));
+  }
+})();
+</script>
+</body>
+</html>

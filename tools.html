@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tools &amp; Automation Engines Catalog · Manny Ruesch</title>
-<meta name="description" content="Production-ready n8n workflows, Python CLI tools, and autonomous AI engines. Zero recurring subscriptions, instant ZIP download.">
+<title>Engineering Blueprints &amp; System Architectures · Manny Ruesch</title>
+<meta name="description" content="Curated showcase of production-grade system architectures, multi-agent topologies, vector synchronization engines, and interactive dry-run simulators.">
 <link rel="canonical" href="https://manny-ruesch.github.io/tools.html">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Tools &amp; Automation Engines Catalog · Manny Ruesch">
-<meta property="og:description" content="Production-ready n8n workflows, Python CLI tools, and autonomous AI engines.">
+<meta property="og:title" content="Engineering Blueprints &amp; System Architectures · Manny Ruesch">
+<meta property="og:description" content="Deep-dives into production-grade system architectures, node topologies, strict data schemas, and interactive browser dry-run simulators.">
 <meta property="og:url" content="https://manny-ruesch.github.io/tools.html">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
@@ -20,37 +20,42 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/site.css">
 <style>
-
-/* ---- PRODUCTION TOOLS SHOWROOM (FEATURED TOP 3) ---- */
-.tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(20px,2.5vw,28px);margin-top:20px}
+/* ---- ARCHITECTURE BLUEPRINTS CATALOG ---- */
+.tools-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(22px,2.8vw,32px);margin-top:20px}
 .tool-card{display:flex;flex-direction:column;background:#FFFFFF;border:var(--bw) solid #000000;box-shadow:var(--hard-shadow);border-radius:4px;overflow:hidden;transition:transform .15s var(--ease),box-shadow .15s var(--ease);opacity:1 !important;transform:none !important}
 .tool-card:hover{transform:translate(-3px,-3px) !important;box-shadow:var(--hard-shadow-lg)}
 .tool-media{position:relative;width:100%;aspect-ratio:16/9;background:#0d1118;border-bottom:var(--bw) solid #000000;overflow:hidden}
 .tool-media img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s ease}
 .tool-card:hover .tool-media img{transform:scale(1.03)}
-.tool-badge-pill{position:absolute;top:12px;left:12px;background:#FFFFFF;color:var(--acc);border:2px solid #000000;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:800;border-radius:2px;box-shadow:var(--hard-shadow-sm);text-transform:uppercase}
-.tool-price-tag{position:absolute;top:12px;right:12px;background:#000000;color:#FFFFFF;border:2px solid #000000;padding:4px 10px;font-family:'JetBrains Mono',monospace;font-size:.82rem;font-weight:800;border-radius:3px;box-shadow:2px 2px 0px rgba(0,0,0,0.3)}
-.tool-content{padding:22px;display:flex;flex-direction:column;flex:1}
-.tool-content h4{font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:1.15rem;line-height:1.25;letter-spacing:-.01em;color:#000000;margin-bottom:10px}
-.tool-content p{color:#444444;font-size:.9rem;line-height:1.5;margin-bottom:16px;flex:1}
+.tool-badge-pill{position:absolute;top:12px;left:12px;background:#FFFFFF;color:var(--acc);border:2px solid #000000;padding:4px 10px;font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:800;border-radius:2px;box-shadow:var(--hard-shadow-sm);text-transform:uppercase}
+.tool-metric-tag{position:absolute;top:12px;right:12px;background:#000000;color:#FFFFFF;border:2px solid #000000;padding:4px 10px;font-family:'JetBrains Mono',monospace;font-size:.74rem;font-weight:800;border-radius:3px;box-shadow:2px 2px 0px rgba(0,0,0,0.3);letter-spacing:.03em;text-transform:uppercase}
+.tool-content{padding:24px;display:flex;flex-direction:column;flex:1}
+.tool-content h4{font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:1.25rem;line-height:1.25;letter-spacing:-.01em;color:#000000;margin-bottom:10px}
+.tool-content p{color:#333333;font-size:.92rem;line-height:1.55;margin-bottom:18px;flex:1}
+
+/* Technical Specifications Matrix inside each Catalog Card */
+.spec-matrix{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  background:#F8F8F8;
+  border:2px solid #000000;
+  border-radius:4px;
+  padding:12px 14px;
+  margin-bottom:16px;
+}
+.spec-item{display:flex;flex-direction:column;gap:2px}
+.spec-lbl{font-family:'JetBrains Mono',monospace;font-size:.64rem;font-weight:800;color:#666666;text-transform:uppercase;letter-spacing:.05em}
+.spec-val{font-family:'JetBrains Mono',monospace;font-size:.76rem;font-weight:800;color:#000000}
+.spec-val.acc{color:var(--acc)}
+
 .tool-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
-.tool-tag{font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:700;color:#000000;background:#F0F0F0;border:1.5px solid #000000;border-radius:2px;padding:2px 8px}
-.tool-actions{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding-top:16px;border-top:1.5px solid #E5E5E5}
-.btn-gumroad{display:inline-flex;align-items:center;justify-content:center;background:var(--acc);color:#FFFFFF;border:2px solid #000000;padding:10px 14px;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:.85rem;letter-spacing:.02em;text-transform:uppercase;border-radius:3px;box-shadow:var(--hard-shadow-sm);transition:all .15s}
-.btn-gumroad:hover{background:#E02447;transform:translate(-1px,-1px);box-shadow:var(--hard-shadow);color:#FFFFFF}
-.btn-whop{display:inline-flex;align-items:center;justify-content:center;background:#000000;color:#FFFFFF;border:2px solid #000000;padding:10px 14px;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:.85rem;letter-spacing:.02em;text-transform:uppercase;border-radius:3px;box-shadow:var(--hard-shadow-sm);transition:all .15s}
-.btn-whop:hover{background:#222222;transform:translate(-1px,-1px);box-shadow:var(--hard-shadow);color:#FFFFFF}
+.tool-tag{font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:700;color:#000000;background:#F0F0F0;border:1.5px solid #000000;border-radius:2px;padding:3px 8px}
+.tool-actions{display:grid;grid-template-columns:1fr;gap:10px;align-items:center;padding-top:16px;border-top:1.5px solid #E5E5E5}
+.btn-blueprint{display:inline-flex;align-items:center;justify-content:center;background:var(--acc);color:#FFFFFF;border:2px solid #000000;padding:12px 16px;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:.88rem;letter-spacing:.03em;text-transform:uppercase;border-radius:3px;box-shadow:var(--hard-shadow-sm);transition:all .15s}
+.btn-blueprint:hover{background:#000000;transform:translate(-2px,-2px);box-shadow:var(--hard-shadow);color:#FFFFFF}
 
-/* Tools CTA Bar */
-.tools-cta-bar{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;background:#FFFFFF;border:var(--bw) solid #000000;box-shadow:var(--hard-shadow);border-radius:4px;padding:22px 28px;margin-top:32px}
-.tools-cta-bar .cta-title{font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:1.25rem;color:#000000;letter-spacing:-.01em}
-.tools-cta-bar .cta-sub{font-size:.9rem;color:#555555;font-weight:500;margin-top:4px}
-.btn-explore-catalog{display:inline-flex;align-items:center;gap:10px;background:#000000;color:#FFFFFF;border:2px solid #000000;padding:12px 24px;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:.95rem;text-transform:uppercase;letter-spacing:.03em;border-radius:4px;box-shadow:var(--hard-shadow-sm);transition:all .15s;white-space:nowrap}
-.btn-explore-catalog:hover{background:var(--acc);border-color:#000000;color:#FFFFFF;transform:translate(-2px,-2px);box-shadow:var(--hard-shadow)}
-@media(max-width:960px){.tools-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:640px){.tools-grid{grid-template-columns:1fr}.tools-cta-bar{flex-direction:column;align-items:stretch;text-align:left}.btn-explore-catalog{justify-content:center}}
-
-/* Catalog Page Styles */
+/* Catalog Page Header & Controls */
 .catalog-head{padding-top:clamp(120px,16vh,160px);padding-bottom:40px;border-bottom:var(--bw) solid #000000}
 .catalog-bar{display:flex;gap:16px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin:30px 0 20px}
 .filter-tabs{display:flex;gap:8px;flex-wrap:wrap}
@@ -64,6 +69,7 @@
 .empty-notice{display:none;padding:60px 20px;text-align:center;background:#FFFFFF;border:var(--bw) solid #000000;box-shadow:var(--hard-shadow);border-radius:4px;margin-top:20px}
 .empty-notice h3{font-family:'Space Grotesk',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:8px}
 .empty-notice p{color:#666666;font-size:.95rem}
+@media(max-width:860px){.tools-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body id="top">
@@ -74,7 +80,7 @@
     <a href="index.html" class="logo"><span class="mk">MR</span><span>Manny Ruesch</span></a>
     <div class="navlinks">
       <a href="index.html#work" class="hide-sm">Work</a>
-      <a href="tools.html" class="hide-sm active" style="color:var(--acc);font-weight:800">Tools</a>
+      <a href="tools.html" class="hide-sm active" style="color:var(--acc);font-weight:800">Blueprints</a>
       <a href="index.html#stack" class="hide-sm">Stack</a>
       <a href="index.html#contact" class="hide-sm">Contact</a>
       <a href="assets/cv-manny-ruesch.pdf" target="_blank" rel="noopener" class="hide-sm">CV ↗</a>
@@ -86,25 +92,25 @@
 <header class="catalog-head">
   <div class="wrap">
     <a href="index.html" class="mono" style="font-size:.82rem;font-weight:800;color:var(--acc);display:inline-flex;align-items:center;gap:6px;margin-bottom:18px">← Back to Portfolio</a>
-    <div class="eyebrow" style="margin-bottom:16px">MR Studio · Production Tools</div>
-    <h1 class="sec-h" style="font-size:clamp(2.2rem,4.5vw,3.6rem)">Ready-to-Deploy Engines &amp; Workflows.</h1>
-    <p style="color:#444444;font-size:1.15rem;max-width:64ch;margin-top:14px;line-height:1.5">
-      The complete arsenal of self-hosted automation scripts, autonomous agents, and programmatic content pipelines. Zero subscription fees, instant ZIP download, own the code forever.
+    <div class="eyebrow" style="margin-bottom:16px">Open Architecture · Curated Technical Audit</div>
+    <h1 class="sec-h" style="font-size:clamp(2.2rem,4.5vw,3.6rem)">Engineering Blueprints &amp; System Architectures.</h1>
+    <p style="color:#444444;font-size:1.12rem;max-width:66ch;margin-top:14px;line-height:1.55">
+      Curated from a technical complexity audit of 44 local builds. Only the Top 8 highest-scoring distributed engines, multi-agent pipelines, and fault-tolerant workflows are featured below—complete with source code inspectors, strict JSON schemas, and interactive browser dry-run simulators.
     </p>
 
     <div class="catalog-bar">
       <div class="filter-tabs" id="filter-tabs">
-        <button class="filter-tab active" data-filter="all">All Tools (6)</button>
-        <button class="filter-tab" data-filter="n8n">n8n Workflows</button>
-        <button class="filter-tab" data-filter="python">Python Pipelines</button>
-        <button class="filter-tab" data-filter="seo">SEO &amp; Content</button>
-        <button class="filter-tab" data-filter="rag">AI &amp; RAG</button>
+        <button class="filter-tab active" data-filter="all">All Blueprints (8)</button>
+        <button class="filter-tab" data-filter="python">Python &amp; FastAPI</button>
+        <button class="filter-tab" data-filter="n8n">n8n Orchestration</button>
+        <button class="filter-tab" data-filter="vision">Vision &amp; RPA</button>
+        <button class="filter-tab" data-filter="rag">RAG &amp; Observability</button>
       </div>
       <div class="search-box">
-        <input type="text" id="search-input" class="search-input" placeholder="Search keywords..." aria-label="Search tools">
+        <input type="text" id="search-input" class="search-input" placeholder="Search architecture, stack, schema..." aria-label="Search blueprints">
       </div>
     </div>
-    <div class="results-counter" id="results-counter">Showing 6 of 6 production tools</div>
+    <div class="results-counter" id="results-counter">Showing 8 of 8 curated engineering blueprints (ranked by complexity score)</div>
   </div>
 </header>
 
@@ -112,107 +118,195 @@
   <div class="wrap">
     <div class="tools-grid" id="tools-container">
 
-      <div class="tool-card" data-categories="n8n rag all" data-search="ai virtual home staging micro-saas & agency kit full production pipeline furnishing empty property photos in under 35 seconds. complete with webhook api, custom presets, and architecture guide. n8n nano banana pro micro-saas real estate">
+      <!-- RANK 01: OTel LLM Budget Enforcer (96/100) -->
+      <div class="tool-card" data-categories="python rag all" data-search="otel llm budget enforcer cost-fallback proxy gateway python fastapi opentelemetry semantic cache token bucket decimal circuit breaker">
         <div class="tool-media">
-          <img src="assets/gumroad/ai-virtual-staging-n8n.png" alt="AI Virtual Home Staging Micro-SaaS & Agency Kit" loading="lazy">
-          <span class="tool-badge-pill">FLAGSHIP MICRO-SAAS</span>
-          <span class="tool-price-tag">39 €</span>
+          <img src="assets/blueprints/otel-llm-budget-enforcer-cost-fallback-proxy-20261012.png" alt="OTel LLM Budget Enforcer & Dynamic Cost-Fallback Proxy" loading="lazy">
+          <span class="tool-badge-pill">RANK #01 · FLAGSHIP GATEWAY</span>
+          <span class="tool-metric-tag">SCORE: 96 / 100</span>
         </div>
         <div class="tool-content">
-          <h4>AI Virtual Home Staging Micro-SaaS & Agency Kit</h4>
-          <p>Full production pipeline furnishing empty property photos in under 35 seconds. Complete with webhook API, custom presets, and architecture guide.</p>
-          <div class="tool-tags"><span class="tool-tag">n8n</span><span class="tool-tag">Nano Banana Pro</span><span class="tool-tag">Micro-SaaS</span><span class="tool-tag">Real Estate</span></div>
+          <h4>OTel LLM Budget Enforcer &amp; Cost-Fallback Proxy</h4>
+          <p>Multi-tenant async FastAPI gateway enforcing sliding-window Decimal token budgets, semantic vector caching (cosine &ge; 0.92), runaway agent loop circuit breaking, and automatic cheaper-model failover with OpenTelemetry spans.</p>
+          <div class="spec-matrix">
+            <div class="spec-item"><span class="spec-lbl">Complexity Tier</span><span class="spec-val acc">Tier S · 96/100</span></div>
+            <div class="spec-item"><span class="spec-lbl">Node / Module Count</span><span class="spec-val">6 Modules · 2,442 Py LOC</span></div>
+            <div class="spec-item"><span class="spec-lbl">Avg Execution Time</span><span class="spec-val">&lt; 4 ms proxy overhead</span></div>
+            <div class="spec-item"><span class="spec-lbl">Trigger Architecture</span><span class="spec-val">Async ASGI Proxy Daemon</span></div>
+          </div>
+          <div class="tool-tags"><span class="tool-tag">Python</span><span class="tool-tag">FastAPI</span><span class="tool-tag">OpenTelemetry</span><span class="tool-tag">Semantic Cache</span><span class="tool-tag">Decimal Math</span></div>
           <div class="tool-actions">
-            <a href="https://mannyverse767.gumroad.com/l/ai-virtual-staging-n8n" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
-            <a href="https://whop.com/mr-studio-7faa/ai-virtual-home-staging-micro-saas-agency-kit-n8n-gemini-workflow" target="_blank" rel="noopener" class="btn-whop">Whop ↗</a>
+            <a href="work/otel-llm-gateway.html" class="btn-blueprint">Inspect Blueprint &amp; Simulator →</a>
           </div>
         </div>
       </div>
-      <div class="tool-card" data-categories="n8n rag all" data-search="autonomous ai memory & rag sync (notion + airtable) zero-maintenance continuous rag sync engine between notion databases, airtable crm, and gemini embeddings for autonomous multi-agent systems. n8n rag sync notion api airtable gemini">
+
+      <!-- RANK 02: Autonomous CI/CD Log Triage & Self-Healing PR Engine (94/100) -->
+      <div class="tool-card" data-categories="python all" data-search="autonomous cicd log triage self-healing pr engine python duckdb ast parsing stack trace git pull request flake detection">
         <div class="tool-media">
-          <img src="assets/gumroad/ai-agent-memory-rag-sync-notion-airtable-n8n-20260929.png" alt="Autonomous AI Memory & RAG Sync (Notion + Airtable)" loading="lazy">
-          <span class="tool-badge-pill">AUTONOMOUS RAG</span>
-          <span class="tool-price-tag">19 €</span>
+          <img src="assets/blueprints/autonomous-cicd-log-triage-self-healing-pr-engine-20261007.png" alt="Autonomous CI/CD Log Triage & Self-Healing PR Engine" loading="lazy">
+          <span class="tool-badge-pill">RANK #02 · SELF-HEALING CI/CD</span>
+          <span class="tool-metric-tag">SCORE: 94 / 100</span>
         </div>
         <div class="tool-content">
-          <h4>Autonomous AI Memory & RAG Sync (Notion + Airtable)</h4>
-          <p>Zero-maintenance continuous RAG sync engine between Notion databases, Airtable CRM, and Gemini embeddings for autonomous multi-agent systems.</p>
-          <div class="tool-tags"><span class="tool-tag">n8n</span><span class="tool-tag">RAG Sync</span><span class="tool-tag">Notion API</span><span class="tool-tag">Airtable</span><span class="tool-tag">Gemini</span></div>
+          <h4>Autonomous CI/CD Log Triage &amp; Self-Healing PR Engine</h4>
+          <p>Streams multi-megabyte CI build logs into an in-memory DuckDB analytical engine, isolates crashing frames via AST slicing (98.4% token compression), filters transient flakes, and opens AST-verified healing Pull Requests.</p>
+          <div class="spec-matrix">
+            <div class="spec-item"><span class="spec-lbl">Complexity Tier</span><span class="spec-val acc">Tier S · 94/100</span></div>
+            <div class="spec-item"><span class="spec-lbl">Node / Module Count</span><span class="spec-val">6 Stages · 2,524 Py LOC</span></div>
+            <div class="spec-item"><span class="spec-lbl">Avg Execution Time</span><span class="spec-val">~2.1 s end-to-end</span></div>
+            <div class="spec-item"><span class="spec-lbl">Trigger Architecture</span><span class="spec-val">Event-Driven CI Webhook</span></div>
+          </div>
+          <div class="tool-tags"><span class="tool-tag">Python</span><span class="tool-tag">DuckDB</span><span class="tool-tag">AST Slicing</span><span class="tool-tag">Structured Outputs</span><span class="tool-tag">Git Automation</span></div>
           <div class="tool-actions">
-            <a href="https://mannyverse767.gumroad.com/l/ai-agent-memory-rag-sync-notion-airtable-n8n-20260929" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
-            <a href="https://whop.com/mr-studio-7faa/autonomous-ai-memory-rag-sync-for-notion-airtable-n8n-engine" target="_blank" rel="noopener" class="btn-whop">Whop ↗</a>
+            <a href="work/cicd-self-healing.html" class="btn-blueprint">Inspect Blueprint &amp; Simulator →</a>
           </div>
         </div>
       </div>
-      <div class="tool-card" data-categories="n8n rag all" data-search="autonomous b2b lead enrichment & scoring agent high-throughput pipeline that scrapes icp prospect domains, discovers verified professional emails via hunter api, and scores lead intent with llms. n8n lead scoring hunter.io autonomous agent">
+
+      <!-- RANK 03: Autonomous AI Memory & Vector RAG Sync Engine (93/100) -->
+      <div class="tool-card" data-categories="n8n rag all" data-search="autonomous ai memory vector rag sync engine notion airtable n8n sha-256 deduplication embeddings pinecone qdrant">
         <div class="tool-media">
-          <img src="assets/gumroad/autonomous-b2b-lead-enrichment-scoring-n8n-20260927.png" alt="Autonomous B2B Lead Enrichment & Scoring Agent" loading="lazy">
-          <span class="tool-badge-pill">B2B AGENT</span>
-          <span class="tool-price-tag">19 €</span>
+          <img src="assets/blueprints/ai-agent-memory-rag-sync-notion-airtable-n8n-20261001.png" alt="Autonomous AI Memory & Vector RAG Sync Engine" loading="lazy">
+          <span class="tool-badge-pill">RANK #03 · VECTOR SYNC DAG</span>
+          <span class="tool-metric-tag">SCORE: 93 / 100</span>
         </div>
         <div class="tool-content">
-          <h4>Autonomous B2B Lead Enrichment & Scoring Agent</h4>
-          <p>High-throughput pipeline that scrapes ICP prospect domains, discovers verified professional emails via Hunter API, and scores lead intent with LLMs.</p>
-          <div class="tool-tags"><span class="tool-tag">n8n</span><span class="tool-tag">Lead Scoring</span><span class="tool-tag">Hunter.io</span><span class="tool-tag">Autonomous Agent</span></div>
+          <h4>Autonomous AI Memory &amp; Vector RAG Sync Engine</h4>
+          <p>Continuous bi-directional RAG synchronization between Notion databases and Airtable CRM into vector stores. Features canonical schema normalization, SHA-256 content-hash deduplication, and 768-dim vector upserts.</p>
+          <div class="spec-matrix">
+            <div class="spec-item"><span class="spec-lbl">Complexity Tier</span><span class="spec-val acc">Tier S · 93/100</span></div>
+            <div class="spec-item"><span class="spec-lbl">Node / Module Count</span><span class="spec-val">17 n8n Nodes + 333 JS LOC</span></div>
+            <div class="spec-item"><span class="spec-lbl">Avg Execution Time</span><span class="spec-val">~980 ms delta sync</span></div>
+            <div class="spec-item"><span class="spec-lbl">Trigger Architecture</span><span class="spec-val">15m Cron + Webhook Hybrid</span></div>
+          </div>
+          <div class="tool-tags"><span class="tool-tag">n8n</span><span class="tool-tag">Vector Embeddings</span><span class="tool-tag">SHA-256 Dedup</span><span class="tool-tag">Notion API</span><span class="tool-tag">Qdrant / Pinecone</span></div>
           <div class="tool-actions">
-            <a href="https://mannyverse767.gumroad.com/l/autonomous-b2b-lead-enrichment-scoring-n8n-20260927" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
-            <a href="https://whop.com/mr-studio-7faa/autonomous-b2b-lead-enrichment-scoring-agent-n8n-ai-workflow" target="_blank" rel="noopener" class="btn-whop">Whop ↗</a>
+            <a href="work/rag-memory-sync.html" class="btn-blueprint">Inspect Blueprint &amp; Simulator →</a>
           </div>
         </div>
       </div>
-      <div class="tool-card" data-categories="python seo all" data-search="programmatic seo engine: automated qc pipeline industrial-scale keyword clustering and article generator with real-time heuristic scoring, automated schema markup, and internal link routing. python automated qc seo pipeline data pipeline">
+
+      <!-- RANK 04: Zero-API Desktop RPA & Vision Execution Engine (91/100) -->
+      <div class="tool-card" data-categories="python vision all" data-search="zero-api desktop rpa vision execution engine python multimodal bounding box grounding dpi win32 closed-loop verification">
         <div class="tool-media">
-          <img src="assets/gumroad/programmatic-seo-engine-python-qc-20260928.png" alt="Programmatic SEO Engine: Automated QC Pipeline" loading="lazy">
-          
-          <span class="tool-price-tag">19 €</span>
+          <img src="assets/blueprints/zero-api-desktop-automation-engine-python-vision-llm-20261005.png" alt="Zero-API Desktop RPA & Vision Execution Engine" loading="lazy">
+          <span class="tool-badge-pill">RANK #04 · MULTIMODAL RPA</span>
+          <span class="tool-metric-tag">SCORE: 91 / 100</span>
         </div>
         <div class="tool-content">
-          <h4>Programmatic SEO Engine: Automated QC Pipeline</h4>
-          <p>Industrial-scale keyword clustering and article generator with real-time heuristic scoring, automated schema markup, and internal link routing.</p>
-          <div class="tool-tags"><span class="tool-tag">Python</span><span class="tool-tag">Automated QC</span><span class="tool-tag">SEO Pipeline</span><span class="tool-tag">Data Pipeline</span></div>
+          <h4>Zero-API Desktop RPA &amp; Vision Execution Engine</h4>
+          <p>Drives legacy desktop GUIs without APIs by locking Win32 per-monitor DPI awareness, grounding UI controls on a normalized 0–1000 grid via Vision LLMs, and verifying every input with closed-loop perceptual frame diffing.</p>
+          <div class="spec-matrix">
+            <div class="spec-item"><span class="spec-lbl">Complexity Tier</span><span class="spec-val acc">Tier A+ · 91/100</span></div>
+            <div class="spec-item"><span class="spec-lbl">Node / Module Count</span><span class="spec-val">5 Modules · 3,155 Py LOC</span></div>
+            <div class="spec-item"><span class="spec-lbl">Avg Execution Time</span><span class="spec-val">~1.1 s per verified action</span></div>
+            <div class="spec-item"><span class="spec-lbl">Trigger Architecture</span><span class="spec-val">CLI Daemon / Task Queue</span></div>
+          </div>
+          <div class="tool-tags"><span class="tool-tag">Python</span><span class="tool-tag">Gemini Vision</span><span class="tool-tag">Pydantic v2</span><span class="tool-tag">Win32 / Xvfb</span><span class="tool-tag">Closed-Loop RPA</span></div>
           <div class="tool-actions">
-            <a href="https://mannyverse767.gumroad.com/l/programmatic-seo-engine-python-qc-20260928" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
-            <a href="https://whop.com/mr-studio-7faa/programmatic-seo-engine-python-pipeline-with-automated-quality-control" target="_blank" rel="noopener" class="btn-whop">Whop ↗</a>
+            <a href="work/zero-api-vision-rpa.html" class="btn-blueprint">Inspect Blueprint &amp; Simulator →</a>
           </div>
         </div>
       </div>
-      <div class="tool-card" data-categories="n8n seo all" data-search="multilingual seo article generator & internal linking plug-and-play n8n workflow leveraging google autocomplete scraping and gemini flash to produce structured, multilingual articles on demand. n8n gemini flash google autocomplete markdown">
+
+      <!-- RANK 05: Autonomous Visual QA & DOM/Layout Anomaly Detector (89/100) -->
+      <div class="tool-card" data-categories="python vision all" data-search="autonomous visual qa broken ui bug detector playwright python dom geometry rect intersection multimodal vision layout audit">
         <div class="tool-media">
-          <img src="assets/gumroad/multilingual-seo-article-generator-n8n.png" alt="Multilingual SEO Article Generator & Internal Linking" loading="lazy">
-          
-          <span class="tool-price-tag">19 €</span>
+          <img src="assets/blueprints/autonomous-visual-qa-broken-ui-detector-python-20261009.png" alt="Autonomous Visual QA & DOM/Layout Anomaly Detector" loading="lazy">
+          <span class="tool-badge-pill">RANK #05 · VISUAL QA ENGINE</span>
+          <span class="tool-metric-tag">SCORE: 89 / 100</span>
         </div>
         <div class="tool-content">
-          <h4>Multilingual SEO Article Generator & Internal Linking</h4>
-          <p>Plug-and-play n8n workflow leveraging Google Autocomplete scraping and Gemini Flash to produce structured, multilingual articles on demand.</p>
-          <div class="tool-tags"><span class="tool-tag">n8n</span><span class="tool-tag">Gemini Flash</span><span class="tool-tag">Google Autocomplete</span><span class="tool-tag">Markdown</span></div>
+          <h4>Autonomous Visual QA &amp; DOM/Layout Anomaly Detector</h4>
+          <p>Eliminates false-positive pixel diffs by combining headless Playwright multi-viewport sweeps (1440w / 768w / 375w) and deterministic DOM rectangle intersection math with multimodal Vision-LLM severity grading.</p>
+          <div class="spec-matrix">
+            <div class="spec-item"><span class="spec-lbl">Complexity Tier</span><span class="spec-val acc">Tier A+ · 89/100</span></div>
+            <div class="spec-item"><span class="spec-lbl">Node / Module Count</span><span class="spec-val">5 Modules · 3,015 Py LOC</span></div>
+            <div class="spec-item"><span class="spec-lbl">Avg Execution Time</span><span class="spec-val">~1.5 s (3 viewports)</span></div>
+            <div class="spec-item"><span class="spec-lbl">Trigger Architecture</span><span class="spec-val">CI/CD Pre-Deploy Hook</span></div>
+          </div>
+          <div class="tool-tags"><span class="tool-tag">Python</span><span class="tool-tag">Playwright Async</span><span class="tool-tag">DOM Geometry</span><span class="tool-tag">Gemini Vision</span><span class="tool-tag">CI Gate</span></div>
           <div class="tool-actions">
-            <a href="https://mannyverse767.gumroad.com/l/multilingual-seo-article-generator-n8n" target="_blank" rel="noopener" class="btn-gumroad">Get on Gumroad ↗</a>
-            <a href="https://whop.com/mr-studio-7faa/multilingual-seo-article-generator-automated-internal-linking-n8n-gemini-w" target="_blank" rel="noopener" class="btn-whop">Whop ↗</a>
+            <a href="work/visual-qa-detector.html" class="btn-blueprint">Inspect Blueprint &amp; Simulator →</a>
           </div>
         </div>
       </div>
-      <div class="tool-card" data-categories="python seo all" data-search="programmatic seo markdown engine with quality gates high-velocity programmatic content generator in pure python. enforces strict automated quality filters, heading hierarchy, and zero fluff. python open-source programmatic seo markdown quality gates">
+
+      <!-- RANK 06: Hybrid B2B Waterfall Enrichment & Multi-Source Orchestrator (88/100) -->
+      <div class="tool-card" data-categories="n8n python all" data-search="hybrid b2b waterfall enrichment multi-source orchestrator n8n python sqlite cache pydantic icp scoring hunter">
         <div class="tool-media">
-          <img src="assets/gumroad/programmatic-seo-markdown-generator-python-20260929.png" alt="Programmatic SEO Markdown Engine with Quality Gates" loading="lazy">
-          <span class="tool-badge-pill">100% FREE · OPEN-SOURCE</span>
-          <span class="tool-price-tag" style="background:var(--acc);color:#FFFFFF">0 €+ FREE</span>
+          <img src="assets/blueprints/b2b-directory-scraping-pipeline-n8n-python-20261004.png" alt="Hybrid B2B Waterfall Enrichment & Multi-Source Orchestrator" loading="lazy">
+          <span class="tool-badge-pill">RANK #06 · HYBRID WATERFALL</span>
+          <span class="tool-metric-tag">SCORE: 88 / 100</span>
         </div>
         <div class="tool-content">
-          <h4>Programmatic SEO Markdown Engine with Quality Gates</h4>
-          <p>High-velocity programmatic content generator in pure Python. Enforces strict automated quality filters, heading hierarchy, and zero fluff.</p>
-          <div class="tool-tags"><span class="tool-tag">Python</span><span class="tool-tag">Open-Source</span><span class="tool-tag">Programmatic SEO</span><span class="tool-tag">Markdown</span><span class="tool-tag">Quality Gates</span></div>
+          <h4>Hybrid B2B Waterfall Enrichment &amp; Multi-Source Engine</h4>
+          <p>Couples a 14-node n8n orchestration DAG with a Python FastAPI/SQLite extraction worker. Executes a cost-ordered waterfall: 0.5ms SQLite TTL cache &rarr; direct DOM tech-stack fingerprinter &rarr; API fallback &rarr; Pydantic ICP scoring.</p>
+          <div class="spec-matrix">
+            <div class="spec-item"><span class="spec-lbl">Complexity Tier</span><span class="spec-val acc">Tier A · 88/100</span></div>
+            <div class="spec-item"><span class="spec-lbl">Node / Module Count</span><span class="spec-val">14 n8n Nodes + 886 Py LOC</span></div>
+            <div class="spec-item"><span class="spec-lbl">Avg Execution Time</span><span class="spec-val">0.8 ms (cached) / 1.2 s (live)</span></div>
+            <div class="spec-item"><span class="spec-lbl">Trigger Architecture</span><span class="spec-val">Webhook + Batch Queue</span></div>
+          </div>
+          <div class="tool-tags"><span class="tool-tag">n8n</span><span class="tool-tag">Python FastAPI</span><span class="tool-tag">SQLite WAL Cache</span><span class="tool-tag">Pydantic v2</span><span class="tool-tag">ICP Rubric</span></div>
           <div class="tool-actions">
-            <a href="https://mannyverse767.gumroad.com/l/programmatic-seo-markdown-generator-python-20260929" target="_blank" rel="noopener" class="btn-gumroad">Download Free (0 €+) ↗</a>
-            <a href="https://whop.com/mr-studio-7faa/programmatic-seo-engine-with-automated-quality-gates-python-markdown" target="_blank" rel="noopener" class="btn-whop">Whop (Free) ↗</a>
+            <a href="work/b2b-waterfall-engine.html" class="btn-blueprint">Inspect Blueprint &amp; Simulator →</a>
           </div>
         </div>
       </div>
+
+      <!-- RANK 07: Self-Healing Webhook Dead-Letter Queue (DLQ) & Replay Engine (86/100) -->
+      <div class="tool-card" data-categories="n8n all" data-search="self-healing webhook dead-letter queue dlq payload recovery engine n8n redis sha-256 idempotency setnx exponential jitter backoff">
+        <div class="tool-media">
+          <img src="assets/blueprints/webhook-dlq-payload-recovery-engine-n8n-redis-20261006.png" alt="Self-Healing Webhook Dead-Letter Queue & Replay Engine" loading="lazy">
+          <span class="tool-badge-pill">RANK #07 · FAULT-TOLERANT BUS</span>
+          <span class="tool-metric-tag">SCORE: 86 / 100</span>
+        </div>
+        <div class="tool-content">
+          <h4>Self-Healing Webhook Dead-Letter Queue (DLQ) &amp; Replay</h4>
+          <p>Decouples high-volume webhook ingestion from downstream outages via a &lt;8ms Redis LPUSH buffer (HTTP 202 Ack), exponential backoff with 30% random jitter, recursive secret redaction, and Redis SETNX idempotent replay.</p>
+          <div class="spec-matrix">
+            <div class="spec-item"><span class="spec-lbl">Complexity Tier</span><span class="spec-val acc">Tier A · 86/100</span></div>
+            <div class="spec-item"><span class="spec-lbl">Node / Module Count</span><span class="spec-val">21 n8n Nodes + Redis Bus</span></div>
+            <div class="spec-item"><span class="spec-lbl">Avg Execution Time</span><span class="spec-val">7.4 ms ingest ack (HTTP 202)</span></div>
+            <div class="spec-item"><span class="spec-lbl">Trigger Architecture</span><span class="spec-val">High-Throughput Webhook</span></div>
+          </div>
+          <div class="tool-tags"><span class="tool-tag">n8n</span><span class="tool-tag">Redis Streams</span><span class="tool-tag">SHA-256 Idempotency</span><span class="tool-tag">Jitter Backoff</span><span class="tool-tag">DLQ Replay</span></div>
+          <div class="tool-actions">
+            <a href="work/webhook-dlq-engine.html" class="btn-blueprint">Inspect Blueprint &amp; Simulator →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- RANK 08: Real-Time Brand Sentiment & Anomaly Intelligence Engine (85/100) -->
+      <div class="tool-card" data-categories="python rag all" data-search="real-time brand sentiment anomaly intelligence engine python gemini sqlite postgresql z-score sarcasm detection">
+        <div class="tool-media">
+          <img src="assets/blueprints/realtime-brand-sentiment-gemini-python-20261004.png" alt="Real-Time Brand Sentiment & Anomaly Intelligence Engine" loading="lazy">
+          <span class="tool-badge-pill">RANK #08 · STREAM ANALYTICS</span>
+          <span class="tool-metric-tag">SCORE: 85 / 100</span>
+        </div>
+        <div class="tool-content">
+          <h4>Real-Time Stream Sentiment &amp; Z-Score Anomaly Engine</h4>
+          <p>Asyncio stream processor with SHA-256 syndication deduplication, schema-ordered sarcasm &amp; churn-intent classification via structured LLM outputs, and rolling Z-score velocity spike detection backed by indexed SQL rollups.</p>
+          <div class="spec-matrix">
+            <div class="spec-item"><span class="spec-lbl">Complexity Tier</span><span class="spec-val acc">Tier A · 85/100</span></div>
+            <div class="spec-item"><span class="spec-lbl">Node / Module Count</span><span class="spec-val">5 Modules · 1,915 Py LOC</span></div>
+            <div class="spec-item"><span class="spec-lbl">Avg Execution Time</span><span class="spec-val">1.4 ms (dedup) / 580 ms (LLM)</span></div>
+            <div class="spec-item"><span class="spec-lbl">Trigger Architecture</span><span class="spec-val">Asyncio Stream Consumer</span></div>
+          </div>
+          <div class="tool-tags"><span class="tool-tag">Python</span><span class="tool-tag">Asyncio</span><span class="tool-tag">Structured Outputs</span><span class="tool-tag">Z-Score Math</span><span class="tool-tag">SQLite / Postgres</span></div>
+          <div class="tool-actions">
+            <a href="work/sentiment-anomaly-engine.html" class="btn-blueprint">Inspect Blueprint &amp; Simulator →</a>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <div class="empty-notice" id="empty-notice">
-      <h3>No matching tools found</h3>
-      <p>Try searching with another keyword or reset the category filters.</p>
+      <h3>No matching blueprints found</h3>
+      <p>Try searching with another architectural keyword or reset the category filters.</p>
     </div>
   </div>
 </main>
@@ -222,7 +316,7 @@
     <div class="logo"><span class="mk">MR</span></div>
     <div class="mono">Designed &amp; built by Manny Ruesch · 2026</div>
     <div style="display:flex;gap:18px;align-items:center">
-      <a href="index.html#contact">Custom Pipeline Request ↗</a>
+      <a href="index.html#contact">Architecture &amp; Engineering Inquiries ↗</a>
       <a href="#top">Back to top ↑</a>
     </div>
   </div>
@@ -230,7 +324,6 @@
 
 <script src="assets/site.js"></script>
 <script>
-// Real-time Instant Filter & Search
 (function(){
   const tabs = document.querySelectorAll('.filter-tab');
   const searchInput = document.getElementById('search-input');
@@ -257,7 +350,7 @@
       }
     });
 
-    counter.textContent = `Showing ${visible} of ${cards.length} production tools`;
+    counter.textContent = `Showing ${visible} of ${cards.length} curated engineering blueprints (ranked by complexity score)`;
     empty.style.display = (visible === 0) ? 'block' : 'none';
   }
 

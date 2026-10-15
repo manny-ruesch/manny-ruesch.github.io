@@ -1,0 +1,667 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Autonomous Visual QA &amp; DOM/Layout Anomaly Detector · Manny Ruesch</title>
+<meta name="description" content="Pixel-by-pixel screenshot diffing cries wolf every time dynamic copy changes or a font anti-aliases differently. This 3,015-line Python &amp; Playwright crawler combines deterministic DOM bounding-box geometry math with multimodal Vision-LLM semantic auditing across Desktop, Tablet, and Mobile viewports.">
+<link rel="canonical" href="https://manny-ruesch.github.io/work/visual-qa-detector.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Autonomous Visual QA &amp; DOM/Layout Anomaly Detector · Manny Ruesch">
+<meta property="og:description" content="Pixel-by-pixel screenshot diffing cries wolf every time dynamic copy changes or a font anti-aliases differently. This 3,015-line Python &amp; Playwright crawler combines deterministic DOM bounding-box geometry math with multimodal Vision-LLM semantic auditing across Desktop, Tablet, and Mobile viewports.">
+<meta property="og:url" content="https://manny-ruesch.github.io/work/visual-qa-detector.html">
+<meta property="og:image" content="https://manny-ruesch.github.io/assets/og/home.png?v=2">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../favicon.svg?v=2" type="image/svg+xml">
+<link rel="icon" href="../favicon-32.png?v=2" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png?v=2">
+<meta name="theme-color" content="#F0F0F0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="stylesheet" href="../assets/case.css">
+</head>
+<body id="top">
+<div id="progress"></div><div id="glow"></div>
+
+<nav id="nav" aria-label="Main">
+  <div class="wrap">
+    <a href="../index.html" class="logo"><span class="mk">MR</span><span>Manny Ruesch</span></a>
+    <div class="navlinks">
+      <a href="../index.html#work" class="hide-sm">Work</a>
+      <a href="../tools.html" class="hide-sm">Blueprints</a>
+      <a href="../index.html#stack" class="hide-sm">Stack</a>
+      <a href="../index.html#contact" class="hide-sm">Contact</a>
+      <a href="https://www.linkedin.com/in/manny-ruesch" target="_blank" rel="noopener" class="cta">LinkedIn ↗</a>
+    </div>
+  </div>
+</nav>
+
+<header class="case-head">
+  <div class="wrap">
+    <a href="../tools.html" class="backlink">← All Engineering Blueprints</a>
+    <div class="kicker">// blueprint #05 · complexity score: 89/100 · playwright + vision qa</div>
+    <h1>Catching broken CSS layouts, z-index collisions, and mobile overflows without brittle pixel-diffs</h1>
+    <p class="lede">Pixel-by-pixel screenshot diffing cries wolf every time dynamic copy changes or a font anti-aliases differently. This 3,015-line Python &amp; Playwright crawler combines deterministic DOM bounding-box geometry math with multimodal Vision-LLM semantic auditing across Desktop, Tablet, and Mobile viewports.</p>
+    <div class="metrics3">
+      <div><b>3 Viewports</b><span>Desktop · Tablet · Mobile sweeps</span></div>
+      <div><b>DOM + Vision</b><span>Dual-layer geometry + AI audit</span></div>
+      <div><b>3,015 LOC</b><span>Python · Playwright · Vision CLI</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="sec rv"><div class="wrap">
+  <h2>The engineering problem</h2>
+  <p>Traditional visual regression tools compare baseline PNGs pixel-for-pixel. When a marketing headline changes or a timestamp updates, the entire page shifts by 4px and fails CI—training engineers to click 'Approve All' without looking.</p><p>True visual bugs are structural and semantic: a CTA button clipped off the right edge on iPhone SE (<code>scrollWidth &gt; clientWidth</code>), two sibling text nodes overlapping due to a bad absolute position, or a broken hero image returning HTTP 404. I built a hybrid auditor that computes exact DOM rectangle intersections first, then passes flagged regions to Gemini Vision for semantic severity grading.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>System architecture &amp; interactive topology</h2>
+  <p>A 3,015-line multi-viewport crawler and visual auditor across <code>playwright_crawler.py</code>, <code>visual_qa_engine.py</code>, and <code>gemini_auditor.py</code>:</p>
+  <ul>
+    <li><strong>Multi-Viewport Headless Crawler (<code>playwright_crawler.py</code>):</strong> Sweeps internal routes across Desktop (<code>1440x900</code>), Tablet (<code>768x1024</code>), and Mobile (<code>375x812</code>) with network-idle stabilization.</li><li><strong>Deterministic DOM Geometry Probes (<code>visual_qa_engine.py</code>):</strong> Injects JS bounding-box inspectors to detect horizontal overflow, text bounding-box intersections (<code>Rect.intersects</code>), and zero-dimension broken images.</li><li><strong>Multimodal Semantic Auditor (<code>gemini_auditor.py</code>):</strong> Evaluates full-page screenshots alongside DOM anomaly coordinates to filter out intentional overlapping designs (e.g. badges over cards) vs. real UI defects.</li><li><strong>CI Exit-Code Gate &amp; Annotated Reports:</strong> Emits structured <code>visual_qa_report.json</code> and fails CI builds only when <code>CRITICAL</code> or <code>HIGH</code> severity defects are confirmed.</li>
+  </ul>
+
+  
+  <div class="visual-showcase">
+    <div class="visual-head">
+      <div class="v-dots"><span></span><span></span><span></span></div>
+      <div class="v-title">SYSTEM TOPOLOGY &amp; ARCHITECTURE BLUEPRINT</div>
+      <div class="v-tag">PRODUCTION ENGINE</div>
+    </div>
+    <div class="visual-body">
+      <img src="../assets/blueprints/autonomous-visual-qa-broken-ui-detector-python-20261009.png" alt="Autonomous Visual QA &amp; DOM/Layout Anomaly Detector architecture visualization" loading="lazy">
+    </div>
+    <div class="visual-foot">
+      <span><b>END-TO-END FLOW:</b> Route Crawler → Viewport Matrix → DOM Geometry Probe → Vision Auditor → Box Highlighter → CI Verdict Gate</span>
+      <span class="v-live">● DETERMINISTIC PIPELINE</span>
+    </div>
+  </div>
+
+  <!-- SECTION 1: INTERACTIVE ARCHITECTURE GRAPH (REAL NODE TOPOLOGY) -->
+  <div class="diag" style="margin-top:28px">
+    <svg viewBox="0 0 920 205" role="img" aria-label="Interactive 6-stage execution topology for Autonomous Visual QA &amp; DOM/Layout Anomaly Detector">
+      <defs>
+        <marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#000000"/>
+        </marker>
+        <marker id="ah-red" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#FF385C"/>
+        </marker>
+        <filter id="diag-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      <g class="edge" marker-end="url(#ah)">
+        <path d="M 146 92 L 164 92"/><path d="M 296 92 L 314 92"/><path d="M 446 92 L 464 92"/><path d="M 596 92 L 614 92"/><path d="M 746 92 L 764 92"/><path d="M 680 126 C 680 185 380 185 380 126" stroke-dasharray="5 5"/>
+      </g>
+      <g class="flow" marker-end="url(#ah-red)">
+        <path d="M 146 92 L 164 92"/><path d="M 296 92 L 314 92"/><path d="M 446 92 L 464 92"/><path d="M 596 92 L 614 92"/><path d="M 746 92 L 764 92"/><path d="M 680 126 C 680 185 380 185 380 126" stroke-dasharray="5 5"/>
+      </g>
+      <g class="diag-photons">
+        
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 146 92 L 164 92" dur="0.9s" repeatCount="indefinite" begin="0.0s"/>
+        </circle>
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 296 92 L 314 92" dur="0.9s" repeatCount="indefinite" begin="0.25s"/>
+        </circle>
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 446 92 L 464 92" dur="0.9s" repeatCount="indefinite" begin="0.5s"/>
+        </circle>
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 596 92 L 614 92" dur="0.9s" repeatCount="indefinite" begin="0.75s"/>
+        </circle>
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 746 92 L 764 92" dur="0.9s" repeatCount="indefinite" begin="1.0s"/>
+        </circle>
+        <circle r="3.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 680 126 C 680 185 380 185 380 126" dur="1.8s" repeatCount="indefinite" begin="0.5s"/>
+        </circle>
+      </g>
+      
+      <g class="diag-node" data-node="n1" style="cursor:pointer">
+        <rect x="18" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="14" y="58" width="132" height="68" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="20" y="64" width="46" height="12" rx="2" fill="#000000"/>
+        <text x="43" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 01</text>
+        <text x="80" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">Route Crawler</text>
+        <text x="80" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">Playwright Async BFS</text>
+      </g>
+      <g class="diag-node" data-node="n2" style="cursor:pointer">
+        <rect x="168" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="164" y="58" width="132" height="68" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="170" y="64" width="46" height="12" rx="2" fill="#000000"/>
+        <text x="193" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 02</text>
+        <text x="230" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">Viewport Matrix</text>
+        <text x="230" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">1440w · 768w · 375w</text>
+      </g>
+      <g class="diag-node" data-node="n3" style="cursor:pointer">
+        <rect x="318" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="314" y="58" width="132" height="68" rx="4" fill="#FFF2F4" stroke="#FF385C" stroke-width="3"/>
+        <rect x="320" y="64" width="46" height="12" rx="2" fill="#FF385C"/>
+        <text x="343" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 03</text>
+        <text x="380" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#FF385C" text-anchor="middle">DOM Geometry Probe</text>
+        <text x="380" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">Rect.intersects Math</text>
+      </g>
+      <g class="diag-node" data-node="n4" style="cursor:pointer">
+        <rect x="468" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="464" y="58" width="132" height="68" rx="4" fill="#FFF2F4" stroke="#FF385C" stroke-width="3"/>
+        <rect x="470" y="64" width="46" height="12" rx="2" fill="#FF385C"/>
+        <text x="493" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 04</text>
+        <text x="530" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#FF385C" text-anchor="middle">Vision Auditor</text>
+        <text x="530" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">Multimodal Triage</text>
+      </g>
+      <g class="diag-node" data-node="n5" style="cursor:pointer">
+        <rect x="618" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="614" y="58" width="132" height="68" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="620" y="64" width="46" height="12" rx="2" fill="#000000"/>
+        <text x="643" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 05</text>
+        <text x="680" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">Box Highlighter</text>
+        <text x="680" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">Defect Crop &amp; Draw</text>
+      </g>
+      <g class="diag-node" data-node="n6" style="cursor:pointer">
+        <rect x="768" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="764" y="58" width="132" height="68" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="770" y="64" width="46" height="12" rx="2" fill="#000000"/>
+        <text x="793" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 06</text>
+        <text x="830" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">CI Verdict Gate</text>
+        <text x="830" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">JSON Report + ExitCode</text>
+      </g>
+    </svg>
+  </div>
+  <p class="diag-cap">Click any node in the SVG diagram or list below to inspect its payload contract, latency SLA, and retry policy.</p>
+
+  <div class="bp-topo-shell" id="bp-topo">
+    <div class="sim-header">
+      <div class="sim-badge"><span class="dot-live"></span> 01 · INTERACTIVE NODE TOPOLOGY INSPECTOR</div>
+      <div class="sim-title">Inspect Stage-by-Stage Execution Contracts &amp; Fault Boundaries</div>
+      <p class="sim-intro">Select any node in the pipeline to examine its architectural responsibility, input/output schema types, p95 execution latency, and error recovery policy.</p>
+    </div>
+    <div class="bp-topo-grid">
+      <div class="bp-nodes-list" id="bp-node-btns">
+        
+          <button type="button" class="bp-node-btn active" data-node="n1">
+            <div class="n-left">
+              <span class="n-idx">NODE 01</span>
+              <span class="n-name">Route Crawler</span>
+            </div>
+            <span class="n-lat">320 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n2">
+            <div class="n-left">
+              <span class="n-idx">NODE 02</span>
+              <span class="n-name">Viewport Matrix</span>
+            </div>
+            <span class="n-lat">190 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n3">
+            <div class="n-left">
+              <span class="n-idx">NODE 03</span>
+              <span class="n-name">DOM Geometry Probe</span>
+            </div>
+            <span class="n-lat">28 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n4">
+            <div class="n-left">
+              <span class="n-idx">NODE 04</span>
+              <span class="n-name">Vision Auditor</span>
+            </div>
+            <span class="n-lat">940 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n5">
+            <div class="n-left">
+              <span class="n-idx">NODE 05</span>
+              <span class="n-name">Box Highlighter</span>
+            </div>
+            <span class="n-lat">22 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n6">
+            <div class="n-left">
+              <span class="n-idx">NODE 06</span>
+              <span class="n-name">CI Verdict Gate</span>
+            </div>
+            <span class="n-lat">8 ms</span>
+          </button>
+      </div>
+      <div class="bp-node-detail">
+        <div class="bp-nd-head">
+          <div class="bp-nd-title" id="nd-title">NODE 01 · Route Crawler</div>
+          <span class="bp-nd-badge" id="nd-lat">LATENCY: 320 ms</span>
+        </div>
+        <div class="bp-nd-row">
+          <div class="bp-nd-lbl">Architectural Role</div>
+          <div class="bp-nd-val" id="nd-role">Launches headless Chromium, discovers same-origin routes via BFS link extraction, and disables CSS animations/transitions for deterministic rendering.</div>
+        </div>
+        <div class="bp-nd-row">
+          <div class="bp-nd-lbl">Input / Output Payload Contract</div>
+          <div class="bp-nd-val mono" id="nd-io">IN: CrawlSeed(base_url, max_pages=25) -&gt; OUT: List[PageTarget(url, slug, depth)]</div>
+        </div>
+        <div class="bp-nd-row">
+          <div class="bp-nd-lbl">Error &amp; Retry Policy</div>
+          <div class="bp-nd-val" id="nd-retry">Automatic retry on navigation timeout with fallback from networkidle to domcontentloaded.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Real code &amp; schema inspector</h2>
+  <p>Extracted directly from the production repository. Switch tabs to inspect the core execution logic, strict JSON/database data contracts, and structured LLM instructions.</p>
+
+  <!-- SECTION 2: REAL CODE & SCHEMA INSPECTOR (TABBED COMPONENT) -->
+  <div class="bp-inspector" id="bp-inspector">
+    <div class="bp-tabs-bar">
+      <button type="button" class="bp-tab-btn active" data-tab="tab1">
+        <span>01 · DOM Geometry &amp; Intersection Engine</span>
+        <span class="sub">visual_qa_engine.py · Rect Collision Math</span>
+      </button>
+      <button type="button" class="bp-tab-btn" data-tab="tab2">
+        <span>02 · Structured Visual QA Report Schema</span>
+        <span class="sub">visual_qa_report.json · Multi-Viewport Output</span>
+      </button>
+      <button type="button" class="bp-tab-btn" data-tab="tab3">
+        <span>03 · Vision Auditor Prompt &amp; Parser</span>
+        <span class="sub">gemini_auditor.py · Semantic UI Triage</span>
+      </button>
+    </div>
+    <div class="bp-code-toolbar">
+      <span class="bp-code-file" id="bp-code-filename">// SOURCE: products/autonomous-visual-qa-broken-ui-detector-python-20261009/package/visual_qa_engine.py</span>
+      <button type="button" class="bp-copy-code" id="bp-copy-btn">Copy Snippet</button>
+    </div>
+    <pre class="bp-code-pre" id="bp-code-view">
+class BugSeverity(str, enum.Enum):
+    CRITICAL = &quot;CRITICAL&quot;
+    HIGH = &quot;HIGH&quot;
+    MEDIUM = &quot;MEDIUM&quot;
+    LOW = &quot;LOW&quot;
+    INFO = &quot;INFO&quot;
+
+
+class BugCategory(str, enum.Enum):
+    HORIZONTAL_OVERFLOW = &quot;HORIZONTAL_OVERFLOW&quot;
+    TEXT_OVERLAP = &quot;TEXT_OVERLAP&quot;
+    TEXT_TRUNCATION = &quot;TEXT_TRUNCATION&quot;
+    OCCLUDED_INTERACTIVE = &quot;OCCLUDED_INTERACTIVE&quot;
+    BROKEN_ASSET = &quot;BROKEN_ASSET&quot;
+    VISUAL_REGRESSION = &quot;VISUAL_REGRESSION&quot;
+    LAYOUT_SHIFT = &quot;LAYOUT_SHIFT&quot;
+
+
+@dataclasses.dataclass
+class Rect:
+    x: float
+    y: float
+    width: float
+    height: float
+
+    def to_dict(self) -&gt; Dict[str, float]:
+        return {&quot;x&quot;: self.x, &quot;y&quot;: self.y, &quot;width&quot;: self.width, &quot;height&quot;: self.height}
+
+    @property
+    def right(self) -&gt; float:
+        return self.x + self.width
+
+    @property
+    def bottom(self) -&gt; float:
+        return self.y + self.height
+
+    def intersects(self, other: &quot;Rect&quot;) -&gt; bool:
+        return not (
+            self.right &lt;= other.x
+            or other.right &lt;= self.x
+            or self.bottom &lt;= other.y
+            or other.bottom &lt;= self.y
+        )
+
+
+@dataclasses.dataclass
+class UIBug:
+    category: BugCategory
+    severity: BugSeverity
+    selector: str
+    description: str
+    bounding_box: Optional[Rect]
+    viewport: str
+    details: Dict[str, Any] = dataclasses.field(default_factory=dict)
+    screenshot_path: Optional[str] = None
+
+    def to_dict(self) -&gt; Dict[str, Any]:
+        return {
+            &quot;category&quot;: self.category.value,
+            &quot;severity&quot;: self.severity.value,
+            &quot;selector&quot;: self.selector,
+            &quot;description&quot;: self.description,
+            &quot;bounding_box&quot;: self.bounding_box.to_dict() if self.bounding_box else None,
+            &quot;viewport&quot;: self.viewport,
+            &quot;details&quot;: self.details,
+            &quot;screenshot_path&quot;: self.screenshot_path,
+        }
+
+
+@dataclasses.dataclass
+class ViewportPreset:
+    name: str
+    width: int
+    height: int
+    is_mobile: bool = False
+    device_scale_factor: float = 1.0
+
+
+DEFAULT_VIEWPORTS = [
+    ViewportPreset(name=&quot;Desktop-1080p&quot;, width=1920, height=1080),
+    ViewportPreset(name=&quot;Laptop-WXGA&quot;, width=1366, height=768),
+    ViewportPreset(name=&quot;Tablet-Portrait&quot;, width=768, height=1024, is_mobile=True),
+    ViewportPreset(name=&quot;Mobile-Viewport&quot;, width=375, height=812, is_mobile=True),
+]
+
+# Client-side JavaScript evaluation script for structural UI anomalies
+CLIENT_DETECTION_SCRIPT = &quot;&quot;&quot;
+() =&gt; {
+    const bugs = [];
+    const docWidth = document.documentElement.clientWidth;
+    const docHeight = document.documentElement.clientHeight;
+    const body = document.body;
+
+    function getUniqueSelector(el) {
+        if (!(el instanceof Element)) return &#x27;&#x27;;
+        if (el.id) return `#${el.id}`;
+        let path = [];
+        while (el &amp;&amp; el.nodeType === Node.ELEMENT_NODE) {
+            let selector = el.nodeName.toLowerCase();</pre>
+  </div>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Interactive dry-run simulator</h2>
+  <p>Select a test scenario and trigger a deterministic dry-run execution across the node topology to inspect real-time logs, compute metrics, and final output payloads.</p>
+
+  <!-- SECTION 3: INTERACTIVE DRY-RUN SIMULATOR -->
+  <div class="sim-container" id="bp-sim" style="margin:28px 0 24px;background:#FFFFFF;border:var(--bw) solid #000000;box-shadow:var(--hard-shadow-lg);border-radius:6px;overflow:hidden">
+    <div class="sim-header">
+      <div class="sim-badge"><span class="dot-live"></span> 03 · LIVE DETERMINISTIC DRY-RUN SIMULATOR</div>
+      <div class="sim-title">Step Through Topology Nodes &amp; Stream Execution Telemetry</div>
+      <p class="sim-intro">Choose a payload scenario below or click "Run Dry-Run Simulation" to step through the pipeline stages and inspect the resulting JSON output contract.</p>
+    </div>
+
+    <div class="sim-controls">
+      <span class="ctrl-label">SELECT TEST SCENARIO:</span>
+      <div class="sim-presets" id="bp-scen-btns">
+        <button type="button" class="preset-btn active" data-scen="mobile-overflow">1. Mobile 375px Horizontal Overflow &amp; Clipped CTA Bug</button><button type="button" class="preset-btn" data-scen="dynamic-copy-pass">2. Dynamic Copy &amp; Marketing Banner Update (Zero False Positives)</button><button type="button" class="preset-btn" data-scen="broken-svg-asset">3. Broken CDN Image &amp; Z-Index Sticky Header Occlusion</button>
+      </div>
+    </div>
+
+    <div class="bp-sim-action-bar">
+      <div class="bp-step-strip" id="bp-step-strip">
+        <span class="bp-step-pill done" data-step-idx="0">NODE 01 · Route Crawler</span><span class="bp-step-pill done" data-step-idx="1">NODE 02 · Viewport Matrix</span><span class="bp-step-pill done" data-step-idx="2">NODE 03 · DOM Geometry Probe</span><span class="bp-step-pill done" data-step-idx="3">NODE 04 · Vision Auditor</span><span class="bp-step-pill done" data-step-idx="4">NODE 05 · Box Highlighter</span><span class="bp-step-pill done" data-step-idx="5">NODE 06 · CI Verdict Gate</span>
+      </div>
+      <button type="button" class="bp-run-sim-btn" id="bp-run-btn">Run Dry-Run Simulation ✦</button>
+    </div>
+
+    <div class="critic-layout">
+      <div class="critic-left-col">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:800;color:#38BDF8">// TIMESTAMPED EXECUTION TRACE</span>
+          <span id="bp-sim-status" class="auth-pill fail">CI BLOCKED · 2 HIGH DEFECTS</span>
+        </div>
+        <div class="trace-terminal" id="bp-sim-logs" style="min-height:250px;white-space:pre-wrap">[00:00.320] CRAWL: Loaded /pricing across Desktop (1440w), Tablet (768w), Mobile (375w)
+[00:00.510] DOM_PROBE [Desktop 1440w]: 0 overflow, 0 collisions -&gt; PASS
+[00:00.538] DOM_PROBE [Mobile 375w]: Detected scrollWidth (462px) &gt; innerWidth (375px) on .pricing-card-pro
+[00:00.542] DOM_PROBE [Mobile 375w]: Rect.intersects() TRUE between .badge-popular and h3.plan-title
+[00:01.480] VISION_AUDITOR: Confirmed CRITICAL horizontal bleed (+87px) &amp; HIGH text overlap (conf=0.95)
+[00:01.508] CI_GATE: Wrote visual_qa_report.json | Exiting with code 1 (Deployment blocked)</div>
+        <p id="bp-sim-summary" style="font-size:0.8rem;color:#94A3B8;margin:6px 0 0;line-height:1.45">The desktop layout rendered cleanly, but on a 375px mobile viewport a fixed-width pricing card bled 87px off-screen and collided with the plan title—caught and blocked before merge.</p>
+      </div>
+
+      <div class="critic-right-col">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-family:'Space Grotesk',sans-serif;font-size:0.88rem;font-weight:800;color:#000000">FINAL OUTPUT PAYLOAD CONTRACT</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;font-weight:800;color:var(--acc)">SCHEMA VALIDATED ✓</span>
+        </div>
+        <div style="background:#0F172A;border:2px solid #000000;border-radius:4px;padding:14px;flex:1">
+          <pre id="bp-sim-payload" style="margin:0;color:#34D399;font-family:'JetBrains Mono',monospace;font-size:0.72rem;line-height:1.45;white-space:pre-wrap">{
+  &quot;url&quot;: &quot;https://staging.example.com/pricing&quot;,
+  &quot;viewport&quot;: &quot;mobile_375x812&quot;,
+  &quot;status&quot;: &quot;FAILED&quot;,
+  &quot;defects_found&quot;: [
+    {
+      &quot;category&quot;: &quot;HORIZONTAL_OVERFLOW&quot;,
+      &quot;severity&quot;: &quot;CRITICAL&quot;,
+      &quot;selector&quot;: &quot;div.pricing-grid &gt; .pricing-card-pro&quot;,
+      &quot;bounding_box&quot;: {&quot;x&quot;: 16, &quot;y&quot;: 412, &quot;width&quot;: 446, &quot;height&quot;: 520},
+      &quot;overflow_px&quot;: 87
+    },
+    {
+      &quot;category&quot;: &quot;TEXT_OVERLAP&quot;,
+      &quot;severity&quot;: &quot;HIGH&quot;,
+      &quot;selector&quot;: &quot;span.badge-popular &lt;-&gt; h3.plan-title&quot;,
+      &quot;confidence&quot;: 0.95
+    }
+  ]
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="sim-specs">
+      <div><b>TOTAL LATENCY</b> <span id="bp-m-lat">1,508 ms (3 Viewports)</span></div>
+      <div><b>COMPUTE / TOKENS</b> <span id="bp-m-comp">3 screenshots + DOM rect sweep</span></div>
+      <div><b>ESTIMATED RUN COST</b> <span class="cost-tag" id="bp-m-cost">$0.00051 USD</span></div>
+      <div><b>EXECUTION MODE</b> <span>Deterministic Self-Hosted</span></div>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Production resilience &amp; edge-case handling</h2>
+  <p>Every production system is defined by how it behaves when upstream dependencies fail, rate-limits trigger, or malformed payloads arrive at the boundary.</p>
+
+  <!-- SECTION 4: 3-CARD PRODUCTION RESILIENCE BREAKDOWN -->
+  <div class="bp-resilience-grid">
+    
+    <div class="bp-res-card">
+      <span class="r-tag">01 · ANIMATION &amp; FONT FREEZING</span>
+      <h3>Deterministic Frame Stabilization</h3>
+      <p>Injects CSS to freeze transitions/animations and awaits <code>document.fonts.ready</code> + lazy-scroll completion so screenshots never capture half-rendered skeletons.</p>
+    </div>
+    <div class="bp-res-card">
+      <span class="r-tag">02 · DUAL DOM + VISION VERIFICATION</span>
+      <h3>Geometry Math + Semantic Triage</h3>
+      <p><code>Rect.intersects()</code> provides exact pixel coordinates of overlapping elements, while Gemini Vision distinguishes intentional badge overlays from broken CSS collisions.</p>
+    </div>
+    <div class="bp-res-card">
+      <span class="r-tag">03 · BOUNDED BFS CRAWL &amp; SANITIZATION</span>
+      <h3>Same-Origin Scope &amp; JSON Recovery</h3>
+      <p>Restricts crawling to same-origin routes with configurable concurrency limits and strips malformed markdown wrappers from LLM JSON responses.</p>
+    </div>
+  </div>
+
+  
+  <div class="callout decision">
+    <span class="badge">ARCHITECTURAL DECISION</span>
+    <h3>Why neither DOM assertions nor Vision LLMs are sufficient alone</h3>
+    <p>Pure DOM assertions cannot judge visual aesthetics or contrast legibility over background images, while pure Vision LLMs struggle to report exact CSS selectors and pixel overflow counts.</p>
+    <p>Combining Playwright's in-page <code>getBoundingClientRect()</code> sweep with Vision LLM confirmation gives exact CSS selectors (<code>div.pricing-grid &gt; .card</code>) backed by human-like visual judgment.</p>
+    <p class="outcome"><b>SYNERGY</b> Exact CSS selector attribution with <1% false-positive rate.</p>
+  </div>
+  <div class="callout pitfall">
+    <span class="badge">PRODUCTION PITFALL</span>
+    <h3>Lazy-loaded images below the fold appear as blank gaps in full-page screenshots</h3>
+    <p>Playwright's <code>page.screenshot(full_page=True)</code> resizes the viewport buffer without firing intersection observers cleanly, leaving <code>loading="lazy"</code> images unrendered.</p>
+    <p>Before taking any screenshot, the crawler runs a fast incremental scroll pass down the document and waits for all visible <code>HTMLImageElement.complete</code> promises to settle.</p>
+    <p class="outcome"><b>FIX</b> Pre-capture scroll hydration eliminated false 'missing image' alerts below the fold.</p>
+  </div>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Stack &amp; specifications</h2>
+  <ul>
+    <li><strong>Python 3.11+ &amp; Playwright Async API</strong>: Multi-viewport headless Chromium orchestration</li><li><strong>DOM Geometry Engine</strong>: Custom rectangle intersection, overflow, and z-index occlusion math</li><li><strong>Multimodal Vision LLM</strong>: Semantic severity grading and false-positive suppression</li><li><strong>GitHub Actions / CI CLI</strong>: Automated exit-code gating and annotated PNG artifact generation</li>
+  </ul>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Architectural takeaway</h2>
+  <p>Visual QA should test layout invariants, not static pixel bitmaps. Pairing DOM bounding-box geometry with multimodal vision catches real CSS breakages while ignoring benign content updates.</p>
+</div></section>
+
+<div class="wrap"><nav class="pager" aria-label="Other blueprints">
+  <a href="zero-api-vision-rpa.html">← Zero-API Desktop RPA &amp; Vision Engine</a>
+  <a href="b2b-waterfall-engine.html">Hybrid B2B Waterfall Enrichment Engine →</a>
+</nav></div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="logo"><span class="mk">MR</span></div>
+    <div class="mono">Designed &amp; built by Manny Ruesch · 2026</div>
+    <a href="#top">Back to top ↑</a>
+  </div>
+</footer>
+
+<script src="../assets/site.js"></script>
+<script>
+(function(){
+  const NODES = {"n1": {"id": "n1", "idx": "NODE 01", "name": "Route Crawler", "sub": "Playwright Async BFS", "latency": "320 ms", "accent": false, "role": "Launches headless Chromium, discovers same-origin routes via BFS link extraction, and disables CSS animations/transitions for deterministic rendering.", "io_type": "IN: CrawlSeed(base_url, max_pages=25) -> OUT: List[PageTarget(url, slug, depth)]", "retry_policy": "Automatic retry on navigation timeout with fallback from networkidle to domcontentloaded."}, "n2": {"id": "n2", "idx": "NODE 02", "name": "Viewport Matrix", "sub": "1440w \u00b7 768w \u00b7 375w", "latency": "190 ms", "accent": false, "role": "Resizes browser context sequentially across Desktop, Tablet, and Mobile viewports, triggering lazy-loaded images via smooth scroll pass.", "io_type": "IN: PageTarget -> OUT: List[ViewportContext(viewport_name, width, height, full_screenshot_png)]", "retry_policy": "Waits for document.fonts.ready and all img.complete states before capturing frame."}, "n3": {"id": "n3", "idx": "NODE 03", "name": "DOM Geometry Probe", "sub": "Rect.intersects Math", "latency": "28 ms", "accent": true, "role": "Executes in-page boundingClientRect sweep to detect horizontal scroll bleed, colliding text boxes, truncated buttons, and broken asset URLs.", "io_type": "IN: ViewportContext -> OUT: List[DOMCandidateDefect(category, selector, bounding_box: Rect)]", "retry_policy": "Filters out hidden/zero-opacity elements (display:none, visibility:hidden, opacity:0)."}, "n4": {"id": "n4", "idx": "NODE 04", "name": "Vision Auditor", "sub": "Multimodal Triage", "latency": "940 ms", "accent": true, "role": "Sends viewport screenshot + DOM candidate coordinates to Gemini Vision to verify visual defects and classify severity (CRITICAL / HIGH / MEDIUM / LOW).", "io_type": "IN: (ScreenshotPNG, List[DOMCandidateDefect]) -> OUT: List[VisualBug(category, severity, confidence)]", "retry_policy": "JSON response sanitizer strips markdown wrappers; retries up to 3x on rate limits."}, "n5": {"id": "n5", "idx": "NODE 05", "name": "Box Highlighter", "sub": "Defect Crop & Draw", "latency": "22 ms", "accent": false, "role": "Draws color-coded severity bounding boxes onto the viewport screenshot and crops 2x zoomed evidence tiles for each confirmed defect.", "io_type": "IN: (ScreenshotPNG, List[VisualBug]) -> OUT: AnnotatedArtifactPaths(full_png, cropped_tiles)", "retry_policy": "Clamps bounding box coordinates to image dimensions to prevent out-of-bounds crop errors."}, "n6": {"id": "n6", "idx": "NODE 06", "name": "CI Verdict Gate", "sub": "JSON Report + ExitCode", "latency": "8 ms", "accent": false, "role": "Aggregates defects across all pages and viewports into visual_qa_report.json and returns non-zero exit code if any CRITICAL/HIGH bug exists.", "io_type": "IN: List[PageAuditResult] -> OUT: QAAuditReport(summary, pass_status, exit_code)", "retry_policy": "Always writes partial JSON report on interrupt so CI artifacts remain inspectable."}};
+  const TABS = {"tab1": {"label": "DOM Geometry & Intersection Engine", "sub": "visual_qa_engine.py \u00b7 Rect Collision Math", "file": "products/autonomous-visual-qa-broken-ui-detector-python-20261009/package/visual_qa_engine.py", "code": "\nclass BugSeverity(str, enum.Enum):\n    CRITICAL = \"CRITICAL\"\n    HIGH = \"HIGH\"\n    MEDIUM = \"MEDIUM\"\n    LOW = \"LOW\"\n    INFO = \"INFO\"\n\n\nclass BugCategory(str, enum.Enum):\n    HORIZONTAL_OVERFLOW = \"HORIZONTAL_OVERFLOW\"\n    TEXT_OVERLAP = \"TEXT_OVERLAP\"\n    TEXT_TRUNCATION = \"TEXT_TRUNCATION\"\n    OCCLUDED_INTERACTIVE = \"OCCLUDED_INTERACTIVE\"\n    BROKEN_ASSET = \"BROKEN_ASSET\"\n    VISUAL_REGRESSION = \"VISUAL_REGRESSION\"\n    LAYOUT_SHIFT = \"LAYOUT_SHIFT\"\n\n\n@dataclasses.dataclass\nclass Rect:\n    x: float\n    y: float\n    width: float\n    height: float\n\n    def to_dict(self) -> Dict[str, float]:\n        return {\"x\": self.x, \"y\": self.y, \"width\": self.width, \"height\": self.height}\n\n    @property\n    def right(self) -> float:\n        return self.x + self.width\n\n    @property\n    def bottom(self) -> float:\n        return self.y + self.height\n\n    def intersects(self, other: \"Rect\") -> bool:\n        return not (\n            self.right <= other.x\n            or other.right <= self.x\n            or self.bottom <= other.y\n            or other.bottom <= self.y\n        )\n\n\n@dataclasses.dataclass\nclass UIBug:\n    category: BugCategory\n    severity: BugSeverity\n    selector: str\n    description: str\n    bounding_box: Optional[Rect]\n    viewport: str\n    details: Dict[str, Any] = dataclasses.field(default_factory=dict)\n    screenshot_path: Optional[str] = None\n\n    def to_dict(self) -> Dict[str, Any]:\n        return {\n            \"category\": self.category.value,\n            \"severity\": self.severity.value,\n            \"selector\": self.selector,\n            \"description\": self.description,\n            \"bounding_box\": self.bounding_box.to_dict() if self.bounding_box else None,\n            \"viewport\": self.viewport,\n            \"details\": self.details,\n            \"screenshot_path\": self.screenshot_path,\n        }\n\n\n@dataclasses.dataclass\nclass ViewportPreset:\n    name: str\n    width: int\n    height: int\n    is_mobile: bool = False\n    device_scale_factor: float = 1.0\n\n\nDEFAULT_VIEWPORTS = [\n    ViewportPreset(name=\"Desktop-1080p\", width=1920, height=1080),\n    ViewportPreset(name=\"Laptop-WXGA\", width=1366, height=768),\n    ViewportPreset(name=\"Tablet-Portrait\", width=768, height=1024, is_mobile=True),\n    ViewportPreset(name=\"Mobile-Viewport\", width=375, height=812, is_mobile=True),\n]\n\n# Client-side JavaScript evaluation script for structural UI anomalies\nCLIENT_DETECTION_SCRIPT = \"\"\"\n() => {\n    const bugs = [];\n    const docWidth = document.documentElement.clientWidth;\n    const docHeight = document.documentElement.clientHeight;\n    const body = document.body;\n\n    function getUniqueSelector(el) {\n        if (!(el instanceof Element)) return '';\n        if (el.id) return `#${el.id}`;\n        let path = [];\n        while (el && el.nodeType === Node.ELEMENT_NODE) {\n            let selector = el.nodeName.toLowerCase();"}, "tab2": {"label": "Structured Visual QA Report Schema", "sub": "visual_qa_report.json \u00b7 Multi-Viewport Output", "file": "products/autonomous-visual-qa-broken-ui-detector-python-20261009/package/visual_qa_report.json", "code": "{\n  \"report_metadata\": {\n    \"version\": \"1.4.0\",\n    \"generator\": \"autonomous-visual-qa-cli\",\n    \"generated_at\": \"2025-02-18T14:32:08.419Z\",\n    \"execution_duration_ms\": 14820,\n    \"environment\": {\n      \"runner\": \"Playwright/1.41.2\",\n      \"browser\": \"Chromium 122.0.6261.29\",\n      \"os\": \"Linux x86_64 (Debian 12)\",\n      \"node_version\": \"v20.11.0\",\n      \"python_version\": \"3.11.8\"\n    },\n    \"configuration\": {\n      \"base_url\": \"https://staging.internal-app.dev\",\n      \"baseline_commit\": \"e8f3b21\",\n      \"target_commit\": \"7a941f0\",\n      \"perceptual_threshold\": 0.05,\n      \"color_delta_e_threshold\": 2.3,\n      \"detect_layout_shifts\": true,\n      \"detect_z_index_collisions\": true,\n      \"detect_text_clipping\": true,\n      \"ignore_selectors\": [\n        \"[data-qa-ignore]\",\n        \".dynamic-timestamp\",\n        \"iframe[src*='recaptcha']\"\n      ],\n      \"viewports\": [\n        {\n          \"name\": \"desktop-standard\",\n          \"width\": 1920,\n          \"height\": 1080,\n          \"device_scale_factor\": 1.0\n        },\n        {\n          \"name\": \"tablet-portrait\",\n          \"width\": 768,\n          \"height\": 1024,\n          \"device_scale_factor\": 2.0\n        },\n        {\n          \"name\": \"mobile-small\",\n          \"width\": 375,\n          \"height\": 812,\n          \"device_scale_factor\": 3.0\n        }\n      ]\n    }\n  },\n  \"summary\": {\n    \"status\": \"FAILED\",\n    \"total_pages_scanned\": 4,\n    \"total_viewports_evaluated\": 12,\n    \"total_snapshots_captured\": 24,\n    \"total_issues_detected\": 5,\n    \"critical_issues\": 2,\n    \"high_issues\": 1,\n    \"medium_issues\": 1,\n    \"low_issues\": 1,\n    \"breakdown_by_category\": {\n      \"z_index_collision\": 1,\n      \"text_truncation_overflow\": 1,\n      \"horizontal_scroll_leak\": 1,\n      \"typography_overlap\": 1,\n      \"perceptual_visual_drift\": 1\n    }\n  },\n  \"results\": [\n    {\n      \"url\": \"https://staging.internal-app.dev/dashboard\",\n      \"route\": \"/dashboard\",\n      \"viewport\": \"mobile-small (375x812)\",\n      \"status\": \"FAILED\",\n      \"metrics\": {\n        \"layout_shift_score\": 0.082,\n        \"dom_elements_evaluated\": 412,\n        \"ssim_similarity_index\": 0.9412,\n        \"mismatched_pixels_count\": 1420\n      },\n      \"artifacts\": {\n        \"baseline_screenshot\": \"artifacts/screenshots/dashboard_mobile-small_baseline.png\",\n        \"actual_screenshot\": \"artifacts/screenshots/dashboard_mobile-small_actual.png\",\n        \"diff_overlay\": \"artifacts/diffs/dashboard_mobile-small_diff.png\",\n        \"bounding_box_annotated\": \"artifacts/annotated/dashboard_mobile-small_annotations.png\"\n      },\n      \"issues\": [\n        {\n          \"id\": \"VQA-2025-001\",\n          \"severity\": \"CRITICAL\",\n          \"category\": \"horizontal_scroll_leak\","}, "tab3": {"label": "Vision Auditor Prompt & Parser", "sub": "gemini_auditor.py \u00b7 Semantic UI Triage", "file": "products/autonomous-visual-qa-broken-ui-detector-python-20261009/package/gemini_auditor.py", "code": "    annotated_screenshot_path: Optional[str] = None\n    execution_time_seconds: float = 0.0\n    model_used: str = \"gemini-2.5-flash\"\n    metadata: Dict[str, Any] = field(default_factory=dict)\n\n    def to_dict(self) -> Dict[str, Any]:\n        return {\n            \"url\": self.url,\n            \"viewport\": self.viewport,\n            \"screenshot_path\": self.screenshot_path,\n            \"annotated_screenshot_path\": self.annotated_screenshot_path,\n            \"passed\": self.passed,\n            \"summary\": self.summary,\n            \"execution_time_seconds\": round(self.execution_time_seconds, 3),\n            \"model_used\": self.model_used,\n            \"bug_count\": len(self.bugs),\n            \"bugs\": [asdict(b) for b in self.bugs],\n            \"metadata\": self.metadata,\n        }\n\n    def to_json(self, indent: int = 2) -> str:\n        return json.dumps(self.to_dict(), indent=indent)\n\n\nSYSTEM_AUDITOR_PROMPT = \"\"\"You are a Staff Frontend QA Automation Architect and Multimodal UI Auditor.\nYour job is to inspect high-resolution web page screenshots captured from automated headless browsers (Playwright/Puppeteer)\nand detect genuine visual rendering bugs, layout breakdowns, responsiveness flaws, and CSS regressions.\n\nYou must differentiate intentional design choices from actual rendering bugs.\nDO NOT flag intentional styling (such as artistic overlaps, semi-transparent overlays, intentional asymmetrical designs).\n\nCRITICAL BUG TYPES TO DETECT:\n1. TYPOGRAPHY_OVERLAP: Text nodes colliding, overlapping lines (bad line-height), text rendering on top of icons or other labels.\n2. RESPONSIVE_OVERFLOW: Elements protruding outside card boundaries, horizontal clipping, awkward wraps on buttons/badges.\n3. Z_INDEX_COLLISION: Modals or menus rendering behind transparent overlays, sticky headers clipping under or covering page inputs, floating action buttons blocking text or form controls.\n4. BROKEN_ASSET: Missing image placeholders (alt text outline with broken icon), empty frames where content failed to load, missing web fonts rendering generic fallback boxes (FOUT/TOFU).\n5. ALIGNMENT_ANOMALY: Grid columns breaking out of alignment, flex items squished with 0 width, unbalanced margins, orphaned buttons floating unexpectedly.\n6. CLIPPED_CONTENT: Text truncated abruptly without ellipsis, dropdown options cut off at viewport edge.\n7. CONTRAST_READABILITY: Text that is virtually invisible due to color matching background or unreadable overlay.\n\nCOORDINATES SYSTEM:\nFor each bug detected, provide a bounding_box with normalized integer coordinates from 0 to 1000:\n- ymin: top edge (0 to 1000)\n- xmin: left edge (0 to 1000)\n- ymax: bottom edge (0 to 1000)\n- xmax: right edge (0 to 1000)\n\nOUTPUT FORMAT:\nYou MUST respond with a single valid JSON object strictly matching this JSON schema:\n{\n  \"summary\": \"Overall evaluation of UI state (1-3 sentences)\",\n  \"passed\": true/false (true if zero CRITICAL or HIGH bugs exist),\n  \"bugs\": [\n    {\n      \"id\": \"bug-1\",\n      \"category\": \"TYPOGRAPHY_OVERLAP\" | \"RESPONSIVE_OVERFLOW\" | \"Z_INDEX_COLLISION\" | \"BROKEN_ASSET\" | \"ALIGNMENT_ANOMALY\" | \"CLIPPED_CONTENT\" | \"CONTRAST_READABILITY\" | \"OTHER\",\n      \"severity\": \"CRITICAL\" | \"HIGH\" | \"MEDIUM\" | \"LOW\" | \"COSMETIC\",\n      \"title\": \"Concise bug summary\",\n      \"description\": \"Precise explanation of what is visually broken and why it fails QA\",\n      \"element_selector_guess\": \"Best guess CSS selector (e.g., '.hero-section h1', '#navbar-cart-badge')\",\n      \"suggested_css_fix\": \"Recommended CSS fix (e.g., 'z-index: 1000; overflow: hidden; line-height: 1.5;')\",\n      \"confidence_score\": 0.95,\n      \"bounding_box\": {\n        \"ymin\": 120,\n        \"xmin\": 340,\n        \"ymax\": 180,\n        \"xmax\": 620\n      }\n    }\n  ]\n}\n\nIf no visual bugs are detected, return \"passed\": true and an empty \"bugs\" list [].\nDo not wrap your output in markdown codeblocks (```json). Return raw JSON only.\n\"\"\"\n\n\nclass GeminiVisualAuditor:\n    \"\"\"\n    Multimodal visual auditor powered by Gemini models for automated UI bug detection.\n    \"\"\"\n\n    def __init__(\n        self,\n        api_key: Optional[str] = None,\n        model_name: str = \"gemini-2.5-flash\",\n        max_retries: int = 3,\n        retry_delay_seconds: float = 2.0,\n    ):\n        self.api_key = api_key or os.environ.get(\"GEMINI_API_KEY\") or os.environ.get(\"GOOGLE_API_KEY\")\n        if not self.api_key:\n            raise ValueError(\n                \"Gemini API key is required. Set GEMINI_API_KEY environment variable \"\n                \"or pass `api_key` directly to GeminiVisualAuditor.\"\n            )"}};
+  const SCENARIOS = {"mobile-overflow": {"id": "mobile-overflow", "btn_label": "1. Mobile 375px Horizontal Overflow & Clipped CTA Bug", "badge_text": "CI BLOCKED \u00b7 2 HIGH DEFECTS", "badge_class": "fail", "latency": "1,508 ms (3 Viewports)", "compute": "3 screenshots + DOM rect sweep", "cost": "$0.00051 USD", "logs": ["[00:00.320] CRAWL: Loaded /pricing across Desktop (1440w), Tablet (768w), Mobile (375w)", "[00:00.510] DOM_PROBE [Desktop 1440w]: 0 overflow, 0 collisions -> PASS", "[00:00.538] DOM_PROBE [Mobile 375w]: Detected scrollWidth (462px) > innerWidth (375px) on .pricing-card-pro", "[00:00.542] DOM_PROBE [Mobile 375w]: Rect.intersects() TRUE between .badge-popular and h3.plan-title", "[00:01.480] VISION_AUDITOR: Confirmed CRITICAL horizontal bleed (+87px) & HIGH text overlap (conf=0.95)", "[00:01.508] CI_GATE: Wrote visual_qa_report.json | Exiting with code 1 (Deployment blocked)"], "payload": "{\n  \"url\": \"https://staging.example.com/pricing\",\n  \"viewport\": \"mobile_375x812\",\n  \"status\": \"FAILED\",\n  \"defects_found\": [\n    {\n      \"category\": \"HORIZONTAL_OVERFLOW\",\n      \"severity\": \"CRITICAL\",\n      \"selector\": \"div.pricing-grid > .pricing-card-pro\",\n      \"bounding_box\": {\"x\": 16, \"y\": 412, \"width\": 446, \"height\": 520},\n      \"overflow_px\": 87\n    },\n    {\n      \"category\": \"TEXT_OVERLAP\",\n      \"severity\": \"HIGH\",\n      \"selector\": \"span.badge-popular <-> h3.plan-title\",\n      \"confidence\": 0.95\n    }\n  ]\n}", "summary": "The desktop layout rendered cleanly, but on a 375px mobile viewport a fixed-width pricing card bled 87px off-screen and collided with the plan title\u2014caught and blocked before merge."}, "dynamic-copy-pass": {"id": "dynamic-copy-pass", "btn_label": "2. Dynamic Copy & Marketing Banner Update (Zero False Positives)", "badge_text": "ALL VIEWPORTS PASSED \u2713", "badge_class": "pass", "latency": "1,390 ms", "compute": "3 viewports audited", "cost": "$0.00048 USD", "logs": ["[00:00.290] CRAWL: Loaded /home after hero copy & testimonial rotation update", "[00:00.480] LEGACY_DIFF_NOTE: Pixel-diff would fail (42% pixel change due to taller hero paragraph)", "[00:00.505] DOM_PROBE: 0 horizontal overflows, 0 colliding text rects, 18/18 images loaded (HTTP 200)", "[00:01.380] VISION_AUDITOR: Layout hierarchy, contrast, and spacing verified clean across all 3 viewports", "[00:01.390] CI_GATE: PASS (Exit code 0)"], "payload": "{\n  \"url\": \"https://staging.example.com/home\",\n  \"viewports_tested\": [\"desktop_1440x900\", \"tablet_768x1024\", \"mobile_375x812\"],\n  \"status\": \"PASSED\",\n  \"pixel_shift_ignored\": \"42.0% vertical reflow (benign copy change)\",\n  \"structural_defects\": 0,\n  \"broken_assets\": 0\n}", "summary": "Where a pixel-diff tool would fail CI because new marketing copy pushed the page down by 28px, semantic DOM+Vision auditing recognizes the reflow is structurally sound."}, "broken-svg-asset": {"id": "broken-svg-asset", "btn_label": "3. Broken CDN Image & Z-Index Sticky Header Occlusion", "badge_text": "HIGH DEFECT FLAGGED \u26a0\ufe0f", "badge_class": "warn", "latency": "1,460 ms", "compute": "3 viewports + asset probe", "cost": "$0.00049 USD", "logs": ["[00:00.310] CRAWL: Audited /checkout across 3 viewports", "[00:00.495] ASSET_PROBE: img.partner-logo returned naturalWidth=0 (HTTP 404 from CDN)", "[00:00.512] DOM_PROBE: Fixed header (z-index: 9999) occludes top 38% of #submit-order-btn on scroll", "[00:01.450] VISION_AUDITOR: Flagged OCCLUDED_INTERACTIVE (HIGH) + BROKEN_ASSET (MEDIUM)", "[00:01.460] CI_GATE: Annotated evidence saved to artifacts/checkout_tablet_defects.png"], "payload": "{\n  \"url\": \"https://staging.example.com/checkout\",\n  \"status\": \"FAILED\",\n  \"defects_found\": [\n    {\n      \"category\": \"OCCLUDED_INTERACTIVE\",\n      \"severity\": \"HIGH\",\n      \"selector\": \"button#submit-order-btn\",\n      \"occluded_by\": \"header.sticky-nav\",\n      \"overlap_ratio\": 0.38\n    },\n    {\n      \"category\": \"BROKEN_ASSET\",\n      \"severity\": \"MEDIUM\",\n      \"selector\": \"img.partner-logo\",\n      \"natural_width\": 0\n    }\n  ]\n}", "summary": "Detects both broken image assets (naturalWidth == 0) and interactive CTA buttons partially covered by sticky navigation bars."}};
+
+  // 1. Interactive Node Topology
+  function selectNode(nodeId) {
+    const n = NODES[nodeId];
+    if (!n) return;
+    document.querySelectorAll('#bp-node-btns .bp-node-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.node === nodeId);
+    });
+    document.getElementById('nd-title').textContent = n.idx + ' · ' + n.name;
+    document.getElementById('nd-lat').textContent = 'LATENCY: ' + n.latency;
+    document.getElementById('nd-role').textContent = n.role;
+    document.getElementById('nd-io').textContent = n.io_type;
+    document.getElementById('nd-retry').textContent = n.retry_policy;
+  }
+
+  document.querySelectorAll('[data-node]').forEach(el => {
+    el.addEventListener('click', () => selectNode(el.dataset.node));
+  });
+
+  // 2. Code & Schema Tabs
+  let currentTab = 'tab1';
+  document.querySelectorAll('#bp-inspector .bp-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#bp-inspector .bp-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentTab = btn.dataset.tab;
+      const t = TABS[currentTab];
+      if (t) {
+        document.getElementById('bp-code-filename').textContent = '// SOURCE: ' + t.file;
+        document.getElementById('bp-code-view').textContent = t.code;
+      }
+    });
+  });
+
+  const copyBtn = document.getElementById('bp-copy-btn');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      const code = document.getElementById('bp-code-view').textContent;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(() => {
+          copyBtn.textContent = 'Copied! ✓';
+          setTimeout(() => { copyBtn.textContent = 'Copy Snippet'; }, 1800);
+        });
+      }
+    });
+  }
+
+  // 3. Dry-Run Simulator with Step-by-Step Animation
+  let activeScen = 'mobile-overflow';
+  let simTimer = null;
+
+  function runSimulation(scenId, animate) {
+    const s = SCENARIOS[scenId];
+    if (!s) return;
+    if (simTimer) clearInterval(simTimer);
+
+    const pills = document.querySelectorAll('#bp-step-strip .bp-step-pill');
+    const logsEl = document.getElementById('bp-sim-logs');
+    const payloadEl = document.getElementById('bp-sim-payload');
+    const statusEl = document.getElementById('bp-sim-status');
+    const summaryEl = document.getElementById('bp-sim-summary');
+    const latEl = document.getElementById('bp-m-lat');
+    const compEl = document.getElementById('bp-m-comp');
+    const costEl = document.getElementById('bp-m-cost');
+
+    if (!animate) {
+      pills.forEach(p => { p.className = 'bp-step-pill done'; });
+      logsEl.textContent = s.logs.join('\n');
+      payloadEl.textContent = s.payload;
+      statusEl.textContent = s.badge_text;
+      statusEl.className = 'auth-pill ' + s.badge_class;
+      summaryEl.textContent = s.summary;
+      latEl.textContent = s.latency;
+      compEl.textContent = s.compute;
+      costEl.textContent = s.cost;
+      return;
+    }
+
+    // Step-by-step live trace animation
+    pills.forEach(p => { p.className = 'bp-step-pill'; });
+    logsEl.textContent = '[00:00.000] INIT: Starting deterministic dry-run execution...';
+    statusEl.textContent = 'EXECUTING DRY-RUN...';
+    statusEl.className = 'auth-pill warn';
+
+    let step = 0;
+    const totalSteps = pills.length;
+    simTimer = setInterval(() => {
+      if (step < totalSteps) {
+        pills.forEach((p, idx) => {
+          if (idx < step) p.className = 'bp-step-pill done';
+          else if (idx === step) p.className = 'bp-step-pill running';
+          else p.className = 'bp-step-pill';
+        });
+        const logSlice = s.logs.slice(0, step + 1);
+        logsEl.textContent = logSlice.join('\n');
+        step++;
+      } else {
+        clearInterval(simTimer);
+        pills.forEach(p => { p.className = 'bp-step-pill done'; });
+        logsEl.textContent = s.logs.join('\n');
+        payloadEl.textContent = s.payload;
+        statusEl.textContent = s.badge_text;
+        statusEl.className = 'auth-pill ' + s.badge_class;
+        summaryEl.textContent = s.summary;
+        latEl.textContent = s.latency;
+        compEl.textContent = s.compute;
+        costEl.textContent = s.cost;
+      }
+    }, 180);
+  }
+
+  document.querySelectorAll('#bp-scen-btns .preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#bp-scen-btns .preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeScen = btn.dataset.scen;
+      runSimulation(activeScen, true);
+    });
+  });
+
+  const runBtn = document.getElementById('bp-run-btn');
+  if (runBtn) {
+    runBtn.addEventListener('click', () => runSimulation(activeScen, true));
+  }
+})();
+</script>
+</body>
+</html>

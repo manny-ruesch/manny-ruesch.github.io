@@ -129,19 +129,20 @@ document.querySelectorAll('.rv').forEach(el=>io.observe(el));
 (function(){
   const btn=document.getElementById('copy-email-btn');
   const txt=document.getElementById('copy-btn-text');
+  const origTxt=txt?txt.textContent:'manny.ruesch@gmail.com';
   const toast=document.getElementById('toast');
   let timer;
   if(!btn)return;
   btn.addEventListener('click',()=>{
     const email=btn.dataset.email||'manny.ruesch@gmail.com';
     function showSuccess(){
-      if(txt)txt.textContent='Copied!';
+      if(txt)txt.textContent='Copied! ✓';
       if(toast){
         toast.classList.add('show');
         clearTimeout(timer);
         timer=setTimeout(()=>{
           toast.classList.remove('show');
-          if(txt)txt.textContent='Copy email';
+          if(txt)txt.textContent=origTxt;
         },2800);
       }
     }

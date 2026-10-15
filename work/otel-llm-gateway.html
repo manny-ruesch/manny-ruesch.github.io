@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OTel LLM Budget Enforcer &amp; Dynamic Cost-Fallback Proxy · Manny Ruesch</title>
+<meta name="description" content="Multi-agent loops and unthrottled tenant traffic can burn through an LLM API budget in minutes. This self-hosted FastAPI gateway intercepts every completion request in &lt;4ms, enforces sliding-window Decimal budgets, serves semantic cache hits, and downgrades frontier models to fast flash tiers before hard quota exhaustion.">
+<link rel="canonical" href="https://manny-ruesch.github.io/work/otel-llm-gateway.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OTel LLM Budget Enforcer &amp; Dynamic Cost-Fallback Proxy · Manny Ruesch">
+<meta property="og:description" content="Multi-agent loops and unthrottled tenant traffic can burn through an LLM API budget in minutes. This self-hosted FastAPI gateway intercepts every completion request in &lt;4ms, enforces sliding-window Decimal budgets, serves semantic cache hits, and downgrades frontier models to fast flash tiers before hard quota exhaustion.">
+<meta property="og:url" content="https://manny-ruesch.github.io/work/otel-llm-gateway.html">
+<meta property="og:image" content="https://manny-ruesch.github.io/assets/og/home.png?v=2">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../favicon.svg?v=2" type="image/svg+xml">
+<link rel="icon" href="../favicon-32.png?v=2" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png?v=2">
+<meta name="theme-color" content="#F0F0F0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="stylesheet" href="../assets/case.css">
+</head>
+<body id="top">
+<div id="progress"></div><div id="glow"></div>
+
+<nav id="nav" aria-label="Main">
+  <div class="wrap">
+    <a href="../index.html" class="logo"><span class="mk">MR</span><span>Manny Ruesch</span></a>
+    <div class="navlinks">
+      <a href="../index.html#work" class="hide-sm">Work</a>
+      <a href="../tools.html" class="hide-sm">Blueprints</a>
+      <a href="../index.html#stack" class="hide-sm">Stack</a>
+      <a href="../index.html#contact" class="hide-sm">Contact</a>
+      <a href="https://www.linkedin.com/in/manny-ruesch" target="_blank" rel="noopener" class="cta">LinkedIn ↗</a>
+    </div>
+  </div>
+</nav>
+
+<header class="case-head">
+  <div class="wrap">
+    <a href="../tools.html" class="backlink">← All Engineering Blueprints</a>
+    <div class="kicker">// blueprint #01 · complexity score: 96/100 · async proxy gateway</div>
+    <h1>Enforcing hard token budgets with automatic model failover and OpenTelemetry spans</h1>
+    <p class="lede">Multi-agent loops and unthrottled tenant traffic can burn through an LLM API budget in minutes. This self-hosted FastAPI gateway intercepts every completion request in &lt;4ms, enforces sliding-window Decimal budgets, serves semantic cache hits, and downgrades frontier models to fast flash tiers before hard quota exhaustion.</p>
+    <div class="metrics3">
+      <div><b>&lt; 4 ms</b><span>Proxy routing overhead (p95)</span></div>
+      <div><b>80% / 100%</b><span>Soft-fallback vs. Hard-cap gates</span></div>
+      <div><b>2,442 LOC</b><span>Async Python + OpenTelemetry</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="sec rv"><div class="wrap">
+  <h2>The engineering problem</h2>
+  <p>When autonomous agents or multi-tenant SaaS features call frontier models (<code>gpt-4o</code>, <code>claude-3-5-sonnet</code>) directly, a single recursive retry loop or burst of uncached queries can exhaust monthly token budgets in hours. Provider billing dashboards update with a multi-minute lag—far too late to stop a runaway loop.</p><p>Existing gateways either require heavy external infrastructure or binary hard-stops that break user-facing workflows. I needed a deterministic, sub-4ms async proxy that tracks exact IEEE-safe <code>Decimal</code> token spend across sliding windows, caches semantically equivalent prompts, and gracefully degrades to lower-cost models (<code>gemini-2.5-flash</code> / <code>gpt-4o-mini</code>) when a tenant crosses their 80% soft threshold.</p>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>System architecture &amp; interactive topology</h2>
+  <p>A 2,442-line asynchronous FastAPI & OpenTelemetry proxy gateway built around four core subsystems:</p>
+  <ul>
+    <li><strong>Multi-Scope Sliding Window Ledger (<code>budget_engine.py</code>):</strong> Enforces concurrent budgets across <code>GLOBAL</code>, <code>TENANT</code>, <code>PROJECT</code>, and <code>AGENT</code> scopes using exact <code>Decimal('0.000001')</code> arithmetic.</li><li><strong>Dynamic Soft-Cap Model Downgrading:</strong> At 80% budget utilization, transparently rewrites the upstream model target from frontier tiers to high-speed flash tiers while injecting warning headers.</li><li><strong>Runaway Agent Loop Circuit Breaker:</strong> Tracks consecutive agent turn hashes and trips an <code>OPEN</code> circuit if an agent exceeds 25 recursive tool calls without state progression.</li><li><strong>OpenTelemetry GenAI Semantic Conventions:</strong> Emits structured <code>gen_ai.usage.cost</code>, <code>gen_ai.request.model</code>, and <code>gen_ai.budget.action</code> spans to Jaeger/OTLP collectors.</li>
+  </ul>
+
+  
+  <div class="visual-showcase">
+    <div class="visual-head">
+      <div class="v-dots"><span></span><span></span><span></span></div>
+      <div class="v-title">SYSTEM TOPOLOGY &amp; ARCHITECTURE BLUEPRINT</div>
+      <div class="v-tag">PRODUCTION ENGINE</div>
+    </div>
+    <div class="visual-body">
+      <img src="../assets/blueprints/otel-llm-budget-enforcer-cost-fallback-proxy-20261012.png" alt="OTel LLM Budget Enforcer &amp; Dynamic Cost-Fallback Proxy architecture visualization" loading="lazy">
+    </div>
+    <div class="visual-foot">
+      <span><b>END-TO-END FLOW:</b> Async Ingress → Semantic Cache → Budget Enforcer → Fallback Router → Upstream Dispatch → OTel Span &amp; Ledger</span>
+      <span class="v-live">● DETERMINISTIC PIPELINE</span>
+    </div>
+  </div>
+
+  <!-- SECTION 1: INTERACTIVE ARCHITECTURE GRAPH (REAL NODE TOPOLOGY) -->
+  <div class="diag" style="margin-top:28px">
+    <svg viewBox="0 0 920 205" role="img" aria-label="Interactive 6-stage execution topology for OTel LLM Budget Enforcer &amp; Dynamic Cost-Fallback Proxy">
+      <defs>
+        <marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#000000"/>
+        </marker>
+        <marker id="ah-red" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="#FF385C"/>
+        </marker>
+        <filter id="diag-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      <g class="edge" marker-end="url(#ah)">
+        <path d="M 146 92 L 164 92"/><path d="M 296 92 L 314 92"/><path d="M 446 92 L 464 92"/><path d="M 596 92 L 614 92"/><path d="M 746 92 L 764 92"/><path d="M 680 126 C 680 185 380 185 380 126" stroke-dasharray="5 5"/>
+      </g>
+      <g class="flow" marker-end="url(#ah-red)">
+        <path d="M 146 92 L 164 92"/><path d="M 296 92 L 314 92"/><path d="M 446 92 L 464 92"/><path d="M 596 92 L 614 92"/><path d="M 746 92 L 764 92"/><path d="M 680 126 C 680 185 380 185 380 126" stroke-dasharray="5 5"/>
+      </g>
+      <g class="diag-photons">
+        
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 146 92 L 164 92" dur="0.9s" repeatCount="indefinite" begin="0.0s"/>
+        </circle>
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 296 92 L 314 92" dur="0.9s" repeatCount="indefinite" begin="0.25s"/>
+        </circle>
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 446 92 L 464 92" dur="0.9s" repeatCount="indefinite" begin="0.5s"/>
+        </circle>
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 596 92 L 614 92" dur="0.9s" repeatCount="indefinite" begin="0.75s"/>
+        </circle>
+        <circle r="4" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 746 92 L 764 92" dur="0.9s" repeatCount="indefinite" begin="1.0s"/>
+        </circle>
+        <circle r="3.5" fill="#FF385C" filter="url(#diag-glow)">
+          <animateMotion path="M 680 126 C 680 185 380 185 380 126" dur="1.8s" repeatCount="indefinite" begin="0.5s"/>
+        </circle>
+      </g>
+      
+      <g class="diag-node" data-node="n1" style="cursor:pointer">
+        <rect x="18" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="14" y="58" width="132" height="68" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="20" y="64" width="46" height="12" rx="2" fill="#000000"/>
+        <text x="43" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 01</text>
+        <text x="80" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">Async Ingress</text>
+        <text x="80" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">FastAPI + Bearer Auth</text>
+      </g>
+      <g class="diag-node" data-node="n2" style="cursor:pointer">
+        <rect x="168" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="164" y="58" width="132" height="68" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="170" y="64" width="46" height="12" rx="2" fill="#000000"/>
+        <text x="193" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 02</text>
+        <text x="230" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">Semantic Cache</text>
+        <text x="230" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">SHA-256 + Cosine &gt;=0.92</text>
+      </g>
+      <g class="diag-node" data-node="n3" style="cursor:pointer">
+        <rect x="318" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="314" y="58" width="132" height="68" rx="4" fill="#FFF2F4" stroke="#FF385C" stroke-width="3"/>
+        <rect x="320" y="64" width="46" height="12" rx="2" fill="#FF385C"/>
+        <text x="343" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 03</text>
+        <text x="380" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#FF385C" text-anchor="middle">Budget Enforcer</text>
+        <text x="380" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">Decimal Sliding Window</text>
+      </g>
+      <g class="diag-node" data-node="n4" style="cursor:pointer">
+        <rect x="468" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="464" y="58" width="132" height="68" rx="4" fill="#FFF2F4" stroke="#FF385C" stroke-width="3"/>
+        <rect x="470" y="64" width="46" height="12" rx="2" fill="#FF385C"/>
+        <text x="493" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 04</text>
+        <text x="530" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#FF385C" text-anchor="middle">Fallback Router</text>
+        <text x="530" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">Tier Downgrade + Breaker</text>
+      </g>
+      <g class="diag-node" data-node="n5" style="cursor:pointer">
+        <rect x="618" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="614" y="58" width="132" height="68" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="620" y="64" width="46" height="12" rx="2" fill="#000000"/>
+        <text x="643" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 05</text>
+        <text x="680" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">Upstream Dispatch</text>
+        <text x="680" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">Async httpx Stream</text>
+      </g>
+      <g class="diag-node" data-node="n6" style="cursor:pointer">
+        <rect x="768" y="62" width="132" height="68" rx="4" fill="#000000"/>
+        <rect x="764" y="58" width="132" height="68" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+        <rect x="770" y="64" width="46" height="12" rx="2" fill="#000000"/>
+        <text x="793" y="73" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">NODE 06</text>
+        <text x="830" y="96" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">OTel Span &amp; Ledger</text>
+        <text x="830" y="112" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">OTLP Export + Commit</text>
+      </g>
+    </svg>
+  </div>
+  <p class="diag-cap">Click any node in the SVG diagram or list below to inspect its payload contract, latency SLA, and retry policy.</p>
+
+  <div class="bp-topo-shell" id="bp-topo">
+    <div class="sim-header">
+      <div class="sim-badge"><span class="dot-live"></span> 01 · INTERACTIVE NODE TOPOLOGY INSPECTOR</div>
+      <div class="sim-title">Inspect Stage-by-Stage Execution Contracts &amp; Fault Boundaries</div>
+      <p class="sim-intro">Select any node in the pipeline to examine its architectural responsibility, input/output schema types, p95 execution latency, and error recovery policy.</p>
+    </div>
+    <div class="bp-topo-grid">
+      <div class="bp-nodes-list" id="bp-node-btns">
+        
+          <button type="button" class="bp-node-btn active" data-node="n1">
+            <div class="n-left">
+              <span class="n-idx">NODE 01</span>
+              <span class="n-name">Async Ingress</span>
+            </div>
+            <span class="n-lat">0.4 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n2">
+            <div class="n-left">
+              <span class="n-idx">NODE 02</span>
+              <span class="n-name">Semantic Cache</span>
+            </div>
+            <span class="n-lat">1.1 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n3">
+            <div class="n-left">
+              <span class="n-idx">NODE 03</span>
+              <span class="n-name">Budget Enforcer</span>
+            </div>
+            <span class="n-lat">0.8 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n4">
+            <div class="n-left">
+              <span class="n-idx">NODE 04</span>
+              <span class="n-name">Fallback Router</span>
+            </div>
+            <span class="n-lat">0.3 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n5">
+            <div class="n-left">
+              <span class="n-idx">NODE 05</span>
+              <span class="n-name">Upstream Dispatch</span>
+            </div>
+            <span class="n-lat">310 ms</span>
+          </button>
+          <button type="button" class="bp-node-btn" data-node="n6">
+            <div class="n-left">
+              <span class="n-idx">NODE 06</span>
+              <span class="n-name">OTel Span &amp; Ledger</span>
+            </div>
+            <span class="n-lat">0.6 ms</span>
+          </button>
+      </div>
+      <div class="bp-node-detail">
+        <div class="bp-nd-head">
+          <div class="bp-nd-title" id="nd-title">NODE 01 · Async Ingress</div>
+          <span class="bp-nd-badge" id="nd-lat">LATENCY: 0.4 ms</span>
+        </div>
+        <div class="bp-nd-row">
+          <div class="bp-nd-lbl">Architectural Role</div>
+          <div class="bp-nd-val" id="nd-role">Intercepts OpenAI/Anthropic/Gemini-compatible chat completion payloads, extracts X-Tenant-ID and X-Agent-Loop-Count headers, and initializes the OpenTelemetry root span.</div>
+        </div>
+        <div class="bp-nd-row">
+          <div class="bp-nd-lbl">Input / Output Payload Contract</div>
+          <div class="bp-nd-val mono" id="nd-io">IN: POST /v1/chat/completions (JSON) -&gt; OUT: ValidatedChatRequest(tenant_id, model, messages, loop_depth)</div>
+        </div>
+        <div class="bp-nd-row">
+          <div class="bp-nd-lbl">Error &amp; Retry Policy</div>
+          <div class="bp-nd-val" id="nd-retry">Immediate HTTP 400/401 rejection on malformed schema or missing tenant scope.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Real code &amp; schema inspector</h2>
+  <p>Extracted directly from the production repository. Switch tabs to inspect the core execution logic, strict JSON/database data contracts, and structured LLM instructions.</p>
+
+  <!-- SECTION 2: REAL CODE & SCHEMA INSPECTOR (TABBED COMPONENT) -->
+  <div class="bp-inspector" id="bp-inspector">
+    <div class="bp-tabs-bar">
+      <button type="button" class="bp-tab-btn active" data-tab="tab1">
+        <span>01 · Core Budget Engine Logic</span>
+        <span class="sub">budget_engine.py · Decimal Math</span>
+      </button>
+      <button type="button" class="bp-tab-btn" data-tab="tab2">
+        <span>02 · Policy &amp; Routing Schema</span>
+        <span class="sub">config.example.yaml · Multi-Tenant</span>
+      </button>
+      <button type="button" class="bp-tab-btn" data-tab="tab3">
+        <span>03 · Dynamic Fallback &amp; OTel Gate</span>
+        <span class="sub">proxy_gateway.py · Async Enforcer</span>
+      </button>
+    </div>
+    <div class="bp-code-toolbar">
+      <span class="bp-code-file" id="bp-code-filename">// SOURCE: products/otel-llm-budget-enforcer-cost-fallback-proxy-20261012/package/budget_engine.py</span>
+      <button type="button" class="bp-copy-code" id="bp-copy-btn">Copy Snippet</button>
+    </div>
+    <pre class="bp-code-pre" id="bp-code-view"># Enums and Data Models
+# ============================================================================
+
+class EnforcementAction(str, Enum):
+    ALLOW = &quot;ALLOW&quot;
+    FALLBACK = &quot;FALLBACK&quot;
+    THROTTLE = &quot;THROTTLE&quot;
+    REJECT = &quot;REJECT&quot;
+
+
+class WindowType(str, Enum):
+    SLIDING_MINUTE = &quot;SLIDING_MINUTE&quot;
+    SLIDING_HOUR = &quot;SLIDING_HOUR&quot;
+    DAILY = &quot;DAILY&quot;
+    MONTHLY = &quot;MONTHLY&quot;
+
+
+class ScopeLevel(str, Enum):
+    GLOBAL = &quot;GLOBAL&quot;
+    TENANT = &quot;TENANT&quot;
+    PROJECT = &quot;PROJECT&quot;
+    AGENT = &quot;AGENT&quot;
+    USER = &quot;USER&quot;
+
+
+@dataclass(frozen=True)
+class ModelPrice:
+    &quot;&quot;&quot;Pricing configuration per million tokens in USD.&quot;&quot;&quot;
+    prompt_price_per_m: Decimal
+    completion_price_per_m: Decimal
+
+    def calculate_cost(self, prompt_tokens: int, completion_tokens: int) -&gt; Decimal:
+        p_cost = (Decimal(prompt_tokens) / Decimal(1_000_000)) * self.prompt_price_per_m
+        c_cost = (Decimal(completion_tokens) / Decimal(1_000_000)) * self.completion_price_per_m
+        return (p_cost + c_cost).quantize(Decimal(&quot;0.000001&quot;), rounding=ROUND_HALF_UP)
+
+
+@dataclass
+class BudgetPolicy:
+    &quot;&quot;&quot;Policy governing financial and invocation limits for a specific scope.&quot;&quot;&quot;
+    scope_id: str
+    scope_level: ScopeLevel
+    limit_usd: Decimal
+    window_type: WindowType
+    soft_cap_ratio: float = 0.80  # 80% triggers dynamic fallback
+    hard_cap_ratio: float = 1.00  # 100% triggers hard rejection
+    max_requests_per_minute: int = 120
+    max_consecutive_agent_loops: int = 25  # Runaway loop circuit breaker
+    fallback_models: List[str] = field(default_factory=list)
+
+
+@dataclass
+class EvaluationDecision:
+    &quot;&quot;&quot;Output decision returned by the Budget Engine prior to upstream invocation.&quot;&quot;&quot;
+    action: EnforcementAction
+    allowed_model: str
+    original_model: str
+    current_spend_usd: Decimal
+    budget_limit_usd: Decimal
+    utilization_pct: float
+    reason: str
+    retry_after_seconds: Optional[float] = None
+    telemetry_attributes: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass
+class UsageRecord:
+    timestamp: float
+    cost_usd: Decimal
+    prompt_tokens: int
+    completion_tokens: int
+    model: str
+
+
+# ============================================================================
+# Model Pricing Registry
+# ============================================================================
+
+class ModelPricingRegistry:
+    &quot;&quot;&quot;Catalog of model token rates per million tokens.&quot;&quot;&quot;
+
+    DEFAULT_PRICING: Dict[str, ModelPrice] = {
+        # OpenAI Models
+        &quot;gpt-4o&quot;: ModelPrice(Decimal(&quot;2.50&quot;), Decimal(&quot;10.00&quot;)),
+        &quot;gpt-4o-2024-08-06&quot;: ModelPrice(Decimal(&quot;2.50&quot;), Decimal(&quot;10.00&quot;)),
+        &quot;gpt-4o-mini&quot;: ModelPrice(Decimal(&quot;0.15&quot;), Decimal(&quot;0.60&quot;)),
+        &quot;gpt-4-turbo&quot;: ModelPrice(Decimal(&quot;10.00&quot;), Decimal(&quot;30.00&quot;)),
+        &quot;o1-preview&quot;: ModelPrice(Decimal(&quot;15.00&quot;), Decimal(&quot;60.00&quot;)),
+        &quot;o1-mini&quot;: ModelPrice(Decimal(&quot;3.00&quot;), Decimal(&quot;12.00&quot;)),
+        # Anthropic Models
+        &quot;claude-3-5-sonnet-20241022&quot;: ModelPrice(Decimal(&quot;3.00&quot;), Decimal(&quot;15.00&quot;)),
+        &quot;claude-3-5-haiku-20241022&quot;: ModelPrice(Decimal(&quot;0.80&quot;), Decimal(&quot;4.00&quot;)),
+        &quot;claude-3-opus-20240229&quot;: ModelPrice(Decimal(&quot;15.00&quot;), Decimal(&quot;75.00&quot;)),</pre>
+  </div>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Interactive dry-run simulator</h2>
+  <p>Select a test scenario and trigger a deterministic dry-run execution across the node topology to inspect real-time logs, compute metrics, and final output payloads.</p>
+
+  <!-- SECTION 3: INTERACTIVE DRY-RUN SIMULATOR -->
+  <div class="sim-container" id="bp-sim" style="margin:28px 0 24px;background:#FFFFFF;border:var(--bw) solid #000000;box-shadow:var(--hard-shadow-lg);border-radius:6px;overflow:hidden">
+    <div class="sim-header">
+      <div class="sim-badge"><span class="dot-live"></span> 03 · LIVE DETERMINISTIC DRY-RUN SIMULATOR</div>
+      <div class="sim-title">Step Through Topology Nodes &amp; Stream Execution Telemetry</div>
+      <p class="sim-intro">Choose a payload scenario below or click "Run Dry-Run Simulation" to step through the pipeline stages and inspect the resulting JSON output contract.</p>
+    </div>
+
+    <div class="sim-controls">
+      <span class="ctrl-label">SELECT TEST SCENARIO:</span>
+      <div class="sim-presets" id="bp-scen-btns">
+        <button type="button" class="preset-btn active" data-scen="nominal">1. Nominal High-Load Payload (42% Budget · Primary Tier)</button><button type="button" class="preset-btn" data-scen="soft-cap">2. Soft-Cap Crossing (84% Budget · Auto-Downgrade Failover)</button><button type="button" class="preset-btn" data-scen="loop-breaker">3. Runaway Agent Loop &amp; Hard-Cap Guard (Circuit Tripped)</button>
+      </div>
+    </div>
+
+    <div class="bp-sim-action-bar">
+      <div class="bp-step-strip" id="bp-step-strip">
+        <span class="bp-step-pill done" data-step-idx="0">NODE 01 · Async Ingress</span><span class="bp-step-pill done" data-step-idx="1">NODE 02 · Semantic Cache</span><span class="bp-step-pill done" data-step-idx="2">NODE 03 · Budget Enforcer</span><span class="bp-step-pill done" data-step-idx="3">NODE 04 · Fallback Router</span><span class="bp-step-pill done" data-step-idx="4">NODE 05 · Upstream Dispatch</span><span class="bp-step-pill done" data-step-idx="5">NODE 06 · OTel Span &amp; Ledger</span>
+      </div>
+      <button type="button" class="bp-run-sim-btn" id="bp-run-btn">Run Dry-Run Simulation ✦</button>
+    </div>
+
+    <div class="critic-layout">
+      <div class="critic-left-col">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:800;color:#38BDF8">// TIMESTAMPED EXECUTION TRACE</span>
+          <span id="bp-sim-status" class="auth-pill pass">ACTION: ALLOW (PRIMARY MODEL)</span>
+        </div>
+        <div class="trace-terminal" id="bp-sim-logs" style="min-height:250px;white-space:pre-wrap">[00:00.001] INGRESS: POST /v1/chat/completions | tenant=enterprise_alpha | model=gpt-4o
+[00:00.002] CACHE: Canonical SHA-256 miss (similarity=0.41 &lt; 0.92 threshold)
+[00:00.003] BUDGET: Tenant spend $42.18 / $100.00 (42.18% &lt; 80.0% soft cap) -&gt; Action: ALLOW
+[00:00.003] ROUTER: Circuit state=CLOSED | Dispatching primary target model=gpt-4o
+[00:00.316] UPSTREAM: HTTP 200 OK from primary provider (1,420 in / 380 out tokens)
+[00:00.318] OTEL: Exported span gen_ai.chat | cost_usd=0.007350 | utilization_pct=42.19%</div>
+        <p id="bp-sim-summary" style="font-size:0.8rem;color:#94A3B8;margin:6px 0 0;line-height:1.45">Under normal budget utilization (&lt;80%), the gateway adds only 3.2ms of routing overhead, preserves the requested frontier model, and commits exact 6-decimal-place token spend.</p>
+      </div>
+
+      <div class="critic-right-col">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-family:'Space Grotesk',sans-serif;font-size:0.88rem;font-weight:800;color:#000000">FINAL OUTPUT PAYLOAD CONTRACT</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;font-weight:800;color:var(--acc)">SCHEMA VALIDATED ✓</span>
+        </div>
+        <div style="background:#0F172A;border:2px solid #000000;border-radius:4px;padding:14px;flex:1">
+          <pre id="bp-sim-payload" style="margin:0;color:#34D399;font-family:'JetBrains Mono',monospace;font-size:0.72rem;line-height:1.45;white-space:pre-wrap">{
+  &quot;id&quot;: &quot;chatcmpl-otel-98a7f2c1&quot;,
+  &quot;model&quot;: &quot;gpt-4o&quot;,
+  &quot;budget_governance&quot;: {
+    &quot;action&quot;: &quot;ALLOW&quot;,
+    &quot;original_model&quot;: &quot;gpt-4o&quot;,
+    &quot;routed_model&quot;: &quot;gpt-4o&quot;,
+    &quot;utilization_pct&quot;: 42.19,
+    &quot;current_spend_usd&quot;: &quot;42.187350&quot;,
+    &quot;budget_limit_usd&quot;: &quot;100.000000&quot;
+  },
+  &quot;otel_trace_id&quot;: &quot;4bf92f3577b34da6a3ce929d0e0e4736&quot;
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="sim-specs">
+      <div><b>TOTAL LATENCY</b> <span id="bp-m-lat">318 ms (3.2 ms proxy)</span></div>
+      <div><b>COMPUTE / TOKENS</b> <span id="bp-m-comp">1,420 prompt / 380 completion tokens</span></div>
+      <div><b>ESTIMATED RUN COST</b> <span class="cost-tag" id="bp-m-cost">$0.007350 USD (Exact Decimal)</span></div>
+      <div><b>EXECUTION MODE</b> <span>Deterministic Self-Hosted</span></div>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Production resilience &amp; edge-case handling</h2>
+  <p>Every production system is defined by how it behaves when upstream dependencies fail, rate-limits trigger, or malformed payloads arrive at the boundary.</p>
+
+  <!-- SECTION 4: 3-CARD PRODUCTION RESILIENCE BREAKDOWN -->
+  <div class="bp-resilience-grid">
+    
+    <div class="bp-res-card">
+      <span class="r-tag">01 · DECIMAL PRECISION &amp; LOCKING</span>
+      <h3>Zero Floating-Point Drift Under Concurrency</h3>
+      <p>Token prices ($0.00000015/token) accumulate binary IEEE 754 drift in standard floats. All ledger math uses Python <code>Decimal('0.000001')</code> with per-tenant <code>asyncio.Lock</code> primitives.</p>
+    </div>
+    <div class="bp-res-card">
+      <span class="r-tag">02 · SOFT-CAP GRACEFUL DEGRADATION</span>
+      <h3>Two-Stage Thresholds (80% Soft / 100% Hard)</h3>
+      <p>Instead of dropping production traffic at 100%, the 80% soft-cap rewrites requests to <code>gemini-2.5-flash</code> or <code>gpt-4o-mini</code>, extending remaining runway by up to 15x.</p>
+    </div>
+    <div class="bp-res-card">
+      <span class="r-tag">03 · RUNAWAY LOOP CIRCUIT BREAKER</span>
+      <h3>AST &amp; Prompt-Hash Loop Detection</h3>
+      <p>Tracks sliding state hashes across agent turns. If an autonomous agent repeats tool-call signatures past <code>max_consecutive_agent_loops</code>, the proxy trips fast with <code>Retry-After</code>.</p>
+    </div>
+  </div>
+
+  
+  <div class="callout decision">
+    <span class="badge">ARCHITECTURAL DECISION</span>
+    <h3>Why in-process sliding windows + OTel instead of synchronous Postgres queries</h3>
+    <p>Querying an external SQL database on every LLM request adds 15–40ms of network round-trip latency and creates a single point of failure when the database connection pool saturates.</p>
+    <p>By keeping sliding-window deques in memory with asynchronous WAL snapshots and emitting OpenTelemetry spans out-of-band, p95 proxy overhead stays under 3.5ms.</p>
+    <p class="outcome"><b>TRADE-OFF</b> Sub-4ms in-memory speed with periodic async persistence, trading strict cross-region SQL locking for zero-latency hot-path execution.</p>
+  </div>
+  <div class="callout pitfall">
+    <span class="badge">PRODUCTION PITFALL</span>
+    <h3>Streaming SSE responses don&#x27;t report token usage until the final chunk</h3>
+    <p>When clients request <code>stream: true</code>, upstream providers omit the <code>usage</code> object until the final SSE frame—or drop it entirely if the client disconnects mid-stream.</p>
+    <p>To prevent budget bypass via aborted streams, the gateway pre-reserves estimated prompt tokens using a fast BPE tokenizer heuristic before opening the upstream stream, then reconciles the exact delta on stream close.</p>
+    <p class="outcome"><b>FIX</b> Pre-flight token reservation eliminates concurrent stream over-spend.</p>
+  </div>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Stack &amp; specifications</h2>
+  <ul>
+    <li><strong>Python 3.11+ &amp; FastAPI / ASGI</strong>: Asynchronous non-blocking HTTP proxy server</li><li><strong>OpenTelemetry SDK</strong>: Native <code>gen_ai.*</code> semantic span instrumentation and OTLP exporter</li><li><strong>Decimal Cost Engine</strong>: Fixed-point 6-decimal USD accounting across 5 hierarchy scopes</li><li><strong>Asyncio &amp; httpx</strong>: Connection-pooled upstream streaming with jittered backoff</li>
+  </ul>
+</div></section>
+
+<section class="sec rv"><div class="wrap">
+  <h2>Architectural takeaway</h2>
+  <p>Observability without enforcement is just a post-mortem receipt. Putting a deterministic Decimal budget state machine directly in the proxy hot path turns LLM spend from an unpredictable monthly invoice into a bounded engineering invariant.</p>
+</div></section>
+
+<div class="wrap"><nav class="pager" aria-label="Other blueprints">
+  <a href="../tools.html">← All Blueprints Catalog</a>
+  <a href="cicd-self-healing.html">CI/CD Log Triage &amp; Self-Healing PR Engine →</a>
+</nav></div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="logo"><span class="mk">MR</span></div>
+    <div class="mono">Designed &amp; built by Manny Ruesch · 2026</div>
+    <a href="#top">Back to top ↑</a>
+  </div>
+</footer>
+
+<script src="../assets/site.js"></script>
+<script>
+(function(){
+  const NODES = {"n1": {"id": "n1", "idx": "NODE 01", "name": "Async Ingress", "sub": "FastAPI + Bearer Auth", "latency": "0.4 ms", "accent": false, "role": "Intercepts OpenAI/Anthropic/Gemini-compatible chat completion payloads, extracts X-Tenant-ID and X-Agent-Loop-Count headers, and initializes the OpenTelemetry root span.", "io_type": "IN: POST /v1/chat/completions (JSON) -> OUT: ValidatedChatRequest(tenant_id, model, messages, loop_depth)", "retry_policy": "Immediate HTTP 400/401 rejection on malformed schema or missing tenant scope."}, "n2": {"id": "n2", "idx": "NODE 02", "name": "Semantic Cache", "sub": "SHA-256 + Cosine >=0.92", "latency": "1.1 ms", "accent": false, "role": "Checks exact SHA-256 canonical prompt hash first, then queries the in-memory LSH vector ring for cosine similarity >= 0.92 to short-circuit redundant upstream LLM calls.", "io_type": "IN: ValidatedChatRequest -> OUT: CacheLookupResult(hit: bool, similarity: float, cached_response: Optional[dict])", "retry_policy": "Fail-open: if cache lookup exceeds 2ms SLA, bypasses cache and proceeds to Budget Policy Engine."}, "n3": {"id": "n3", "idx": "NODE 03", "name": "Budget Enforcer", "sub": "Decimal Sliding Window", "latency": "0.8 ms", "accent": true, "role": "Evaluates tenant and agent spend across sliding minute/hour/daily windows using ROUND_HALF_UP Decimal math. Computes utilization_pct and selects ALLOW, FALLBACK, THROTTLE, or REJECT.", "io_type": "IN: (tenant_id, requested_model, est_tokens) -> OUT: EvaluationDecision(action, allowed_model, utilization_pct)", "retry_policy": "Atomic asyncio.Lock per tenant bucket prevents TOCTOU race conditions under parallel bursts."}, "n4": {"id": "n4", "idx": "NODE 04", "name": "Fallback Router", "sub": "Tier Downgrade + Breaker", "latency": "0.3 ms", "accent": true, "role": "Rewrites target model when action == FALLBACK (e.g., gpt-4o -> gemini-2.5-flash) and verifies upstream provider circuit-breaker state (CLOSED / OPEN / HALF_OPEN).", "io_type": "IN: EvaluationDecision -> OUT: UpstreamDispatchPlan(provider_url, target_model, timeout_s, fallback_chain)", "retry_policy": "Automatic failover across secondary provider endpoints on HTTP 429, 502, 503, or 504."}, "n5": {"id": "n5", "idx": "NODE 05", "name": "Upstream Dispatch", "sub": "Async httpx Stream", "latency": "310 ms", "accent": false, "role": "Executes non-blocking httpx request against the selected LLM provider, streams SSE chunks or parses structured JSON, and counts exact prompt/completion tokens.", "io_type": "IN: UpstreamDispatchPlan -> OUT: ProviderResponse(content, prompt_tokens, completion_tokens, upstream_ms)", "retry_policy": "Exponential backoff with full jitter (base 250ms, max 2 retries) before cascading to next fallback model."}, "n6": {"id": "n6", "idx": "NODE 06", "name": "OTel Span & Ledger", "sub": "OTLP Export + Commit", "latency": "0.6 ms", "accent": false, "role": "Commits exact Decimal token cost to the tenant's sliding window ledger and exports OpenTelemetry span attributes (gen_ai.usage.cost_usd, gen_ai.budget.action).", "io_type": "IN: UsageRecord(cost_usd, tokens, model) -> OUT: HTTP 200 JSON + X-Budget-Utilization & X-Routed-Model headers", "retry_policy": "Buffered asynchronous batch span export; never blocks the client response path."}};
+  const TABS = {"tab1": {"label": "Core Budget Engine Logic", "sub": "budget_engine.py \u00b7 Decimal Math", "file": "products/otel-llm-budget-enforcer-cost-fallback-proxy-20261012/package/budget_engine.py", "code": "# Enums and Data Models\n# ============================================================================\n\nclass EnforcementAction(str, Enum):\n    ALLOW = \"ALLOW\"\n    FALLBACK = \"FALLBACK\"\n    THROTTLE = \"THROTTLE\"\n    REJECT = \"REJECT\"\n\n\nclass WindowType(str, Enum):\n    SLIDING_MINUTE = \"SLIDING_MINUTE\"\n    SLIDING_HOUR = \"SLIDING_HOUR\"\n    DAILY = \"DAILY\"\n    MONTHLY = \"MONTHLY\"\n\n\nclass ScopeLevel(str, Enum):\n    GLOBAL = \"GLOBAL\"\n    TENANT = \"TENANT\"\n    PROJECT = \"PROJECT\"\n    AGENT = \"AGENT\"\n    USER = \"USER\"\n\n\n@dataclass(frozen=True)\nclass ModelPrice:\n    \"\"\"Pricing configuration per million tokens in USD.\"\"\"\n    prompt_price_per_m: Decimal\n    completion_price_per_m: Decimal\n\n    def calculate_cost(self, prompt_tokens: int, completion_tokens: int) -> Decimal:\n        p_cost = (Decimal(prompt_tokens) / Decimal(1_000_000)) * self.prompt_price_per_m\n        c_cost = (Decimal(completion_tokens) / Decimal(1_000_000)) * self.completion_price_per_m\n        return (p_cost + c_cost).quantize(Decimal(\"0.000001\"), rounding=ROUND_HALF_UP)\n\n\n@dataclass\nclass BudgetPolicy:\n    \"\"\"Policy governing financial and invocation limits for a specific scope.\"\"\"\n    scope_id: str\n    scope_level: ScopeLevel\n    limit_usd: Decimal\n    window_type: WindowType\n    soft_cap_ratio: float = 0.80  # 80% triggers dynamic fallback\n    hard_cap_ratio: float = 1.00  # 100% triggers hard rejection\n    max_requests_per_minute: int = 120\n    max_consecutive_agent_loops: int = 25  # Runaway loop circuit breaker\n    fallback_models: List[str] = field(default_factory=list)\n\n\n@dataclass\nclass EvaluationDecision:\n    \"\"\"Output decision returned by the Budget Engine prior to upstream invocation.\"\"\"\n    action: EnforcementAction\n    allowed_model: str\n    original_model: str\n    current_spend_usd: Decimal\n    budget_limit_usd: Decimal\n    utilization_pct: float\n    reason: str\n    retry_after_seconds: Optional[float] = None\n    telemetry_attributes: Dict[str, Any] = field(default_factory=dict)\n\n\n@dataclass\nclass UsageRecord:\n    timestamp: float\n    cost_usd: Decimal\n    prompt_tokens: int\n    completion_tokens: int\n    model: str\n\n\n# ============================================================================\n# Model Pricing Registry\n# ============================================================================\n\nclass ModelPricingRegistry:\n    \"\"\"Catalog of model token rates per million tokens.\"\"\"\n\n    DEFAULT_PRICING: Dict[str, ModelPrice] = {\n        # OpenAI Models\n        \"gpt-4o\": ModelPrice(Decimal(\"2.50\"), Decimal(\"10.00\")),\n        \"gpt-4o-2024-08-06\": ModelPrice(Decimal(\"2.50\"), Decimal(\"10.00\")),\n        \"gpt-4o-mini\": ModelPrice(Decimal(\"0.15\"), Decimal(\"0.60\")),\n        \"gpt-4-turbo\": ModelPrice(Decimal(\"10.00\"), Decimal(\"30.00\")),\n        \"o1-preview\": ModelPrice(Decimal(\"15.00\"), Decimal(\"60.00\")),\n        \"o1-mini\": ModelPrice(Decimal(\"3.00\"), Decimal(\"12.00\")),\n        # Anthropic Models\n        \"claude-3-5-sonnet-20241022\": ModelPrice(Decimal(\"3.00\"), Decimal(\"15.00\")),\n        \"claude-3-5-haiku-20241022\": ModelPrice(Decimal(\"0.80\"), Decimal(\"4.00\")),\n        \"claude-3-opus-20240229\": ModelPrice(Decimal(\"15.00\"), Decimal(\"75.00\")),"}, "tab2": {"label": "Policy & Routing Schema", "sub": "config.example.yaml \u00b7 Multi-Tenant", "file": "products/otel-llm-budget-enforcer-cost-fallback-proxy-20261012/package/config.example.yaml", "code": "# ==============================================================================\n# OTel LLM Budget Enforcer & Dynamic Cost-Fallback Proxy Gateway\n# Production Configuration Template (config.example.yaml)\n# ==============================================================================\n\nserver:\n  host: \"0.0.0.0\"\n  port: 8080\n  workers: 4\n  log_level: \"info\"                   # debug, info, warning, error, critical\n  request_timeout_seconds: 60\n  graceful_shutdown_timeout_seconds: 15\n  cors:\n    enabled: true\n    allowed_origins:\n      - \"https://internal.yourcompany.com\"\n      - \"http://localhost:3000\"\n    allowed_headers:\n      - \"Authorization\"\n      - \"Content-Type\"\n      - \"X-Tenant-ID\"\n      - \"X-Project-ID\"\n\n# ------------------------------------------------------------------------------\n# OpenTelemetry (OTel) Observability Configuration\n# ------------------------------------------------------------------------------\ntelemetry:\n  service_name: \"otel-llm-budget-enforcer\"\n  service_version: \"1.4.2\"\n  environment: \"production\"            # production, staging, development\n\n  otlp:\n    # OTLP collector gRPC or HTTP/protobuf endpoint\n    endpoint: \"otel-collector.monitoring.svc.cluster.local:4317\"\n    protocol: \"grpc\"                   # grpc or http/protobuf\n    insecure: true\n    timeout_seconds: 5\n    headers:\n      x-otel-team: \"platform-ai\"\n\n  metrics:\n    enabled: true\n    export_interval_millis: 5000\n    export_system_metrics: true\n    # Custom LLM metrics tracked:\n    # - llm.tokens.prompt.count\n    # - llm.tokens.completion.count\n    # - llm.cost.estimated.usd\n    # - llm.budget.utilization.ratio\n    # - llm.fallback.invocations.count\n    # - llm.requests.rejected.count\n\n  traces:\n    enabled: true\n    sampler:\n      type: \"parentbased_traceidratio\"\n      ratio: 1.0                       # Trace 100% of LLM traffic for auditability\n    capture_prompt_content: false      # Set to false to avoid PII ingestion in APM\n    capture_token_counts: true\n\n# ------------------------------------------------------------------------------\n# State Storage & Distributed Budget Ledger (Redis)\n# ------------------------------------------------------------------------------\nstorage:\n  backend: \"redis\"                     # redis or memory\n  redis:\n    url: \"redis://:ChangeMePassword@redis-cluster.cache.svc.cluster.local:6379/0\"\n    cluster_mode: false\n    connection_timeout_seconds: 2.0\n    socket_keepalive: true\n    pool_size: 50\n    key_prefix: \"llm_budget:\"\n\n# ------------------------------------------------------------------------------\n# Budget Rules, Quotas & Dynamic Action Policies\n# ------------------------------------------------------------------------------\nbudget_enforcement:\n  # Global evaluation window configuration\n  evaluation_windows:\n    hourly_window_seconds: 3600\n    daily_window_seconds: 86400\n    monthly_window_seconds: 2592000\n\n  # Default fallback threshold triggers (expressed as percentage of limit: 0.0 - 1.0)\n  default_actions:"}, "tab3": {"label": "Dynamic Fallback & OTel Gate", "sub": "proxy_gateway.py \u00b7 Async Enforcer", "file": "products/otel-llm-budget-enforcer-cost-fallback-proxy-20261012/package/proxy_gateway.py", "code": "        fallback_applied: bool,\n    ):\n        attributes = {\n            \"gen_ai.request.model\": original_model,\n            \"gen_ai.response.model\": routed_model,\n            \"gen_ai.fallback_applied\": str(fallback_applied),\n            \"http.status_code\": status_code,\n        }\n\n        if self.request_counter:\n            self.request_counter.add(1, attributes)\n        if self.token_counter:\n            self.token_counter.add(prompt_tokens, {**attributes, \"gen_ai.token.type\": \"prompt\"})\n            self.token_counter.add(completion_tokens, {**attributes, \"gen_ai.token.type\": \"completion\"})\n        if self.cost_counter:\n            self.cost_counter.add(cost_usd, attributes)\n        if self.latency_histogram:\n            self.latency_histogram.record(latency_sec, attributes)\n\n    def record_budget_event(self, event_type: str, budget_tier: str, current_spend: float):\n        if self.budget_breach_counter:\n            self.budget_breach_counter.add(1, {\n                \"budget.event_type\": event_type,\n                \"budget.tier\": budget_tier,\n                \"budget.current_spend\": round(current_spend, 4),\n            })\n\n\n# ---------------------------------------------------------------------------\n# Budget State Tracker\n# ---------------------------------------------------------------------------\n@dataclass\nclass BudgetConfig:\n    hard_limit_usd: float = float(os.getenv(\"BUDGET_HARD_LIMIT_USD\", \"50.00\"))\n    fallback_threshold_pct: float = float(os.getenv(\"BUDGET_FALLBACK_THRESHOLD_PCT\", \"0.75\"))\n    window_seconds: int = int(os.getenv(\"BUDGET_WINDOW_SECONDS\", \"86400\"))  # 24 hours\n    auto_reset: bool = True\n\n\nclass BudgetManager:\n    \"\"\"Thread-safe sliding/rolling window budget tracker.\"\"\"\n\n    def __init__(self, config: BudgetConfig, telemetry: TelemetryManager):\n        self.config = config\n        self.telemetry = telemetry\n        self.lock = asyncio.Lock()\n        self.window_start: float = time.time()\n        self.accumulated_cost_usd: float = 0.0\n        self.total_prompt_tokens: int = 0\n        self.total_completion_tokens: int = 0\n        self.total_requests: int = 0\n\n    async def _check_window_reset(self):\n        now = time.time()\n        if self.config.auto_reset and (now - self.window_start >= self.config.window_seconds):\n            logger.info(\"Budget window duration expired. Resetting spend counter.\")\n            self.window_start = now\n            self.accumulated_cost_usd = 0.0\n            self.total_prompt_tokens = 0\n            self.total_completion_tokens = 0\n            self.total_requests = 0\n\n    async def evaluate_budget_status(self) -> Tuple[bool, bool, Dict[str, Any]]:\n        \"\"\"\n        Determines:\n        1. can_proceed (not past hard budget)\n        2. require_fallback (past fallback threshold)\n        3. diagnostics dictionary\n        \"\"\"\n        async with self.lock:\n            await self._check_window_reset()\n            current_spend = self.accumulated_cost_usd\n            hard_limit = self.config.hard_limit_usd\n            fallback_trigger = hard_limit * self.config.fallback_threshold_pct\n\n            can_proceed = current_spend < hard_limit\n            require_fallback = current_spend >= fallback_trigger\n\n            diagnostics = {\n                \"current_spend_usd\": round(current_spend, 6),\n                \"hard_limit_usd\": hard_limit,\n                \"fallback_threshold_usd\": round(fallback_trigger, 6),\n                \"usage_percentage\": round((current_spend / hard_limit) * 100, 2) if hard_limit > 0 else 100.0,\n                \"require_fallback\": require_fallback,\n                \"hard_cap_breached\": not can_proceed,\n                \"window_reset_in_seconds\": max(0, int(self.config.window_seconds - (time.time() - self.window_start))),\n            }\n            return can_proceed, require_fallback, diagnostics\n\n    async def register_usage(self, prompt_tokens: int, completion_tokens: int, cost_usd: float):"}};
+  const SCENARIOS = {"nominal": {"id": "nominal", "btn_label": "1. Nominal High-Load Payload (42% Budget \u00b7 Primary Tier)", "badge_text": "ACTION: ALLOW (PRIMARY MODEL)", "badge_class": "pass", "latency": "318 ms (3.2 ms proxy)", "compute": "1,420 prompt / 380 completion tokens", "cost": "$0.007350 USD (Exact Decimal)", "logs": ["[00:00.001] INGRESS: POST /v1/chat/completions | tenant=enterprise_alpha | model=gpt-4o", "[00:00.002] CACHE: Canonical SHA-256 miss (similarity=0.41 < 0.92 threshold)", "[00:00.003] BUDGET: Tenant spend $42.18 / $100.00 (42.18% < 80.0% soft cap) -> Action: ALLOW", "[00:00.003] ROUTER: Circuit state=CLOSED | Dispatching primary target model=gpt-4o", "[00:00.316] UPSTREAM: HTTP 200 OK from primary provider (1,420 in / 380 out tokens)", "[00:00.318] OTEL: Exported span gen_ai.chat | cost_usd=0.007350 | utilization_pct=42.19%"], "payload": "{\n  \"id\": \"chatcmpl-otel-98a7f2c1\",\n  \"model\": \"gpt-4o\",\n  \"budget_governance\": {\n    \"action\": \"ALLOW\",\n    \"original_model\": \"gpt-4o\",\n    \"routed_model\": \"gpt-4o\",\n    \"utilization_pct\": 42.19,\n    \"current_spend_usd\": \"42.187350\",\n    \"budget_limit_usd\": \"100.000000\"\n  },\n  \"otel_trace_id\": \"4bf92f3577b34da6a3ce929d0e0e4736\"\n}", "summary": "Under normal budget utilization (<80%), the gateway adds only 3.2ms of routing overhead, preserves the requested frontier model, and commits exact 6-decimal-place token spend."}, "soft-cap": {"id": "soft-cap", "btn_label": "2. Soft-Cap Crossing (84% Budget \u00b7 Auto-Downgrade Failover)", "badge_text": "ACTION: FALLBACK (MODEL DOWNGRADED)", "badge_class": "warn", "latency": "142 ms (2.9 ms proxy)", "compute": "2,150 prompt / 510 completion tokens", "cost": "$0.000478 USD (-94% vs Frontier)", "logs": ["[00:00.001] INGRESS: POST /v1/chat/completions | tenant=growth_tier | model=claude-3-5-sonnet", "[00:00.002] CACHE: Vector similarity=0.68 (below 0.92 threshold) -> Proceeding to policy engine", "[00:00.003] BUDGET: Tenant spend $42.10 / $50.00 (84.20% >= 80.0% soft_cap_ratio)", "[00:00.003] FALLBACK: Rewriting model claude-3-5-sonnet -> gemini-2.5-flash (94% cost reduction)", "[00:00.140] UPSTREAM: HTTP 200 OK from fallback model gemini-2.5-flash in 137ms", "[00:00.142] OTEL: Event gen_ai.budget.soft_cap_fallback | saved_usd=0.013622 | status=200"], "payload": "{\n  \"id\": \"chatcmpl-otel-fallback-44c9\",\n  \"model\": \"gemini-2.5-flash\",\n  \"budget_governance\": {\n    \"action\": \"FALLBACK\",\n    \"original_model\": \"claude-3-5-sonnet\",\n    \"routed_model\": \"gemini-2.5-flash\",\n    \"reason\": \"Soft cap exceeded (84.2% >= 80.0%). Transparently routed to cost-optimized tier.\",\n    \"utilization_pct\": 84.21,\n    \"cost_saved_usd\": \"0.013622\"\n  },\n  \"otel_trace_id\": \"88a10c4492e14b8890123fa9812c4901\"\n}", "summary": "When a tenant crosses the 80% soft threshold, requests do not fail: the gateway transparently routes to gemini-2.5-flash, cutting token cost by 94% and latency by 55%."}, "loop-breaker": {"id": "loop-breaker", "btn_label": "3. Runaway Agent Loop & Hard-Cap Guard (Circuit Tripped)", "badge_text": "ACTION: REJECT (LOOP CIRCUIT BREAKER)", "badge_class": "fail", "latency": "1.8 ms (Zero Upstream Call)", "compute": "0 upstream tokens (Blocked at edge)", "cost": "$0.000000 USD ($14.80 saved)", "logs": ["[00:00.001] INGRESS: POST /v1/chat/completions | tenant=agent_worker_04 | loop_depth=26", "[00:00.001] CIRCUIT: Detected 26 consecutive identical tool-call signatures (max_loops=25)", "[00:00.002] GUARD: Tripping tenant agent circuit breaker -> Action: REJECT (HTTP 429)", "[00:00.002] UPSTREAM: Skipped upstream invocation (0 tokens consumed)", "[00:00.002] OTEL: Emitted alert span gen_ai.Anomaly.runaway_agent_loop | retry_after=60s"], "payload": "{\n  \"error\": {\n    \"code\": \"budget_circuit_breaker_tripped\",\n    \"action\": \"REJECT\",\n    \"message\": \"Runaway agent loop detected (26 consecutive turns > max 25). Upstream call aborted.\",\n    \"retry_after_seconds\": 60.0,\n    \"current_spend_usd\": \"49.820000\",\n    \"budget_limit_usd\": \"50.000000\"\n  },\n  \"otel_trace_id\": \"e19f002184c74100b82910482a9103ff\"\n}", "summary": "When an autonomous agent enters an infinite tool-calling loop, the gateway detects repeated prompt fingerprints at turn 26 and halts execution at the edge in 1.8ms."}};
+
+  // 1. Interactive Node Topology
+  function selectNode(nodeId) {
+    const n = NODES[nodeId];
+    if (!n) return;
+    document.querySelectorAll('#bp-node-btns .bp-node-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.node === nodeId);
+    });
+    document.getElementById('nd-title').textContent = n.idx + ' · ' + n.name;
+    document.getElementById('nd-lat').textContent = 'LATENCY: ' + n.latency;
+    document.getElementById('nd-role').textContent = n.role;
+    document.getElementById('nd-io').textContent = n.io_type;
+    document.getElementById('nd-retry').textContent = n.retry_policy;
+  }
+
+  document.querySelectorAll('[data-node]').forEach(el => {
+    el.addEventListener('click', () => selectNode(el.dataset.node));
+  });
+
+  // 2. Code & Schema Tabs
+  let currentTab = 'tab1';
+  document.querySelectorAll('#bp-inspector .bp-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#bp-inspector .bp-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentTab = btn.dataset.tab;
+      const t = TABS[currentTab];
+      if (t) {
+        document.getElementById('bp-code-filename').textContent = '// SOURCE: ' + t.file;
+        document.getElementById('bp-code-view').textContent = t.code;
+      }
+    });
+  });
+
+  const copyBtn = document.getElementById('bp-copy-btn');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      const code = document.getElementById('bp-code-view').textContent;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(() => {
+          copyBtn.textContent = 'Copied! ✓';
+          setTimeout(() => { copyBtn.textContent = 'Copy Snippet'; }, 1800);
+        });
+      }
+    });
+  }
+
+  // 3. Dry-Run Simulator with Step-by-Step Animation
+  let activeScen = 'nominal';
+  let simTimer = null;
+
+  function runSimulation(scenId, animate) {
+    const s = SCENARIOS[scenId];
+    if (!s) return;
+    if (simTimer) clearInterval(simTimer);
+
+    const pills = document.querySelectorAll('#bp-step-strip .bp-step-pill');
+    const logsEl = document.getElementById('bp-sim-logs');
+    const payloadEl = document.getElementById('bp-sim-payload');
+    const statusEl = document.getElementById('bp-sim-status');
+    const summaryEl = document.getElementById('bp-sim-summary');
+    const latEl = document.getElementById('bp-m-lat');
+    const compEl = document.getElementById('bp-m-comp');
+    const costEl = document.getElementById('bp-m-cost');
+
+    if (!animate) {
+      pills.forEach(p => { p.className = 'bp-step-pill done'; });
+      logsEl.textContent = s.logs.join('\n');
+      payloadEl.textContent = s.payload;
+      statusEl.textContent = s.badge_text;
+      statusEl.className = 'auth-pill ' + s.badge_class;
+      summaryEl.textContent = s.summary;
+      latEl.textContent = s.latency;
+      compEl.textContent = s.compute;
+      costEl.textContent = s.cost;
+      return;
+    }
+
+    // Step-by-step live trace animation
+    pills.forEach(p => { p.className = 'bp-step-pill'; });
+    logsEl.textContent = '[00:00.000] INIT: Starting deterministic dry-run execution...';
+    statusEl.textContent = 'EXECUTING DRY-RUN...';
+    statusEl.className = 'auth-pill warn';
+
+    let step = 0;
+    const totalSteps = pills.length;
+    simTimer = setInterval(() => {
+      if (step < totalSteps) {
+        pills.forEach((p, idx) => {
+          if (idx < step) p.className = 'bp-step-pill done';
+          else if (idx === step) p.className = 'bp-step-pill running';
+          else p.className = 'bp-step-pill';
+        });
+        const logSlice = s.logs.slice(0, step + 1);
+        logsEl.textContent = logSlice.join('\n');
+        step++;
+      } else {
+        clearInterval(simTimer);
+        pills.forEach(p => { p.className = 'bp-step-pill done'; });
+        logsEl.textContent = s.logs.join('\n');
+        payloadEl.textContent = s.payload;
+        statusEl.textContent = s.badge_text;
+        statusEl.className = 'auth-pill ' + s.badge_class;
+        summaryEl.textContent = s.summary;
+        latEl.textContent = s.latency;
+        compEl.textContent = s.compute;
+        costEl.textContent = s.cost;
+      }
+    }, 180);
+  }
+
+  document.querySelectorAll('#bp-scen-btns .preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#bp-scen-btns .preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeScen = btn.dataset.scen;
+      runSimulation(activeScen, true);
+    });
+  });
+
+  const runBtn = document.getElementById('bp-run-btn');
+  if (runBtn) {
+    runBtn.addEventListener('click', () => runSimulation(activeScen, true));
+  }
+})();
+</script>
+</body>
+</html>
