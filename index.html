@@ -323,31 +323,13 @@ a.card:focus-visible{outline:3px solid #000000;outline-offset:3px}
 
     </div>
 
-    <div class="grouphead rv"><h3>Personal builds</h3><span>// nights &amp; weekends</span></div>
-    <div class="cards">
-      <a class="card rv" href="work/jarvis.html">
-        <span class="badge" style="background:#FFF0F2;color:#FF385C;border-color:#FF385C">VOICE PIPELINE SIM ✦</span>
-        <span class="idx">07</span>
-        <h4>Jarvis · voice assistant</h4>
-        <p>A native macOS assistant with a strict wake-word, a cinematic HUD, and a Claude "brain" that reads &amp; writes files, searches the web, and opens apps by voice.</p>
-        <div class="tags"><span class="tag">Python</span><span class="tag">pywebview</span><span class="tag">Edge-TTS</span><span class="tag">Claude</span></div>
-      </a>
-      <a class="card rv d1" href="work/content-factory.html">
-        <span class="badge" style="background:#FFF0F2;color:#FF385C;border-color:#FF385C">PIPELINE SIM ✦</span>
-        <span class="idx">08</span>
-        <h4>Content Factory</h4>
-        <p>An automated B2B clip factory: pull long-form video, cut highlights, generate faceless clips with GPT-4o &amp; ElevenLabs, and auto-post to TikTok / YouTube / Meta.</p>
-        <div class="tags"><span class="tag">FastAPI</span><span class="tag">Celery</span><span class="tag">ffmpeg</span><span class="tag">GPT-4o</span></div>
-      </a>
-    </div>
-
-    <div class="grouphead rv"><h3>Autonomous Agents &amp; Systems</h3><span>// hermes agent &amp; multi-agent architectures</span></div>
+    <div class="grouphead rv"><h3>Autonomous Agents &amp; Open-Source Systems</h3><span>// hermes agent, cli packages &amp; multi-agent architectures</span></div>
     <div class="cards mono1">
       <div class="card feat rv">
         <div class="badge" style="background:#FFF0F2;color:#FF385C;border-color:#FF385C">ADVERSARIAL SIM · v1.1.0 ✦</div>
         <div class="inner">
           <div>
-            <span class="idx">09</span>
+            <span class="idx">07</span>
             <h4>Critic-Refine · Autonomous Agent Committee</h4>
             <p>A production-grade 3-tier adversarial verification skill (Generator, Polymorphic Critic, Judge) for Hermes Agent. Features dense logical blueprinting, Zero-Context Blind Audits via isolated sub-agents, and a strict deductive anti-sycophancy rubric.</p>
             <div class="tags"><span class="tag">Hermes Agent</span><span class="tag">Zero-Context Blind Audit</span><span class="tag">Deductive Scoring</span><span class="tag">SecOps &amp; QA</span></div>
@@ -370,6 +352,38 @@ a.card:focus-visible{outline:3px solid #000000;outline-offset:3px}
               <span class="step-num">03 · PHASE 3</span>
               <span class="step-title">Judge Arbitrator</span>
               <span class="step-desc">Dry-run &amp; Deductive Score</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card feat rv d1">
+        <div class="badge" style="background:#FFF0F2;color:#FF385C;border-color:#FF385C">OPEN-SOURCE CLI · 10,439 LOC ✦</div>
+        <div class="inner">
+          <div>
+            <span class="idx">08</span>
+            <h4>Remote Job Hunter · Autonomous ATS Scouting &amp; Command Center</h4>
+            <p>An open-source Python CLI (<code>pipx install remote-job-hunter</code>) and FastAPI Command Center that polls 9 direct ATS and job feeds in parallel, compiles a declarative <code>profile.yaml</code> into sub-millisecond lookaround regex gates, runs 2-pass LLM or Zero-API-Key batch triage with truncation salvage, and renders 1-page A4 ATS-safe PDFs.</p>
+            <div class="tags"><span class="tag">Python 3.11+</span><span class="tag">FastAPI</span><span class="tag">SQLite WAL</span><span class="tag">Zero-API-Key Mode</span><span class="tag">Pytest (58 Modules)</span></div>
+            <div style="margin-top:22px;display:flex;gap:10px;flex-wrap:wrap"><a href="work/remote-job-hunter.html" class="btn primary mag" style="padding:8px 18px;font-size:.82rem">Interactive blueprint &amp; sim →</a><a href="https://github.com/manny-ruesch/remote-job-hunter" target="_blank" rel="noopener" class="btn mag" style="padding:8px 16px;font-size:.82rem">GitHub Repo (MIT) ↗</a></div>
+          </div>
+          <div class="pipeline-diagram">
+            <div class="step">
+              <span class="step-num">01 · INGRESS</span>
+              <span class="step-title">9 ATS Connectors</span>
+              <span class="step-desc">Ashby · GH · Lever · WTTJ</span>
+            </div>
+            <div class="arrow">→</div>
+            <div class="step critic-step">
+              <span class="step-num">02 · GATING</span>
+              <span class="step-title">ProfileScorer</span>
+              <span class="step-desc">Lookaround Regex + Gates</span>
+            </div>
+            <div class="arrow">→</div>
+            <div class="step judge-step">
+              <span class="step-num">03 · TRIAGE &amp; CV</span>
+              <span class="step-title">2-Pass / Zero-Key</span>
+              <span class="step-desc">Dossier + 1-Page A4 PDF</span>
             </div>
           </div>
         </div>
