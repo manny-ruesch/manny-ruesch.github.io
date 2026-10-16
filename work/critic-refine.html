@@ -43,13 +43,17 @@
 <header class="case-head">
   <div class="wrap">
     <a href="../index.html#work" class="backlink">← Work</a>
-    <div class="kicker">// autonomous agents · hermes agent skill</div>
+    <div class="kicker">// autonomous agents · hermes agent skill · v1.1.0</div>
     <h1>An autonomous committee that stress-tests AI code before you see it</h1>
-    <p class="lede">Single-pass LLMs produce code that compiles but crashes under edge cases. Critic-Refine simulates a 3-tier adversarial committee: a generator, a polymorphic domain critic, and a judge executing mental dry-runs with explicit trade-offs.</p>
+    <p class="lede">Single-pass LLMs suffer from "First-Draft Sycophancy"—they write code that compiles, rationalize their initial choices, and rubber-stamp their own self-reviews. Critic-Refine v1.1.0 enforces a 3-tier adversarial tribunal: a dense logical blueprint generator, an anti-complacent polymorphic critic (with Zero-Context Blind Audits), and a judge applying a strict deductive scoring rubric.</p>
+    <div style="margin:18px 0 24px;display:flex;gap:12px;flex-wrap:wrap">
+      <a href="https://github.com/manny-ruesch/critic-refine-skill" target="_blank" rel="noopener" class="btn primary mag" style="padding:9px 18px;font-size:.82rem">★ GitHub Repo (v1.1.0) ↗</a>
+      <a href="https://dev.to/reigen/why-your-ai-agent-lies-to-you-and-how-i-forced-mine-into-a-3-tier-adversarial-tribunal-5aba" target="_blank" rel="noopener" class="btn mag" style="padding:9px 16px;font-size:.82rem">Read Dev.to Deep-Dive ↗</a>
+    </div>
     <div class="metrics3">
-      <div><b>3-tier</b><span>Actor-Critic-Judge</span></div>
-      <div><b>0–100</b><span>Calibrated confidence</span></div>
-      <div><b>&lt; 8 s</b><span>In-turn turnaround</span></div>
+      <div><b>3-tier</b><span>Blueprint · Critic · Judge</span></div>
+      <div><b>100 - Δ</b><span>Deductive anti-sycophancy score</span></div>
+      <div><b>Blind Audit</b><span>Zero-context sub-agent isolation</span></div>
     </div>
   </div>
 </header>
@@ -58,18 +62,18 @@
 
 <section class="sec rv"><div class="wrap">
   <h2>The problem</h2>
-  <p>Single-pass AI generators suffer from structural complacency: they write code that looks clean, passes basic happy-path unit tests, and satisfies the prompt on the surface.</p>
+  <p>Single-pass AI generators suffer from structural complacency and <strong>retroactive rationalization</strong>: they commit to an architectural path in the first 150 tokens, write verbose boilerplate that passes basic happy-path tests, and fall in love with their own explanations when asked to self-review.</p>
   <p>In production, however, subtle failure modes remain undetected: floating-point precision imprecisions (<code>1e-16</code>) causing CPU micro-spins, silent <code>float('nan')</code> bypasses freezing thread pools, timing attacks in token comparisons, or memory leaks under concurrency. Standard chat assistants lack a built-in adversarial counterweight to catch these issues before handing code to the engineer.</p>
 </div></section>
 
 <section class="sec rv"><div class="wrap">
-  <h2>What I built</h2>
-  <p>A native, production-grade skill for <strong>Hermes Agent</strong> (v1.0.0) that intercepts complex engineering tasks and runs an internal 3-role committee before generating the final response.</p>
+  <h2>What I built (v1.1.0 Upgrade)</h2>
+  <p>An open-source, production-grade skill for <strong>Hermes Agent</strong> (v1.1.0) that intercepts high-stakes engineering tasks and runs an internal 3-phase adversarial tribunal before generating the final response.</p>
   <ul>
-    <li><strong>The Generator (Actor):</strong> Architectures the first-pass implementation, prioritizing functional coverage and core logic.</li>
-    <li><strong>The Polymorphic Critic:</strong> Dynamically adopts the domain persona of the harshest auditor (SecOps cryptographer, concurrency specialist, DBA, distributed systems engineer) to attack the solution.</li>
-    <li><strong>The Mental Dry-Run:</strong> The Judge executes mental stress tests on boundary conditions (null pointers, inf, network partitions, high contention) and triggers automated revision loops (max 3).</li>
-    <li><strong>Radical Trade-Off Transparency:</strong> The output documents what was intentionally sacrificed (e.g. latency vs. idempotency) alongside a 0–100 confidence score and residual production risks.</li>
+    <li><strong>Phase 1 — The Generator (Dense Logical Blueprint v1):</strong> Formalizes a compact technical blueprint (function signatures, state structs, concurrency locks, SQL/API flows) <em>without boilerplate or comments</em> to preserve context window attention and expose pure architecture.</li>
+    <li><strong>Phase 2 — The Polymorphic Critic (Anti-Complacency Rule):</strong> Dynamically adopts the harshest domain persona (Principal Rust Systems Engineer, Staff DBA, Lead SecOps Pentester) and is <strong>strictly forbidden from approving Draft v1 as-is</strong>—it must uncover at least 3 concrete failure vectors (or focus 80% of its attack on <code>mode:&lt;focus&gt;</code>).</li>
+    <li><strong>Phase 3 — The Arbitrating Judge (Mental Dry-Run &amp; Deductive Rubric):</strong> Simulates execution against hostile inputs (null payloads, integer overflows, 100x concurrency spikes, mid-transaction disk crashes), runs up to 2 internal feedback loops, and scores confidence deductively from 100 (<code>-5 pts</code> per unverified infra assumption, <code>-5 pts</code> per non-isolated external dependency, <code>-10 pts</code> per edge case delegated to the caller).</li>
+    <li><strong>Zero-Context Blind Audit (<code>delegate_task</code> Deep Mode):</strong> When touching <code>&gt;= 3 files</code> or invoked with <code>deep</code>, spawns an isolated Critic sub-agent that receives <em>only</em> the user prompt and Draft v1—stripping the Generator's reasoning to eliminate confirmation bias.</li>
   </ul>
 
   <!-- INTERACTIVE CRITIC-REFINE COMMITTEE SIMULATOR -->
@@ -132,10 +136,10 @@
 
     <!-- SPECS STRIP -->
     <div class="sim-specs">
-      <div><b>RUNTIME</b> <span>Hermes Agent native skill (v1.0.0)</span></div>
-      <div><b>TURNAROUND</b> <span>&lt; 8 seconds (Single in-turn COT)</span></div>
-      <div><b>MAX REVISIONS</b> <span>3 convergence passes</span></div>
-      <div><b>CONFIDENCE CALIBRATION</b> <span class="cost-tag">Brier score calibrated (0-100)</span></div>
+      <div><b>RUNTIME</b> <span>Hermes Agent native skill (v1.1.0)</span></div>
+      <div><b>BLIND AUDIT</b> <span><code>delegate_task</code> (&ge; 3 files or <code>deep</code>)</span></div>
+      <div><b>MAX REVISIONS</b> <span>2 internal feedback loops</span></div>
+      <div><b>DEDUCTIVE RUBRIC</b> <span class="cost-tag">100 base (-5 infra / -5 dep / -10 edge)</span></div>
     </div>
   </div>
 
@@ -218,9 +222,9 @@
         <rect x="164" y="48" width="150" height="52" rx="4" fill="#000000"/>
         <rect x="160" y="44" width="150" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
         <rect x="166" y="50" width="56" height="11" rx="2" fill="#000000"/>
-        <text x="194" y="59" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">ROLE #1</text>
+        <text x="194" y="59" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">PHASE #1</text>
         <text x="235" y="70" font-family="'Space Grotesk'" font-size="13.5" font-weight="800" fill="#000000" text-anchor="middle">01 · Generator</text>
-        <text x="235" y="84" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">first-pass solution</text>
+        <text x="235" y="84" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">dense Blueprint v1</text>
       </g>
 
       <!-- 03: POLYMORPHIC CRITIC -->
@@ -229,9 +233,9 @@
         <rect x="350" y="36" width="180" height="66" rx="4" fill="#FFF2F4" stroke="#FF385C" stroke-width="3"/>
         <circle cx="366" cy="50" r="3.5" fill="#FF385C"/>
         <circle cx="366" cy="50" r="3.5" stroke="#FF385C" fill="none" class="diag-ping"/>
-        <text x="378" y="53" fill="#FF385C" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800">✦ ADVERSARIAL ROLE #2</text>
+        <text x="378" y="53" fill="#FF385C" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800">✦ BLIND CRITIC #2</text>
         <text x="440" y="72" font-family="'Space Grotesk'" font-size="14.5" font-weight="800" fill="#FF385C" text-anchor="middle">Polymorphic Critic</text>
-        <text x="440" y="88" font-family="'JetBrains Mono'" font-size="9" font-weight="700" fill="#000000" text-anchor="middle">SecOps · Concurrency · DBA</text>
+        <text x="440" y="88" font-family="'JetBrains Mono'" font-size="9" font-weight="700" fill="#000000" text-anchor="middle">&ge;3 flaws · mode:&lt;focus&gt;</text>
       </g>
 
       <!-- 04: JUDGE ARBITRATOR -->
@@ -239,9 +243,9 @@
         <rect x="574" y="42" width="150" height="62" rx="4" fill="#000000"/>
         <rect x="570" y="38" width="150" height="62" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
         <rect x="576" y="44" width="56" height="11" rx="2" fill="#000000"/>
-        <text x="604" y="53" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">ROLE #3</text>
+        <text x="604" y="53" fill="#FFFFFF" font-family="'JetBrains Mono'" font-size="7.5" font-weight="800" text-anchor="middle">PHASE #3</text>
         <text x="645" y="68" font-family="'Space Grotesk'" font-size="13.5" font-weight="800" fill="#000000" text-anchor="middle">Judge Arbitrator</text>
-        <text x="645" y="84" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">dry-run &amp; trade-offs</text>
+        <text x="645" y="84" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">dry-run &amp; -5/-5/-10</text>
       </g>
 
       <!-- 05: OUTPUT REPORT -->
@@ -249,15 +253,15 @@
         <rect x="764" y="48" width="146" height="52" rx="4" fill="#000000"/>
         <rect x="760" y="44" width="146" height="52" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
         <text x="833" y="66" font-family="'Space Grotesk'" font-size="13.5" font-weight="800" fill="#000000" text-anchor="middle">Output Report</text>
-        <text x="833" y="80" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">audit + calibrated fix</text>
+        <text x="833" y="80" font-family="'JetBrains Mono'" font-size="9.5" font-weight="600" fill="#555555" text-anchor="middle">1:1 trace + deductive</text>
       </g>
 
       <!-- 06: ITERATION LOOP BADGE -->
       <g class="diag-node">
         <rect x="274" y="148" width="220" height="38" rx="4" fill="#000000"/>
         <rect x="270" y="144" width="220" height="38" rx="4" fill="#FFFFFF" stroke="#000000" stroke-width="2"/>
-        <text x="380" y="162" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">Iteration Loop (max 3x)</text>
-        <text x="380" y="174" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">if critical vulnerabilities found</text>
+        <text x="380" y="162" font-family="'Space Grotesk'" font-size="12" font-weight="800" fill="#000000" text-anchor="middle">Feedback Loop (max 2x)</text>
+        <text x="380" y="174" font-family="'JetBrains Mono'" font-size="8.5" font-weight="600" fill="#555555" text-anchor="middle">anti-complacency: &ge;3 flaws required</text>
       </g>
     </svg>
   </div>
@@ -298,16 +302,16 @@
 
   <div class="callout decision">
     <span class="badge">DECISION</span>
-    <h3>In-turn multi-persona reasoning vs. isolated subagent processes</h3>
-    <p>Hermes Agent can spawn independent background OS subagents via <code>delegate_task</code>, each with isolated terminal and context. While powerful, multi-agent spawning incurs 30 to 60 seconds of process coordination latency.</p>
-    <p class="outcome"><b>TRADE-OFF</b> For 95% of tasks, Critic-Refine executes as a sequential multi-role Chain-of-Thought in a single fast turn (&lt; 8 seconds). Background subagents are reserved only for full repository deep-dives and terminal execution suites.</p>
+    <h3>Zero-Context Blind Audit vs. In-Turn Scratchpad</h3>
+    <p>When an LLM reviews its own code inside a single context window, it reads the Generator's persuasive justifications alongside the code, triggering confirmation bias. However, spawning OS sub-agents via <code>delegate_task</code> on trivial single-file snippets adds unnecessary coordination latency.</p>
+    <p class="outcome"><b>TRADE-OFF</b> In v1.1.0, single-file tasks run in-turn via a dense logical blueprint (zero boilerplate). As soon as a task touches <code>&gt;= 3 files</code> or includes the <code>deep</code> flag, Critic-Refine triggers a <strong>Zero-Context Blind Audit</strong> via <code>delegate_task</code>—passing <em>only</em> the raw prompt and Draft v1 to the Critic sub-agent without the Generator's reasoning.</p>
   </div>
 
   <div class="callout pitfall">
     <span class="badge">PITFALL</span>
-    <h3>The illusion of "flawless" AI code</h3>
-    <p>Most AI assistants present their code as universally optimal. In real software engineering, every production decision involves trade-offs: mutexes prevent race conditions but introduce lock contention; synchronous fsync ensures durability but throttles throughput.</p>
-    <p class="outcome"><b>DECISION</b> The Judge is strictly forbidden from claiming perfection. It must explicitly articulate the trade-offs made and score the residual risks before clearing deployment.</p>
+    <h3>The illusion of "flawless" 98/100 AI scores</h3>
+    <p>Left to grade themselves, LLMs hallucinate arbitrary 95–98% confidence scores and present their code as universally optimal. In real engineering, every production fix involves trade-offs (e.g., mutex lock contention vs. thread safety) and residual assumptions.</p>
+    <p class="outcome"><b>DECISION</b> v1.1.0 replaces "vibes-based" scoring with a <strong>strict deductive rubric starting at 100</strong>: <code>-5 pts</code> per unverified infra assumption, <code>-5 pts</code> per non-isolated external dependency, and <code>-10 pts</code> per edge case delegated to the caller—paired with 2 mandatory production monitoring alerts.</p>
   </div>
 
 </div></section>
