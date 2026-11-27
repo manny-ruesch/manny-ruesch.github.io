@@ -1,0 +1,5 @@
+Empty apartments photograph badly and cost €400 to stage.
+
+We built a 53-node n8n pipeline that stages listing photos in ~33 seconds. Over 170 properties staged every month at €0.10 per render.
+
+Case study & architecture breakdown: https://manny-ruesch.github.io/work/staging

@@ -1,0 +1,4 @@
+Introducing the systems that give small teams AI superpowers: 32 active production workflows, 720+ automated ops/month, and end-to-end multi-agent pipelines. 
+
+Designed and shipped by Manny Ruesch.
+Check the work: https://manny-ruesch.github.io

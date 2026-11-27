@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>AI Home-Staging Pipeline · Launch Brag</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700;800&family=Space+Grotesk:wght@600;700;800&display=swap');
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg: #F0F0F0;
+        --surface: #FFFFFF;
+        --border: #000000;
+        --acc: #FF385C;
+        --text: #0A0A0A;
+        --muted: #444444;
+        --shadow: 6px 6px 0px #000000;
+        --shadow-lg: 10px 10px 0px #000000;
+      }
+
+      html, body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--bg);
+        font-family: 'Space Grotesk', -apple-system, sans-serif;
+        color: var(--text);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      .mono {
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      .sans {
+        font-family: 'Inter', sans-serif;
+      }
+
+      .bg-grid {
+        position: absolute;
+        inset: 0;
+        background-image: 
+          linear-gradient(to right, rgba(0,0,0,0.06) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(0,0,0,0.06) 1px, transparent 1px);
+        background-size: 40px 40px;
+        pointer-events: none;
+      }
+
+      .scene {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 80px;
+      }
+
+      /* Scene 1: Hook */
+      .hook-badge {
+        background: #FFFFFF;
+        color: #000000;
+        border: 3px solid var(--border);
+        box-shadow: var(--shadow);
+        padding: 12px 24px;
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 32px;
+      }
+
+      .hook-title {
+        font-size: 80px;
+        font-weight: 800;
+        line-height: 1.1;
+        text-align: center;
+        max-width: 1400px;
+        letter-spacing: -0.02em;
+        margin-bottom: 36px;
+      }
+
+      .hook-card {
+        background: #FFFFFF;
+        border: 3px solid var(--border);
+        box-shadow: var(--shadow-lg);
+        padding: 24px 44px;
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        border-radius: 4px;
+      }
+
+      .hook-card .pill-red {
+        background: #000000;
+        color: #FFFFFF;
+        padding: 8px 16px;
+        font-size: 20px;
+        font-weight: 800;
+        border: 2px solid var(--border);
+      }
+
+      .hook-card .txt {
+        font-size: 26px;
+        font-weight: 700;
+        color: #222222;
+      }
+
+      /* Scene 2: Reveal Split Screen */
+      .reveal-head {
+        font-size: 44px;
+        font-weight: 800;
+        text-align: center;
+        letter-spacing: -0.01em;
+        margin-bottom: 32px;
+        color: #0A0A0A;
+      }
+
+      .reveal-head .acc-txt {
+        background: #000000;
+        color: #FFFFFF;
+        padding: 4px 14px;
+        border: 2px solid var(--border);
+        display: inline-block;
+      }
+
+      .split-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        width: 100%;
+        max-width: 1600px;
+        height: 640px;
+      }
+
+      .split-card {
+        position: relative;
+        background: #000000;
+        border: 4px solid var(--border);
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+        border-radius: 6px;
+        height: 100%;
+      }
+
+      .split-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .split-tag {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background: #FFFFFF;
+        color: #000000;
+        border: 3px solid var(--border);
+        padding: 8px 18px;
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        box-shadow: var(--shadow);
+        text-transform: uppercase;
+      }
+
+      .split-tag.tag-after {
+        background: #000000;
+        color: #FFFFFF;
+      }
+
+      /* Scene 3: Specs */
+      .specs-title {
+        font-size: 58px;
+        font-weight: 800;
+        text-align: center;
+        margin-bottom: 40px;
+        letter-spacing: -0.02em;
+      }
+
+      .specs-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 36px;
+        width: 100%;
+        max-width: 1500px;
+        margin-bottom: 44px;
+      }
+
+      .spec-card {
+        background: #FFFFFF;
+        border: 3px solid var(--border);
+        box-shadow: var(--shadow);
+        padding: 44px 32px;
+        text-align: center;
+        border-radius: 4px;
+      }
+
+      .spec-num {
+        font-size: 80px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        margin-bottom: 12px;
+      }
+
+      .spec-num span {
+        color: var(--acc);
+      }
+
+      .spec-lbl {
+        font-size: 18px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+      }
+
+      .tags-row {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .mode-tag {
+        background: #FFFFFF;
+        border: 2px solid var(--border);
+        padding: 10px 22px;
+        font-size: 18px;
+        font-weight: 800;
+        box-shadow: var(--shadow);
+        text-transform: uppercase;
+      }
+
+      /* Scene 4: Outro */
+      .monogram-box {
+        width: 140px;
+        height: 140px;
+        background: var(--acc);
+        border: 4px solid var(--border);
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 64px;
+        font-weight: 900;
+        color: #FFFFFF;
+        margin-bottom: 32px;
+        letter-spacing: -0.05em;
+      }
+
+      .outro-title {
+        font-size: 72px;
+        font-weight: 800;
+        text-align: center;
+        margin-bottom: 24px;
+        letter-spacing: -0.02em;
+      }
+
+      .outro-pill {
+        background: #000000;
+        color: #FFFFFF;
+        border: 3px solid var(--border);
+        box-shadow: var(--shadow);
+        padding: 16px 40px;
+        font-size: 26px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        margin-bottom: 24px;
+      }
+
+      .outro-sub {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="23"
+      data-width="1920"
+      data-height="1080"
+    >
+      <div class="bg-grid"></div>
+
+      <!-- AUDIO TRACKS -->
+      <audio
+        id="bgm"
+        class="clip"
+        src="assets/music/happy-beats-business-moves-vol-1-by-ende-dot-app.mp3"
+        data-start="0"
+        data-duration="23"
+        data-track-index="1"
+        data-volume="0.8"
+        data-automation='{"version":1,"lanes":[{"target":"volume","points":[{"t":0,"v":0.8},{"t":0.4,"v":0.18},{"t":21.2,"v":0.18},{"t":21.8,"v":0.85}]}]}'
+      ></audio>
+
+      <!-- NARRATOR VOICEOVER -->
+      <audio
+        id="vo"
+        class="clip"
+        src="assets/voiceover_staging.mp3"
+        data-start="0.4"
+        data-duration="21.1"
+        data-track-index="3"
+        data-volume="1.0"
+      ></audio>
+
+      <!-- SFX -->
+      <audio
+        id="sfx1"
+        class="clip"
+        src="assets/sfx/ui/switch1.ogg"
+        data-start="0.4"
+        data-duration="0.31"
+        data-track-index="2"
+        data-volume="0.8"
+      ></audio>
+
+      <audio
+        id="sfx-reveal"
+        class="clip"
+        src="assets/sfx/interface/switch_001.ogg"
+        data-start="4.8"
+        data-duration="0.62"
+        data-track-index="2"
+        data-volume="0.9"
+      ></audio>
+
+      <audio
+        id="sfx-specs"
+        class="clip"
+        src="assets/sfx/impact/impactGeneric_light_000.ogg"
+        data-start="11.5"
+        data-duration="0.15"
+        data-track-index="2"
+        data-volume="0.9"
+      ></audio>
+
+      <audio
+        id="sfx-final"
+        class="clip"
+        src="assets/sfx/impact/impactGeneric_light_000.ogg"
+        data-start="17.5"
+        data-duration="0.15"
+        data-track-index="2"
+        data-volume="0.9"
+      ></audio>
+
+      <!-- SCENE 1: HOOK (0.0s - 4.6s) -->
+      <div id="scene1" class="scene clip" data-start="0" data-duration="4.7" data-track-index="0">
+        <div id="h-badge" class="hook-badge mono">Real-Estate AI Automation</div>
+        <h1 id="h-title" class="hook-title">
+          Empty apartments photograph badly and sell slowly.
+        </h1>
+        <div id="h-card" class="hook-card">
+          <div class="pill-red mono">OLD WAY</div>
+          <div class="txt">Physical staging costs €150 – €400 &amp; takes days to schedule</div>
+        </div>
+      </div>
+
+      <!-- SCENE 2: THE REVEAL (4.6s - 11.5s) -->
+      <div id="scene2" class="scene clip" data-start="4.6" data-duration="7.0" data-track-index="0">
+        <h2 id="r-head" class="reveal-head">
+          Raw photo in. <span class="acc-txt">AI-furnished interior out in ~33 seconds.</span>
+        </h2>
+        <div class="split-container">
+          <div id="r-before" class="split-card">
+            <img src="assets/img/staging-before.png" alt="Empty room before staging" />
+            <div class="split-tag mono">BEFORE · RAW LISTING</div>
+          </div>
+          <div id="r-after" class="split-card">
+            <img src="assets/img/staging-after.png" alt="AI-furnished room after staging" />
+            <div class="split-tag tag-after mono">AFTER · AI STAGED (~33s)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCENE 3: PRODUCTION SPECS (11.5s - 17.5s) -->
+      <div id="scene3" class="scene clip" data-start="11.5" data-duration="6.1" data-track-index="0">
+        <h2 id="s-title" class="specs-title">53 n8n Nodes in Production 24/7</h2>
+        <div class="specs-grid">
+          <div id="s-card-1" class="spec-card">
+            <div class="spec-num mono">~33<span>s</span></div>
+            <div class="spec-lbl mono">Per Furnished Room</div>
+          </div>
+          <div id="s-card-2" class="spec-card">
+            <div class="spec-num mono">~175<span>/m</span></div>
+            <div class="spec-lbl mono">Listings Staged Monthly</div>
+          </div>
+          <div id="s-card-3" class="spec-card">
+            <div class="spec-num mono">€0.10<span></span></div>
+            <div class="spec-lbl mono">Cost vs €400 Physical Shoot</div>
+          </div>
+        </div>
+        <div id="s-tags" class="tags-row mono">
+          <div class="mode-tag">Furnish</div>
+          <div class="mode-tag">Declutter</div>
+          <div class="mode-tag">Empty</div>
+          <div class="mode-tag">Upscale</div>
+          <div class="mode-tag">30 Styles Filtered by Room</div>
+        </div>
+      </div>
+
+      <!-- SCENE 4: OUTRO (17.5s - 23.0s) -->
+      <div id="scene4" class="scene clip" data-start="17.5" data-duration="5.5" data-track-index="0">
+        <div id="o-logo" class="monogram-box mono">MR</div>
+        <h2 id="o-title" class="outro-title">Real estate marketing at machine speed.</h2>
+        <div id="o-pill" class="outro-pill mono">manny-ruesch.github.io/work/staging</div>
+        <p id="o-sub" class="outro-sub mono">Built &amp; shipped by Manny Ruesch</p>
+      </div>
+
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+
+      // Scene 1: Hook (0.0 to 4.6s)
+      tl.fromTo("#h-badge", { opacity: 0, y: -30 }, { opacity: 1, y: 0, duration: 0.5, ease: "back.out(1.7)" }, 0.2)
+        .fromTo("#h-title", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.5)
+        .fromTo("#h-card", { opacity: 0, scale: 0.95 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.5)" }, 1.2)
+        .to(["#h-badge", "#h-title", "#h-card"], { opacity: 0, y: -20, duration: 0.4, ease: "power2.in" }, 4.2);
+
+      // Scene 2: Reveal (4.6 to 11.5s)
+      tl.fromTo("#r-head", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 4.7)
+        .fromTo("#r-before", { opacity: 0, x: -60 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 5.0)
+        .fromTo("#r-after", { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 5.3)
+        .to(["#r-head", "#r-before", "#r-after"], { opacity: 0, y: -30, duration: 0.4, ease: "power2.in" }, 11.0);
+
+      // Scene 3: Specs (11.5 to 17.5s)
+      tl.fromTo("#s-title", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 11.6)
+        .fromTo("#s-card-1", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 11.9)
+        .fromTo("#s-card-2", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 12.3)
+        .fromTo("#s-card-3", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 12.7)
+        .fromTo("#s-tags", { opacity: 0, scale: 0.95 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.5)" }, 13.2)
+        .to(["#s-title", ".spec-card", "#s-tags"], { opacity: 0, y: -30, duration: 0.4, ease: "power2.in" }, 17.0);
+
+      // Scene 4: Outro (17.5 to 23.0s)
+      tl.fromTo("#o-logo", { opacity: 0, scale: 0.6, rotation: -8 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.5, ease: "back.out(2)" }, 17.6)
+        .fromTo("#o-title", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 18.0)
+        .fromTo("#o-pill", { opacity: 0, scale: 0.95 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(1.7)" }, 18.5)
+        .fromTo("#o-sub", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, 19.0)
+        .to("#root", { opacity: 0.98, duration: 3.0 }, 20.0);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

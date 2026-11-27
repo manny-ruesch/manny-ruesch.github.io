@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>Manny Ruesch · Launch Brag</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700;800&family=Space+Grotesk:wght@600;700;800&display=swap');
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg: #F0F0F0;
+        --surface: #FFFFFF;
+        --border: #000000;
+        --acc: #FF385C;
+        --text: #0A0A0A;
+        --muted: #444444;
+        --shadow: 6px 6px 0px #000000;
+        --shadow-lg: 10px 10px 0px #000000;
+      }
+
+      html, body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--bg);
+        font-family: 'Space Grotesk', -apple-system, sans-serif;
+        color: var(--text);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      .mono {
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      .sans {
+        font-family: 'Inter', sans-serif;
+      }
+
+      /* Grid background */
+      .bg-grid {
+        position: absolute;
+        inset: 0;
+        background-image: 
+          linear-gradient(to right, rgba(0,0,0,0.06) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(0,0,0,0.06) 1px, transparent 1px);
+        background-size: 40px 40px;
+        pointer-events: none;
+      }
+
+      /* Scene common */
+      .scene {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 80px;
+      }
+
+      /* Scene 1: Hook */
+      .hook-badge {
+        background: #FFFFFF;
+        color: #000000;
+        border: 3px solid var(--border);
+        box-shadow: var(--shadow);
+        padding: 12px 24px;
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 36px;
+      }
+
+      .hook-badge span {
+        color: var(--acc);
+      }
+
+      .hook-title {
+        font-size: 78px;
+        font-weight: 800;
+        line-height: 1.1;
+        text-align: center;
+        max-width: 1400px;
+        letter-spacing: -0.02em;
+        margin-bottom: 30px;
+      }
+
+      .hook-title .highlight {
+        background: var(--acc);
+        color: #FFFFFF;
+        padding: 4px 18px;
+        border: 3px solid var(--border);
+        box-shadow: var(--shadow);
+        display: inline-block;
+      }
+
+      .hook-sub {
+        font-size: 28px;
+        color: var(--muted);
+        font-weight: 700;
+        text-align: center;
+      }
+
+      /* Scene 2: Metrics */
+      .sec-eyebrow {
+        background: #000000;
+        color: #FFFFFF;
+        border: 3px solid var(--border);
+        padding: 10px 24px;
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 50px;
+      }
+
+      .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 32px;
+        width: 100%;
+        max-width: 1600px;
+      }
+
+      .metric-card {
+        background: #FFFFFF;
+        border: 3px solid var(--border);
+        box-shadow: var(--shadow);
+        padding: 48px 36px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+      }
+
+      .metric-val {
+        font-size: 72px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        color: #000000;
+        margin-bottom: 12px;
+      }
+
+      .metric-val .acc {
+        color: var(--acc);
+      }
+
+      .metric-lbl {
+        font-size: 17px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+      }
+
+      /* Scene 3: Showroom */
+      .show-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 36px;
+        width: 100%;
+        max-width: 1600px;
+      }
+
+      .show-card {
+        background: #FFFFFF;
+        border: 3px solid var(--border);
+        box-shadow: var(--shadow);
+        padding: 44px 36px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .show-tag {
+        align-self: flex-start;
+        background: var(--bg);
+        border: 2px solid var(--border);
+        padding: 6px 14px;
+        font-size: 15px;
+        font-weight: 800;
+        text-transform: uppercase;
+        margin-bottom: 24px;
+      }
+
+      .show-card h3 {
+        font-size: 32px;
+        font-weight: 800;
+        margin-bottom: 16px;
+        letter-spacing: -0.01em;
+      }
+
+      .show-card p {
+        font-size: 20px;
+        line-height: 1.5;
+        color: var(--muted);
+        font-weight: 600;
+      }
+
+      /* Scene 4: Outro */
+      .monogram-box {
+        width: 140px;
+        height: 140px;
+        background: var(--acc);
+        border: 4px solid var(--border);
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 64px;
+        font-weight: 900;
+        color: #FFFFFF;
+        margin-bottom: 36px;
+        letter-spacing: -0.05em;
+      }
+
+      .outro-title {
+        font-size: 74px;
+        font-weight: 800;
+        text-align: center;
+        margin-bottom: 28px;
+        letter-spacing: -0.02em;
+      }
+
+      .outro-pill {
+        background: #000000;
+        color: #FFFFFF;
+        border: 3px solid var(--border);
+        box-shadow: var(--shadow);
+        padding: 16px 36px;
+        font-size: 26px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        margin-bottom: 24px;
+      }
+
+      .outro-tagline {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="18"
+      data-width="1920"
+      data-height="1080"
+    >
+      <div class="bg-grid"></div>
+
+      <!-- AUDIO TRACKS -->
+      <audio
+        id="bgm"
+        class="clip"
+        src="assets/music/happy-beats-business-moves-vol-1-by-ende-dot-app.mp3"
+        data-start="0"
+        data-duration="18"
+        data-track-index="1"
+        data-volume="0.8"
+        data-automation='{"version":1,"lanes":[{"target":"volume","points":[{"t":0,"v":0.8},{"t":0.4,"v":0.20},{"t":15.0,"v":0.20},{"t":15.6,"v":0.8}]}]}'
+      ></audio>
+
+      <!-- VOICEOVER NARRATOR TRACK -->
+      <audio
+        id="vo"
+        class="clip"
+        src="assets/voiceover_en.mp3"
+        data-start="0.5"
+        data-duration="14.8"
+        data-track-index="3"
+        data-volume="1.0"
+      ></audio>
+
+      <audio
+        id="sfx1"
+        class="clip"
+        src="assets/sfx/ui/switch1.ogg"
+        data-start="0.4"
+        data-duration="0.31"
+        data-track-index="2"
+        data-volume="0.8"
+      ></audio>
+
+      <audio
+        id="sfx-c1"
+        class="clip"
+        src="assets/sfx/interface/switch_001.ogg"
+        data-start="3.6"
+        data-duration="0.62"
+        data-track-index="2"
+        data-volume="0.7"
+      ></audio>
+
+      <audio
+        id="sfx-c2"
+        class="clip"
+        src="assets/sfx/interface/switch_001.ogg"
+        data-start="4.6"
+        data-duration="0.62"
+        data-track-index="2"
+        data-volume="0.7"
+      ></audio>
+
+      <audio
+        id="sfx-c3"
+        class="clip"
+        src="assets/sfx/interface/switch_001.ogg"
+        data-start="5.6"
+        data-duration="0.62"
+        data-track-index="2"
+        data-volume="0.7"
+      ></audio>
+
+      <audio
+        id="sfx-impact"
+        class="clip"
+        src="assets/sfx/impact/impactGeneric_light_000.ogg"
+        data-start="8.0"
+        data-duration="0.15"
+        data-track-index="2"
+        data-volume="0.9"
+      ></audio>
+
+      <audio
+        id="sfx-final"
+        class="clip"
+        src="assets/sfx/impact/impactGeneric_light_000.ogg"
+        data-start="13.5"
+        data-duration="0.15"
+        data-track-index="2"
+        data-volume="0.9"
+      ></audio>
+
+      <!-- SCENE 1: HOOK (0 - 3.5s) -->
+      <div id="scene1" class="scene clip" data-start="0" data-duration="3.6" data-track-index="0">
+        <div id="h-badge" class="hook-badge mono"><span>●</span> Berlin · AI & Automation Systems</div>
+        <h1 id="h-title" class="hook-title">
+          What happens when small teams get <span class="highlight">AI superpowers</span>?
+        </h1>
+        <p id="h-sub" class="hook-sub mono">Manny Ruesch · End-to-End Autonomous Pipelines</p>
+      </div>
+
+      <!-- SCENE 2: METRICS (3.5 - 8.0s) -->
+      <div id="scene2" class="scene clip" data-start="3.5" data-duration="4.6" data-track-index="0">
+        <div id="m-eyebrow" class="sec-eyebrow mono">// Production Track Record</div>
+        <div class="metrics-grid">
+          <div id="m-card-1" class="metric-card">
+            <div class="metric-val mono">32<span class="acc">+</span></div>
+            <div class="metric-lbl mono">Active Workflows</div>
+          </div>
+          <div id="m-card-2" class="metric-card">
+            <div class="metric-val mono">~720<span class="acc">/m</span></div>
+            <div class="metric-lbl mono">Operations Run</div>
+          </div>
+          <div id="m-card-3" class="metric-card">
+            <div class="metric-val mono">~350<span class="acc">h</span></div>
+            <div class="metric-lbl mono">Saved Monthly</div>
+          </div>
+          <div id="m-card-4" class="metric-card">
+            <div class="metric-val mono">3<span class="acc">L</span></div>
+            <div class="metric-lbl mono">DE · EN · FR</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCENE 3: SHOWCASE (8.0 - 13.5s) -->
+      <div id="scene3" class="scene clip" data-start="8.0" data-duration="5.6" data-track-index="0">
+        <div id="s-eyebrow" class="sec-eyebrow mono">// Systems Shipped in Production</div>
+        <div class="show-grid">
+          <div id="s-card-1" class="show-card">
+            <div class="show-tag mono">Autonomous</div>
+            <h3>E-Commerce Pipeline</h3>
+            <p class="sans">Zero-touch multi-channel publishing to Gumroad & Whop, AI copywriting, Discord alerts & Task Scheduler automation.</p>
+          </div>
+          <div id="s-card-2" class="show-card">
+            <div class="show-tag mono">Computer Vision</div>
+            <h3>Real-Estate Staging</h3>
+            <p class="sans">Generative AI interior design pipelines and marketing workflows built for high-growth brokerage teams.</p>
+          </div>
+          <div id="s-card-3" class="show-card">
+            <div class="show-tag mono">Orchestration</div>
+            <h3>Autonomous Agents</h3>
+            <p class="sans">Self-healing scrapers, webhook listeners, API synchronizers and LLM pipelines running 24/7 with zero bottlenecks.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCENE 4: OUTRO (13.5 - 18.0s) -->
+      <div id="scene4" class="scene clip" data-start="13.5" data-duration="4.5" data-track-index="0">
+        <div id="o-logo" class="monogram-box mono">MR</div>
+        <h2 id="o-title" class="outro-title">Designed &amp; shipped end-to-end.</h2>
+        <div id="o-pill" class="outro-pill mono">manny-ruesch.github.io</div>
+        <p id="o-tag" class="outro-tagline mono">Systems that run on their own.</p>
+      </div>
+
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+
+      // Scene 1: Hook (0 to 3.5s)
+      tl.fromTo("#h-badge", { opacity: 0, y: -30, scale: 0.95 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.7)" }, 0.2)
+        .fromTo("#h-title", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.4)
+        .fromTo("#h-sub", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.8)
+        .to(["#h-badge", "#h-title", "#h-sub"], { opacity: 0, y: -20, duration: 0.3, ease: "power2.in" }, 3.2);
+
+      // Scene 2: Metrics (3.5 to 8.0s)
+      tl.fromTo("#m-eyebrow", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.5)" }, 3.52)
+        .fromTo("#m-card-1", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 3.65)
+        .fromTo("#m-card-2", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 4.15)
+        .fromTo("#m-card-3", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 4.65)
+        .fromTo("#m-card-4", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 5.15)
+        .to(["#m-eyebrow", ".metric-card"], { opacity: 0, y: -30, duration: 0.35, ease: "power2.in" }, 7.6);
+
+      // Scene 3: Showcase (8.0 to 13.5s)
+      tl.fromTo("#s-eyebrow", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.5)" }, 8.02)
+        .fromTo("#s-card-1", { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 8.2)
+        .fromTo("#s-card-2", { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 8.6)
+        .fromTo("#s-card-3", { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 9.0)
+        .to(["#s-eyebrow", ".show-card"], { opacity: 0, y: -30, duration: 0.4, ease: "power2.in" }, 13.1);
+
+      // Scene 4: Outro (13.5 to 18.0s)
+      tl.fromTo("#o-logo", { opacity: 0, scale: 0.6, rotation: -8 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.5, ease: "back.out(2)" }, 13.51)
+        .fromTo("#o-title", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 13.8)
+        .fromTo("#o-pill", { opacity: 0, scale: 0.95 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(1.7)" }, 14.2)
+        .fromTo("#o-tag", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, 14.6)
+        .to("#root", { opacity: 0.98, duration: 2.0 }, 16.0); // Holds until 18s
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
